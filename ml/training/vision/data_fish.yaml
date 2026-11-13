@@ -1,0 +1,10 @@
+# Class order must match the `classes` list registered for vision_fish (app/core/vision.py FISH_CLASSES).
+path: ../data/vision/fish
+train: images/train
+val: images/val
+test: images/test
+names:
+  0: fresh
+  1: discoloured_skin
+  2: damaged_torn
+  3: sunken_eye

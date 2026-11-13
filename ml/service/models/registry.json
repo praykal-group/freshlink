@@ -1,3 +1,16 @@
 {
-  "models": {}
+  "models": {
+    "vision_fish": {
+      "active": null,
+      "versions": {}
+    },
+    "vision_produce": {
+      "active": null,
+      "versions": {}
+    },
+    "shelf_life_cox": {
+      "active": null,
+      "versions": {}
+    }
+  }
 }

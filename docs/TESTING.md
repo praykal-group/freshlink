@@ -82,6 +82,29 @@ The M1 test suite was **not run**, by user instruction (D-26). What was actually
 - Full batch lifecycle through the API; concurrent code allocation; storage capacity under concurrency
 - Trace page rendered on a phone browser
 
+### M5 — 2026-11-13
+**ML service** (`cd ml/service && .venv/Scripts/python -m pytest -q`, Python 3.10 locally, D-60): **45 passed.**
+
+| File | Covers |
+|------|--------|
+| `tests/test_vision_logic.py` | Grade rule: no defect → A; small defect → B; defects summing to 10 % → C; rot/mould → C; area relative to the item; no fresh box → whole image; nothing detected → A with confidence 0; batch = worst image. Letterbox; decoder maps boxes back; confidence 0.35 cut; class-wise NMS 0.5; class-count mismatch |
+| `tests/test_shelf_life.py` | **Q10 returns ≥ 0 and finite for all 10 seed products** over 7 temperatures × 4 ages; formula checks; curve half at total life; Cox at mean covariates = baseline median; elapsed subtraction + clamp; temperature coefficient shortens life; censoring flag; wrong feature list refused; fallback when no Cox |
+| `tests/test_api.py` | Token on every route; shelf life Q10 contract; **200 items answer in < 1 s** (local laptop); validation; registered Cox model is used; **vision 503 without a model**; vision contract end to end with a tiny constant-output ONNX model through the real loader, decoder and grade rule; **wrong sha256 → model not loaded**; exactly 3 URLs |
+| `tests/test_health.py` | 200 with token, 401 without, unset token rejects all |
+
+**Backend** (`cd server && npm test`): **15 suites, 162 tests, all pass.** New: `grading/grading.spec.ts` (photo selection; ML call shape; AUTO grade + batch + trace + shelf-life recompute; missing photos 409; ML down/no model → 503 with nothing stored; unreadable photo 422; shelf-life failure does not undo the grade; dispute once; resolve → MANUAL row; resolve guards), `shelf-life/shelf-life.spec.ts` (backend Q10 = ML numbers; ≥ 2 h trace rule; request shape; ML down → backend Q10; finished batches skipped; ML client token + error mapping).
+
+**Model metrics: NOT MEASURED.** No vision dataset or shelf-life observations exist yet, so there is no YOLOv8 or Cox model (D-57).
+| Target | Status |
+|--------|--------|
+| ML-01 mAP@0.5 ≥ 0.80, grade accuracy ≥ 85 % | Not measured: no model trained |
+| SYN-05 / ML-01 grading ≤ 3 s end to end (`--cpus 2` Docker) | Not measured: no model, Docker not installed |
+| ML-02 Cox C-index ≥ 0.75, error ≤ ±12 h | Not measured: no data; **Q10 fallback is the active method** |
+| ML-02 fallback returns ≥ 0 for every product | **Pass** (unit test above) |
+| Shelf-life answer < 1 s | **Pass** locally for 200 items (not on EC2-like CPU) |
+
+**Deferred M5 checks (NOT RUN):** backend e2e against the real ML container; latency on a `t3.large`-equivalent; a batch with 3 photos graded through the API (needs a model, S3 and a database).
+
 ## Measured metrics
 None yet.
 

@@ -86,3 +86,21 @@ cd server && npm test
 ```bash
 cd server && npm test
 ```
+
+## M5 — ML Service I: Vision Grading and Shelf-Life (2026-11-13)
+
+**Implemented**
+- `ml/service/app/core/`: `registry.py` (active versions, sha256 check), `vision.py` (letterbox, YOLOv8 decode, NMS, grade rule, ONNX wrapper), `shelf_life.py` (Q10, Weibull curve, Cox from parameters), `images.py` (parallel, size-capped photo download), `state.py`, `errors.py`; `schemas/api.py`; routers `vision.py`, `shelf_life.py`; `main.py` (lifespan model loading, error handlers, `/v1/models`).
+- `ml/training/`: `vision/train_yolo.py` + `data_{fish,produce}.yaml`, `shelf_life/train_cox.py`, `requirements-train.txt`, README, DATA_SOURCES templates.
+- `scripts/register_model.py`, `scripts/fetch_models.py` + `.sh`.
+- Backend: `infra/ml/ml-client.service.ts`; `modules/shelf-life` (service, Q10 copy, cargo-status stub); `modules/grading` (service, controller, photo selection); `BatchesService.loadForUser` made public; `FilesService.internalUrl`.
+
+**Tests:** ML 45 pass; backend 162 pass (TESTING.md). Model metrics not measured (no data).
+
+**Limitations / pending:** no datasets → no models (D-57); exposure-based shelf life waits for telemetry (M8, D-59); `cargo.status` is a log line until the realtime gateway (M7).
+
+**Repro**
+```bash
+cd ml/service && python -m venv .venv && .venv/Scripts/pip install -r requirements.txt -r requirements-dev.txt && .venv/Scripts/python -m pytest -q
+cd server && npm test
+```

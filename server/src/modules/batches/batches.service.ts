@@ -205,7 +205,7 @@ export class BatchesService {
   }
 
   async get(user: AuthUser, id: string) {
-    const batch = await this.load(user, id);
+    const batch = await this.loadForUser(user, id);
     const detail = await this.prisma.batch.findUniqueOrThrow({
       where: { id },
       include: {
@@ -219,7 +219,7 @@ export class BatchesService {
   }
 
   /** Loads a batch and applies the site ownership rule (operators: own site only). */
-  private async load(user: AuthUser, id: string): Promise<Batch> {
+  async loadForUser(user: AuthUser, id: string): Promise<Batch> {
     const batch = await this.prisma.batch.findUnique({ where: { id } });
     if (!batch) fail('NOT_FOUND', 'Batch not found', HttpStatus.NOT_FOUND);
     if (user.role === 'OPERATOR' && batch.currentSiteId !== user.siteId && batch.sourceSiteId !== user.siteId) {
@@ -238,7 +238,7 @@ export class BatchesService {
    * device time may not be in the future; the audit log keeps both times.
    */
   async update(user: AuthUser, id: string, dto: EditableBatchFieldsDto, editedAt?: Date) {
-    const batch = await this.load(user, id);
+    const batch = await this.loadForUser(user, id);
     Ownership.assertSite(user, batch.currentSiteId);
     const windowMin = await this.config.get('editWindowMin');
     const now = new Date();
@@ -255,7 +255,7 @@ export class BatchesService {
   }
 
   async createEditRequest(user: AuthUser, id: string, dto: EditRequestDto) {
-    const batch = await this.load(user, id);
+    const batch = await this.loadForUser(user, id);
     Ownership.assertSite(user, batch.currentSiteId);
     const changes = this.diff(batch, dto.changes);
     if (!Object.keys(changes).length) fail('NO_CHANGES', 'The request does not change anything', HttpStatus.BAD_REQUEST);
@@ -363,7 +363,7 @@ export class BatchesService {
   // ───────────────────────── tags and images ─────────────────────────
 
   async attachTag(user: AuthUser, id: string, dto: AttachTagDto) {
-    const batch = await this.load(user, id);
+    const batch = await this.loadForUser(user, id);
     Ownership.assertSite(user, batch.currentSiteId);
     const existing = await this.prisma.batchTag.findUnique({ where: { tagUid: dto.tagUid } });
     if (existing) {
@@ -378,7 +378,7 @@ export class BatchesService {
   }
 
   async attachImage(user: AuthUser, id: string, dto: AttachImageDto) {
-    const batch = await this.load(user, id);
+    const batch = await this.loadForUser(user, id);
     Ownership.assertSite(user, batch.currentSiteId);
     const again = await this.prisma.batchImage.findFirst({ where: { batchId: id, s3Key: dto.key } });
     if (again) return again;
@@ -405,13 +405,13 @@ export class BatchesService {
   // ───────────────────────── storage (SYN-10/20) ─────────────────────────
 
   async storagePath(user: AuthUser, id: string) {
-    const batch = await this.load(user, id);
+    const batch = await this.loadForUser(user, id);
     const product = await this.prisma.product.findUniqueOrThrow({ where: { id: batch.productId } });
     return this.storage.recommend({ product, grade: batch.currentGrade, siteId: batch.currentSiteId, weightKg: Number(batch.weightKg) });
   }
 
   async assignStorage(user: AuthUser, id: string, unitId: string) {
-    const batch = await this.load(user, id);
+    const batch = await this.loadForUser(user, id);
     Ownership.assertSite(user, batch.currentSiteId);
     if (!AT_SITE.includes(batch.status)) {
       fail('INVALID_STATUS', `Cannot store a batch with status ${batch.status}`, HttpStatus.CONFLICT);
@@ -492,7 +492,7 @@ export class BatchesService {
   // ───────────────────────── label, timeline, shelf life ─────────────────────────
 
   async label(user: AuthUser, id: string) {
-    const batch = await this.load(user, id);
+    const batch = await this.loadForUser(user, id);
     const [product, site] = await Promise.all([
       this.prisma.product.findUniqueOrThrow({ where: { id: batch.productId } }),
       this.prisma.site.findUniqueOrThrow({ where: { id: batch.sourceSiteId } }),
@@ -511,7 +511,7 @@ export class BatchesService {
   }
 
   async timeline(user: AuthUser, id: string) {
-    await this.load(user, id);
+    await this.loadForUser(user, id);
     const events = await this.trace.events(id);
     const verdict = await this.trace.verify(id);
     return {
@@ -529,7 +529,7 @@ export class BatchesService {
   }
 
   async shelfLife(user: AuthUser, id: string) {
-    const batch = await this.load(user, id);
+    const batch = await this.loadForUser(user, id);
     const estimates = await this.prisma.shelfLifeEstimate.findMany({ where: { batchId: id }, orderBy: { createdAt: 'desc' }, take: 20 });
     return {
       remainingShelfLifeH: num(batch.remainingShelfLifeH),

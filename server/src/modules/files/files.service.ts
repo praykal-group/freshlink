@@ -51,6 +51,11 @@ export class FilesService {
     return { key, purpose: parsed.purpose, sizeBytes: info.sizeBytes, contentType: info.contentType };
   }
 
+  /** Server-side presigned GET for internal consumers (the ML service). No user check: callers own the batch check. */
+  internalUrl(key: string, expiresIn = 300): Promise<string> {
+    return this.s3.presignGet(key, expiresIn);
+  }
+
   /** Presigned GET (5 min). Managers/admins can read any file; others only what they uploaded. */
   async downloadUrl(user: AuthUser, key: string) {
     if (!parseKey(key)) throw new AppError('INVALID_FILE_KEY', 'Unknown file key', HttpStatus.NOT_FOUND);

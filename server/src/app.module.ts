@@ -15,6 +15,8 @@ import { PrismaModule } from './infra/prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { BatchesModule } from './modules/batches/batches.module';
 import { FilesModule } from './modules/files/files.module';
+import { GradingModule } from './modules/grading/grading.module';
+import { ShelfLifeModule } from './modules/shelf-life/shelf-life.module';
 import { PublicPagesModule } from './modules/public-pages/public-pages.module';
 import { SyncModule } from './modules/sync/sync.module';
 import { TraceModule } from './modules/trace/trace.module';
@@ -46,6 +48,8 @@ import { UsersModule } from './modules/users/users.module';
     BatchesModule,
     SyncModule,
     PublicPagesModule,
+    ShelfLifeModule,
+    GradingModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: AllExceptionsFilter },

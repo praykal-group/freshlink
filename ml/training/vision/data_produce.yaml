@@ -1,0 +1,11 @@
+# Class order must match the `classes` list registered for vision_produce (app/core/vision.py PRODUCE_CLASSES).
+path: ../data/vision/produce
+train: images/train
+val: images/val
+test: images/test
+names:
+  0: fresh
+  1: bruise
+  2: rot_mould
+  3: cut_crack
+  4: overripe

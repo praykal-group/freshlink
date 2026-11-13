@@ -2,6 +2,14 @@
 
 All notable changes, per milestone (Keep a Changelog style).
 
+## [m05] - 2026-11-13
+### Added
+- ML service: hash-verified model registry, YOLOv8 ONNX grading (letterbox, decoder, class-wise NMS, grade rule), Cox PH from exported parameters, Q10 fallback, `/v1/vision/grade`, `/v1/shelf-life/predict`, `/v1/models`, error envelope, 45 tests.
+- Training scripts (YOLOv8s, Cox PH) writing measured metrics; DATA_SOURCES templates; `scripts/register_model.py`, `scripts/fetch_models.{py,sh}`.
+- Backend: grading (grade, dispute, resolve, dispute queue), shelf-life recompute with estimate history, backend Q10 fallback, ML client, `cargo.status` stub.
+### Notes
+- No trained models are included; grading returns 503 until one is registered.
+
 ## [m04] - 2026-11-13
 ### Added
 - Batches: idempotent create with client UUID, list/search/detail, 30-min edit window, edit requests + manager approval, NFC/QR/UHF tags, image attach, storage path + unit recommendation, storage assignment with atomic capacity, receiving, label data, timeline, shelf-life read.

@@ -120,3 +120,23 @@ Operators only see and change batches whose source or current site is their own 
 - `GET /t/:code?s=<sig>` → HTML page: product (EN/HI/MR), origin, time, weight, grade, status, journey timeline, temperature placeholder, **Verified** badge from a fresh chain check. No user ids, tag UIDs or file keys. `s` = base64url(HMAC-SHA256(code, TRACE_SIGNING_KEY))[:22].
 - `GET /t/:code/verify?s=<sig>` → `{code, valid, count, brokenAtSeq?, reason?, checkedAt}`.
 - Bad signature or unknown code → 404 (same response).
+
+### Grading (M5)
+| Method | Path | Notes |
+|--------|------|-------|
+| POST | `/batches/:id/grade` (OPERATOR, ADMIN) | Uses the latest TOP, SIDE, CLOSEUP photo (409 `IMAGES_REQUIRED` with `details.missing`). Sends presigned GET URLs to the ML service. Stores an AUTO grade, sets `currentGrade` (REGISTERED → GRADED), traces `GRADED`, recomputes shelf life. Returns the grade row + `mlLatencyMs`, `totalLatencyMs`, `storagePath`. **503 `GRADING_UNAVAILABLE`** when no model is loaded or ML is down (the app keeps the request queued); 422 `GRADING_FAILED` for unreadable photos |
+| POST | `/batches/:id/grade/dispute` (OPERATOR, ADMIN) | `{reason}`. Flags the latest grade; 409 `NO_GRADE` / `ALREADY_DISPUTED`. Trace `GRADE_DISPUTED` |
+| POST | `/grades/:id/resolve` (MANAGER, ADMIN) | `{grade: A\|B\|C}`. Writes a new MANUAL grade row (the AUTO row is kept), updates the batch, traces `GRADE_RESOLVED`, recomputes shelf life. 409 `NOT_DISPUTED` / `ALREADY_RESOLVED` |
+| GET | `/grades/disputes` (MANAGER, ADMIN) | Open disputes, paged |
+
+### Shelf life (M5)
+Recomputed on grading, dispute resolution and (from M8) on threshold breaches and every 15 min. Each run stores a `shelf_life_estimates` row and updates `batches.remaining_shelf_life_h`. `SHELF_LIFE_UPDATED` is traced only for the first estimate or a change of ≥ 2 h. If the ML service is unreachable the backend computes the Q10 fallback itself (`modelVersion: backend-q10-1`), so a value always exists (ML-02). Read with `GET /batches/:id/shelf-life`.
+
+## ML service (internal, `X-Internal-Token`)
+| Method | Path | Contract |
+|--------|------|----------|
+| GET | `/health` | `{status, models:{vision_fish, vision_produce, shelf_life_cox: {active, loaded, reason, metrics}}}` |
+| GET | `/v1/models` | Same model table |
+| POST | `/v1/vision/grade` | `{batchId, category: FISH\|PRODUCE, imageUrls[3]}` → `{batchId, grade, confidence, defects[{class, conf, box, areaPct}], perImage[{index, grade, confidence, itemDetected, defects}], modelVersion, latencyMs}`. 503 `MODEL_NOT_AVAILABLE` (with `details.reason`) when no hash-verified model is loaded; 422 for image fetch/decode errors |
+| POST | `/v1/shelf-life/predict` | `{items[1..200]: {batchId, productCode, category, grade?, hoursSinceHarvest, meanTempC, degreeMinutesAbove, humidityPct?, ethylenePpm?, shockEvents, baseShelfLifeH, q10, refTempC}}` → `{results[{batchId, remainingH, survivalCurve[{h,p}], method: COX\|Q10_FALLBACK, modelVersion, censored}], latencyMs}`. `baseShelfLifeH`, `q10`, `refTempC` are product reference values sent by the backend (D-53) |
+Errors: `{"error":{"code","message","details"}}`; 401 without/with a wrong token; 422 `VALIDATION_FAILED`.

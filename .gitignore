@@ -16,10 +16,7 @@ deploy/aws/outputs.env
 
 # ML weights and datasets
 ml/training/data/
-ml/service/models/**/*.onnx
-ml/service/models/**/*.pt
-ml/service/models/**/*.pkl
-ml/service/models/**/*.txt.model
+ml/service/models/*/
 
 # Node
 node_modules/
@@ -38,3 +35,5 @@ venv/
 Thumbs.db
 .idea/
 *.iml
+ml/training/**/runs/
+ml/training/**/out/
