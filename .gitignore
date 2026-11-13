@@ -1,0 +1,40 @@
+# Local tooling / notes
+/.claude/
+/prompts.md
+
+# Secrets (Section 19.5) - never commit
+.env
+.env.*
+!.env.example
+*.pem
+*.jks
+*.keystore
+key.properties
+google-services.json
+GoogleService-Info.plist
+deploy/aws/outputs.env
+
+# ML weights and datasets
+ml/training/data/
+ml/service/models/**/*.onnx
+ml/service/models/**/*.pt
+ml/service/models/**/*.pkl
+ml/service/models/**/*.txt.model
+
+# Node
+node_modules/
+dist/
+coverage/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.idea/
+*.iml

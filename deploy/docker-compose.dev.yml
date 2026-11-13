@@ -1,0 +1,28 @@
+# Dev stack (M1). Kafka, Redis, Mosquitto and InfluxDB are deferred (see docs/DECISIONS.md D-25).
+name: iccms-dev
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: iccms
+      POSTGRES_PASSWORD: iccms_dev
+      POSTGRES_DB: iccms
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U iccms"]
+      interval: 5s
+      retries: 10
+
+  ml:
+    build: ../ml/service
+    environment:
+      ML_INTERNAL_TOKEN: dev-internal-token
+    ports: ["8000:8000"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u;u.urlopen(u.Request('http://localhost:8000/health',headers={'X-Internal-Token':'dev-internal-token'}))"]
+      interval: 10s
+      retries: 5
+
+volumes:
+  pgdata:

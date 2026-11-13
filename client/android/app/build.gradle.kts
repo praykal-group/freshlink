@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.client"
+    namespace = "in.iccms.app"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -15,19 +15,36 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.client"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        // Android 8+ (DA-NFR / FO-NFR)
+        minSdk = maxOf(26, flutter.minSdkVersion)
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }
 
+    // One codebase, three APKs (Section 11). Each flavor has its own id, name and manifest.
+    flavorDimensions += "app"
+    productFlavors {
+        create("driver") {
+            dimension = "app"
+            applicationId = "in.iccms.driver"
+            resValue("string", "app_name", "I-CCMS Driver")
+        }
+        create("operator") {
+            dimension = "app"
+            applicationId = "in.iccms.operator"
+            resValue("string", "app_name", "I-CCMS Operator")
+        }
+        create("manager") {
+            dimension = "app"
+            applicationId = "in.iccms.manager"
+            resValue("string", "app_name", "I-CCMS Control Tower")
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
+            // Release signing (key.properties) is added in M10.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
         }
