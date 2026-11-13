@@ -44,12 +44,42 @@ describe('orderOps', () => {
 describe('SyncService', () => {
   let prisma: ReturnType<typeof fakePrisma>;
   let batches: { attachTag: jest.Mock; create: jest.Mock };
+  let trips: { load: jest.Mock; recordEvent: jest.Mock; respondRoute: jest.Mock };
+  let pod: { submit: jest.Mock };
   let sync: SyncService;
 
   beforeEach(() => {
     prisma = fakePrisma();
     batches = { attachTag: jest.fn().mockResolvedValue({ id: 'tag-1' }), create: jest.fn() };
-    sync = new SyncService(prisma as never, batches as never);
+    trips = { load: jest.fn().mockResolvedValue({ loaded: [] }), recordEvent: jest.fn().mockResolvedValue({ id: 'e' }), respondRoute: jest.fn().mockResolvedValue({ status: 'ACCEPTED' }) };
+    pod = { submit: jest.fn().mockResolvedValue({ stored: ['p1'] }) };
+    sync = new SyncService(prisma as never, batches as never, trips as never, pod as never);
+  });
+
+  it('routes driver/operator op types with their own role rules', async () => {
+    const TRIP = '9a8e6a1c-4b2d-4c3e-9a1b-2c3d4e5f6a7b';
+    const STOP = '1b8e6a1c-4b2d-4c3e-9a1b-2c3d4e5f6a7b';
+    const r1 = await sync.process(operator, [op('a1111111-1111-4111-8111-111111111111', 'LOAD', { tripId: TRIP, batchIds: [BATCH_ID] })]);
+    expect(r1.results[0].status).toBe('APPLIED');
+    expect(trips.load).toHaveBeenCalledWith(operator, TRIP, [BATCH_ID]);
+
+    // operator may not send driver ops; driver may not load
+    const r2 = await sync.process(operator, [op('a2222222-2222-4222-8222-222222222222', 'ROUTE_ACCEPT', { tripId: TRIP, version: 2 })]);
+    const r3 = await sync.process(driver, [op('a3333333-3333-4333-8333-333333333333', 'LOAD', { tripId: TRIP, batchIds: [BATCH_ID] })]);
+    expect([r2.results[0].error?.code, r3.results[0].error?.code]).toEqual(['FORBIDDEN_ROLE', 'FORBIDDEN_ROLE']);
+
+    const r4 = await sync.process(driver, [op('a4444444-4444-4444-8444-444444444444', 'ROUTE_ACCEPT', { tripId: TRIP, version: 2 })]);
+    expect(r4.results[0].status).toBe('APPLIED');
+    expect(trips.respondRoute).toHaveBeenCalledWith(driver, TRIP, 2, true);
+
+    const podBody = {
+      receiverName: 'Anil', signatureKey: 'POD_SIGNATURE/2026/11/0f8e6a1c-4b2d-4c3e-9a1b-2c3d4e5f6a7b.png',
+      photoKey: 'POD_PHOTO/2026/11/0f8e6a1c-4b2d-4c3e-9a1b-2c3d4e5f6a7b.jpg', capturedAt: '2026-11-13T10:00:00Z', lat: 19.8, lng: 75.3,
+      items: [{ id: 'b5555555-5555-4555-8555-555555555555', batchId: BATCH_ID, outcome: 'ACCEPTED', acceptedKg: 100, scannedTagUid: '04A1B2C3' }],
+    };
+    const r5 = await sync.process(driver, [op('a5555555-5555-4555-8555-555555555555', 'POD', { tripId: TRIP, stopId: STOP, ...podBody })]);
+    expect(r5.results[0].status).toBe('APPLIED');
+    expect(pod.submit).toHaveBeenCalledWith(driver, TRIP, STOP, expect.objectContaining({ receiverName: 'Anil', items: [expect.objectContaining({ outcome: 'ACCEPTED' })] }));
   });
 
   it('applies an op once; the duplicate replays the stored result without a second write', async () => {
@@ -93,7 +123,7 @@ describe('SyncService', () => {
     expect(batches.create).not.toHaveBeenCalled();
   });
 
-  it('answers UNSUPPORTED for later-milestone types without storing them', async () => {
+  it('answers UNSUPPORTED for later-milestone types (GPS_POINTS, ALERT_ACK: M8) without storing them', async () => {
     const r = await sync.process(driver, [op('77777777-7777-4777-8777-777777777777', 'GPS_POINTS', { points: [] })]);
     expect(r.results[0].status).toBe('UNSUPPORTED');
     expect(prisma.syncOp.create).not.toHaveBeenCalled();

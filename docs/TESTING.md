@@ -137,6 +137,20 @@ Real Solomon files were **not** used (not downloaded; place them in `ml/training
 
 **Deferred M6 checks (NOT RUN):** forecasts stored for all seeded centres/products through the API (needs a database); routing with OSRM/Google against live services.
 
+### M7 — 2026-11-13
+`cd server && npm test` → **21 suites, 210 tests, all pass.** Build + lint pass.
+
+| File | M7 test item covered |
+|------|----------------------|
+| `planning/fefo.spec.ts` | **FEFO picks the lowest shelf life first**; < 24 h → nearest centre; otherwise largest need; whole batches; spoiled/other products skipped; shortfall |
+| `trips/trips.spec.ts` | **Cannot start without pre-check (409)**; **second device → 409**; one active trip per driver/vehicle; foreign driver 403; start side effects (device bind, vehicle IN_USE, IN_TRANSIT + DEPARTED, managers notified); wrong batch on load → 409 with ids; operator only at depot; **SOS → CRITICAL alert + managers + SMS with maps link**; SOS replay idempotent; **order approval is MANAGER/ADMIN only** (route metadata); PoD rules; **PoD PARTIAL → PARTIALLY_DELIVERED + DELIVERED trace (outcome PARTIAL)**, stop/order/trip completion with CO₂ factor; REJECTED path; wrong crate → 409 TAG_MISMATCH; batch code accepted as scan; PoD replay |
+| `trips/trip-rules.spec.ts` | Setpoint intersection; fish + banana incompatible; pre-check codes; status machine; CO₂; maps link |
+| `integrations/integrations.spec.ts` | HMAC accept / prefix / tampered / other key / garbage / missing; **bad HMAC → 401, nothing imported**; unknown/disabled key 401 via SHA-256 lookup; auth before validation; scope 403; **duplicate externalRef → DUPLICATE, no insert**; invalid row rejected; CSV BOM/CRLF/quotes + column mapping |
+| `realtime/realtime.e2e.spec.ts` | **Real Socket.IO server + 3 clients: trip events reach only the trip's driver and managers, a user event only that user, manager events only managers; another driver cannot join the trip room; bad token and wrong app rejected** |
+| `sync/sync.service.spec.ts` | + LOAD / ROUTE_ACCEPT / POD routing and role rules |
+
+**Deferred M7 checks (NOT RUN; need Postgres + the ML container):** "a seeded day goes forecast → orders → approved → trips → loaded → started → delivered through the API"; concurrent code allocation; ERP request over HTTP with a real key.
+
 ## Measured metrics
 None yet.
 

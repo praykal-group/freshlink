@@ -16,6 +16,11 @@ import { AuthModule } from './modules/auth/auth.module';
 import { BatchesModule } from './modules/batches/batches.module';
 import { FilesModule } from './modules/files/files.module';
 import { ForecastModule } from './modules/forecast/forecast.module';
+import { IntegrationsModule } from './modules/integrations/integrations.module';
+import { OrdersModule } from './modules/orders/orders.module';
+import { PlanningModule } from './modules/planning/planning.module';
+import { RealtimeModule } from './modules/realtime/realtime.module';
+import { TripsModule } from './modules/trips/trips.module';
 import { GradingModule } from './modules/grading/grading.module';
 import { MlModule } from './infra/ml/ml.module';
 import { ShelfLifeModule } from './modules/shelf-life/shelf-life.module';
@@ -51,9 +56,14 @@ import { UsersModule } from './modules/users/users.module';
     SyncModule,
     PublicPagesModule,
     MlModule,
+    RealtimeModule,
     ShelfLifeModule,
     GradingModule,
     ForecastModule,
+    OrdersModule,
+    IntegrationsModule,
+    PlanningModule,
+    TripsModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: AllExceptionsFilter },

@@ -7,6 +7,9 @@ import { AppError } from '../../common/errors/app-error';
 import { PrismaService } from '../../infra/prisma/prisma.service';
 import { BatchesService } from '../batches/batches.service';
 import { AttachImageDto, AttachTagDto, CreateBatchDto, EditableBatchFieldsDto, ReceiveDto } from '../batches/dto/batch.dto';
+import { PodService } from '../pod/pod.service';
+import { LoadTripDto, PodDto, TripEventDto } from '../trips/dto/trip.dto';
+import { TripsService } from '../trips/trips.service';
 import type { SyncOpDto, SyncResult, SyncType } from './sync.dto';
 
 type Handler = (user: AuthUser, payload: Record<string, unknown>, op: SyncOpDto, deviceId?: string) => Promise<unknown>;
@@ -23,7 +26,20 @@ const OP_ROLES: Partial<Record<SyncType, UserRole[]>> = {
   TAG_ATTACH: ['OPERATOR', 'ADMIN'],
   IMAGE_ATTACH: ['OPERATOR', 'ADMIN'],
   RECEIVE: ['OPERATOR', 'ADMIN'],
+  LOAD: ['OPERATOR', 'ADMIN'],
+  TRIP_EVENT: ['DRIVER'],
+  POD: ['DRIVER'],
+  ROUTE_ACCEPT: ['DRIVER'],
 };
+
+/** Splits `{<key>: uuid, ...rest}`. */
+function idOf(payload: Record<string, unknown>, key: string): { id: string; rest: Record<string, unknown> } {
+  const { [key]: id, ...rest } = payload;
+  if (typeof id !== 'string' || !/^[0-9a-f-]{36}$/i.test(id)) {
+    throw new InvalidPayload('VALIDATION_FAILED', `payload.${key} must be a UUID`, 400);
+  }
+  return { id, rest };
+}
 
 /** Ops are applied oldest first (capturedAt); a stable sort keeps client order for equal times. */
 export function orderOps<T extends { capturedAt: string }>(ops: T[]): T[] {
@@ -68,6 +84,8 @@ export class SyncService {
   constructor(
     private readonly prisma: PrismaService,
     batches: BatchesService,
+    trips: TripsService,
+    pod: PodService,
   ) {
     this.handlers = {
       BATCH_CREATE: async (user, p, _op, deviceId) => batches.create(user, await parse(CreateBatchDto, p), deviceId),
@@ -86,6 +104,25 @@ export class SyncService {
       RECEIVE: async (user, p) => {
         const { batchId, rest } = batchIdOf(p);
         return batches.receive(user, batchId, await parse(ReceiveDto, rest));
+      },
+      LOAD: async (user, p) => {
+        const { id, rest } = idOf(p, 'tripId');
+        return trips.load(user, id, (await parse(LoadTripDto, rest)).batchIds);
+      },
+      TRIP_EVENT: async (user, p) => {
+        const { id, rest } = idOf(p, 'tripId');
+        return trips.recordEvent(user, id, await parse(TripEventDto, rest));
+      },
+      ROUTE_ACCEPT: async (user, p) => {
+        const { id, rest } = idOf(p, 'tripId');
+        const version = rest.version;
+        if (!Number.isInteger(version) || (version as number) < 1) throw new InvalidPayload('VALIDATION_FAILED', 'payload.version must be a positive integer', 400);
+        return trips.respondRoute(user, id, version as number, true);
+      },
+      POD: async (user, p) => {
+        const { id: tripId, rest } = idOf(p, 'tripId');
+        const { id: stopId, rest: body } = idOf(rest, 'stopId');
+        return pod.submit(user, tripId, stopId, await parse(PodDto, body));
       },
     };
   }

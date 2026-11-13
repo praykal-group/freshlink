@@ -2,6 +2,14 @@
 
 All notable changes, per milestone (Keep a Changelog style).
 
+## [m07] - 2026-11-13
+### Added
+- FEFO planner (`POST /planning/run`) and route building (`POST /planning/routes`) creating trips, stops and route plan v1.
+- Orders: list, draft edit, manager approval with FEFO allocation, CSV import; ERP `POST /integrations/orders` (API key + body HMAC, idempotent) and ADMIN key management.
+- Trips: assign, operator load with wrong-batch check, pre-trip check, start with device/vehicle binding, incidents and SOS (alert + SMS), route accept/decline, arrive, PoD per batch, automatic completion with CO₂.
+- Socket.IO gateway `/rt` with user/trip/manager rooms; `cargo.status` now emitted to trip rooms.
+- `/sync` op types LOAD, TRIP_EVENT, POD, ROUTE_ACCEPT.
+
 ## [m06] - 2026-11-13
 ### Added
 - ML: demand forecast (`/v1/forecast/run`): simulated sales world, festival calendar, shared features, LightGBM + LSTM (ONNX) ensemble with intervals, seasonal-naive fallback, Open-Meteo hook, multi-file models in the registry.

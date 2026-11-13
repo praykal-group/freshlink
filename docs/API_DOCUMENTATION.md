@@ -156,3 +156,46 @@ The worker process also runs the forecast every night at 02:00 IST.
 | POST | `/v1/routes/optimize` | `{mode: INITIAL\|REPLAN, depot, vehicles[{id, capacityKg, start?, shiftEnd?}], stops[{id, lat, lng, demandKg, windowStart?, windowEnd?, serviceMin, shelfLifeH?, mustKeepVehicle?}], fixedPrefix?{vehicleId:[stopId…]} (REPLAN only), departAt?, timeLimitS ≤ 8, seed?}` → `{routes[{vehicleId, stops[{id, eta, lateMin}], distanceKm, loadKg}], fitness, distanceKm, feasible, violations{lateMin, overloadKg, spoilMin, wrongVehicle}, solver: GA, generations, stoppedBy, travelProvider, travelFallbackReason, latencyMs}`. 422: `UNKNOWN_VEHICLE`, `INVALID_MODE`, `INVALID_PREFIX`, `INVALID_WINDOW`, `DUPLICATE_ID` |
 | POST | `/v1/routes/baseline` | Same body (INITIAL only) → same response with `solver: OR_TOOLS`. 503 `BASELINE_UNAVAILABLE` where OR-Tools is not installed (production image) |
 Travel times: `ROUTING_PROVIDER` = `haversine` (default; road factor 1.3, IST time-of-day speeds), `osrm` (`OSRM_URL`) or `google` (`GOOGLE_MAPS_API_KEY`); any provider failure falls back to haversine and is reported in `travelFallbackReason`.
+
+### Planning (MANAGER, ADMIN; M7, W-3)
+| Method | Path | Notes |
+|--------|------|-------|
+| POST | `/planning/run` | `{date}` (IST day). Per distribution centre × product: `need = forecast − on-hand − in-transit`; FEFO allocation of free batches at docks/farm gates/cold storages/warehouses; one DRAFT order per (source, centre, product), window 06:00–18:00 IST. Re-running a date replaces that date's planner drafts. → `{date, replacedDrafts, orders[], needs[{siteCode, productCode, forecastKg, onHandKg, inTransitKg, needKg, shortfallKg}]}` |
+| POST | `/planning/routes` | `{date, depotSiteId}`. APPROVED orders whose source is the depot → ML `/v1/routes/optimize` → one PLANNED trip per used vehicle (`TRP-yyyymmdd-0001`), a PICKUP stop at the depot + a DROP stop per order, `route_plans` v1 (INITIAL, ACCEPTED). Orders → PLANNED. 422 `NO_APPROVED_ORDERS`, 409 `NO_VEHICLES`, 503 `ROUTING_UNAVAILABLE` |
+
+### Orders (MANAGER, ADMIN)
+| Method | Path | Notes |
+|--------|------|-------|
+| GET | `/orders?status&date&cursor` | Paged, with allocated batches |
+| PATCH | `/orders/:id` | DRAFT only: `{quantityKg?, destinationSiteId?, windowStart?, windowEnd?}` (409 `ORDER_NOT_EDITABLE`) |
+| POST | `/orders/:id/approve` | DRAFT → APPROVED. Orders without batches (ERP/CSV) get a FEFO allocation from their source site now. Batches → ALLOCATED + trace `ALLOCATED`. Returns `allocatedKg`, `shortfallKg` |
+| POST | `/orders/import` | multipart `file` (≤ 1 MB, ≤ 2000 rows). Columns: `external_ref, source_site_code, destination_site_code, product_code, quantity_kg, window_start, window_end`. Per row `CREATED` / `DUPLICATE` (same external_ref) / `REJECTED` with reason |
+Order code: `ORD-<yyyymmdd of window start, IST>-0001`.
+
+### ERP integration (no JWT)
+`POST /integrations/orders` with `X-Api-Key: <key>` and `X-Signature: <hex HMAC-SHA256(raw body, key)>` (optional `sha256=` prefix). Body `{orders:[ExternalOrder…]}` (1–500, same fields as the CSV in camelCase). Authentication happens **before** validation: 401 `INVALID_API_KEY` / `INVALID_SIGNATURE`, 403 `FORBIDDEN_SCOPE`, then 400. Idempotent per `externalRef` (origin ERP). Rate limit 60/min per IP.
+ADMIN: `GET /admin/integration-clients`, `POST /admin/integration-clients {name, scopes:["orders:write"]}` → returns `apiKey` once (only its SHA-256 is stored), `POST /admin/integration-clients/:id/disable`.
+
+### Trips (M7)
+| Method | Path | Who | Notes |
+|--------|------|-----|-------|
+| GET | `/driver/trips/current` | DRIVER | ASSIGNED / PRE_CHECK_DONE / IN_PROGRESS trip (IN_PROGRESS first) with stops, batches, vehicle; `null` if none |
+| GET | `/driver/trips?cursor` | DRIVER | History |
+| GET | `/trips?status&date` | MANAGER | |
+| GET | `/trips/:id` | driver (own), operator, manager | Current-version stops, batches on the trip |
+| GET | `/trips/:id/route` | driver (own), manager | `{currentVersion, accepted, pending}` |
+| GET | `/trips/:id/cargo-status` | driver (own), manager | Batches on board with grade + remaining shelf life (`telemetry: null` until M8) |
+| POST | `/trips/:id/assign` | MANAGER | `{driverId, vehicleId}` → ASSIGNED. 409 `DRIVER_BUSY` / `VEHICLE_BUSY` |
+| POST | `/trips/:id/load` | OPERATOR (at the depot) | `{batchIds}`. Each batch must be allocated to an order dropped by this trip (409 `BATCH_NOT_ON_TRIP`, `details.batchIds`) and be at the depot. Batch → LOADED (storage released) + trace `LOADED`. Re-scans are ignored. Loading after a passed pre-check sets the trip back to ASSIGNED |
+| POST | `/trips/:id/pre-check` | DRIVER | `{id?, reeferOn, setpointC, doorsClosed, occurredAt?}`. Setpoint must lie in the intersection of the loaded products' safe ranges (clipped to the reefer). Always saved as a `PRE_TRIP_CHECK` event; fail → 422 `PRE_CHECK_FAILED` (`details.problems`: `REEFER_OFF`, `DOORS_OPEN`, `SETPOINT_OUT_OF_RANGE`, `INCOMPATIBLE_CARGO`) |
+| POST | `/trips/:id/start` | DRIVER | Needs PRE_CHECK_DONE (409 `PRE_CHECK_REQUIRED`) and ≥ 1 loaded batch. Binds `X-Device-Id` (409 `TRIP_ON_OTHER_DEVICE`); one IN_PROGRESS trip per driver (409 `DRIVER_ON_OTHER_TRIP`) and per vehicle (409 `VEHICLE_IN_USE`). Batches → IN_TRANSIT + `DEPARTED`; orders → IN_TRANSIT; pickup stop completed |
+| POST | `/trips/:id/events` | DRIVER | `{id, type: INCIDENT_DELAY\|INCIDENT_BREAKDOWN\|INCIDENT_ACCIDENT\|INCIDENT_ROADBLOCK\|INCIDENT_REEFER_FAULT\|SOS, payload?, photoKey?, voiceKey?, lat?, lng?, occurredAt}`. Idempotent on `id`. **SOS** → CRITICAL `SOS` alert, `alert.raised` to managers, SMS with a maps link to the driver's emergency contact. Incidents → `incident.updated` to managers (handled by the incident engine in M9) |
+| POST | `/trips/:id/routes/:version/accept\|decline` | DRIVER | PROPOSED only. Accept supersedes the old plan and cancels its open stops. Decline is refused for `INCIDENT`/`DIVERSION`/`RESCUE` replans (409 `DECLINE_NOT_ALLOWED`) |
+| POST | `/trips/:id/stops/:stopId/arrive` | DRIVER | `{arrivedAt?, lat?, lng?}` → ARRIVED |
+| POST | `/trips/:id/stops/:stopId/pod` | DRIVER | `{receiverName, signatureKey (POD_SIGNATURE upload), photoKey (POD_PHOTO upload), capturedAt, lat, lng, items[{id, batchId, outcome: ACCEPTED\|PARTIAL\|REJECTED, acceptedKg, reason?, scannedTagUid}]}`. The scan must be one of the batch's tag UIDs or its code (409 `TAG_MISMATCH`). ACCEPTED = full weight; PARTIAL 0 < kg < weight (+ reason); REJECTED 0 kg (+ reason). Batch → DELIVERED / PARTIALLY_DELIVERED / REJECTED with a `DELIVERED`/`REJECTED` trace event. Stop COMPLETED when every expected batch has a PoD; its order → DELIVERED. When all stops are done the trip completes: vehicle AVAILABLE, `co2Kg = distanceKm × emissionFactorKgPerKm` (SYN-16). Rows are idempotent on `items[].id` |
+
+### Sync additions
+`LOAD {tripId, batchIds}` (OPERATOR), `TRIP_EVENT {tripId, ...event}`, `POD {tripId, stopId, ...pod}`, `ROUTE_ACCEPT {tripId, version}` (DRIVER). `GPS_POINTS`, `ALERT_ACK` stay `UNSUPPORTED` until M8.
+
+### Realtime (Socket.IO, path `/rt`)
+Connect with `auth: {token: <Supabase access token>, flavor}`. Same checks as HTTP (valid JWT, linked ACTIVE user, role allowed for the flavor), else `error {code: UNAUTHORIZED}` + disconnect. Rooms: `user:<id>` always, `role:manager` for MANAGER/ADMIN. `trip.join {tripId}` → ack `{ok:true}` for managers or the trip's driver, `{ok:false, code:FORBIDDEN}` otherwise; `trip.leave {tripId}`. Server events used so far: `trip.updated`, `route.updated`, `cargo.status`, `alert.raised`, `incident.updated`.

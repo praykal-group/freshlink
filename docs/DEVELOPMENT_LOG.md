@@ -126,3 +126,24 @@ ml/service/.venv/Scripts/python ml/training/forecast/train_forecast.py --out ml/
 ml/service/.venv/Scripts/python ml/training/routing/benchmark.py --out ml/training/routing/out
 cd ml/service && .venv/Scripts/python -m pytest -q
 ```
+
+## M7 — Orders, FEFO Planning, Trips and Dispatch (2026-11-13)
+
+**Implemented**
+- `common/{geo,ist,codes}.ts` (haversine, IST days, locked code sequences).
+- `modules/planning` (`fefo.ts`, service: run + buildRoutes, controller).
+- `modules/orders` (service, controller incl. CSV import, `csv.ts`), `modules/integrations` (ERP endpoint, `signature.ts`, admin keys).
+- `modules/trips` (`trip-rules.ts`, service, controller, DTOs), `modules/pod/pod.service.ts`.
+- `modules/realtime` (gateway, service, emitter-only module for the worker); `CargoStatusNotifier` emits to trip rooms.
+- `modules/sync`: new op types.
+
+**Bugs found and fixed during the milestone:** ERP endpoint validated the body before authenticating (would return 400 instead of 401) → manual validation after the HMAC check; lint caught an unused destructure in the admin key listing.
+
+**Tests:** 210 pass (TESTING.md).
+
+**Limitations / pending:** SOS/alerts move into the alerts module in M8; incident handling in M9; realtime from the worker and telemetry wait for M8; end-to-end day run needs a database.
+
+**Repro**
+```bash
+cd server && npm test
+```

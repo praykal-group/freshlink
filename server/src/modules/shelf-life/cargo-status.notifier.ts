@@ -1,4 +1,6 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../../infra/prisma/prisma.service';
+import { RealtimeService } from '../realtime/realtime.service';
 
 export interface CargoStatusUpdate {
   batchId: string;
@@ -7,15 +9,19 @@ export interface CargoStatusUpdate {
   trigger: string;
 }
 
-/**
- * `cargo.status` hook stub (M5). The realtime gateway (M7) replaces the body with a Socket.IO
- * emit to `trip:<id>` rooms; callers already use the final signature.
- */
+/** `cargo.status` to the rooms of the trips carrying the batch (DA-FR-05). Temperature joins in M8. */
 @Injectable()
 export class CargoStatusNotifier {
-  private readonly logger = new Logger('CargoStatus');
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly realtime: RealtimeService,
+  ) {}
 
   async batchUpdated(update: CargoStatusUpdate): Promise<void> {
-    this.logger.debug({ msg: 'cargo.status (stub, not emitted)', ...update });
+    const onBoard = await this.prisma.tripBatch.findMany({
+      where: { batchId: update.batchId, unloadedAt: null, trip: { status: 'IN_PROGRESS' } },
+      select: { tripId: true },
+    });
+    for (const { tripId } of onBoard) this.realtime.toTrip(tripId, 'cargo.status', { tripId, ...update });
   }
 }
