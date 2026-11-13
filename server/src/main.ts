@@ -11,7 +11,8 @@ async function bootstrap() {
   // rawBody: the Send SMS Hook signature is computed over the exact bytes Supabase sent.
   const app = await NestFactory.create(AppModule, { bufferLogs: true, rawBody: true });
   app.useLogger(app.get(Logger));
-  app.setGlobalPrefix('api/v1');
+  // Public trace pages live at /t/... (the URL printed on labels), outside the API prefix.
+  app.setGlobalPrefix('api/v1', { exclude: ['t/:code', 't/:code/verify'] });
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
   );

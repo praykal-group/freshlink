@@ -20,10 +20,12 @@ export const envSchema = z
     SUPABASE_JWKS_URL: z.string().url().optional(),
     SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
     SUPABASE_SEND_SMS_HOOK_SECRET: z.string().optional(),
-    TRACE_SIGNING_KEY: z.string().optional(),
+    TRACE_SIGNING_KEY: z.string().min(32, 'TRACE_SIGNING_KEY must be at least 32 characters'),
     OFFER_TOKEN_SECRET: z.string().optional(),
     AWS_REGION: z.string().default('ap-south-1'),
     S3_BUCKET: z.string().optional(),
+    // Dev only: MinIO/localstack endpoint (path-style). Production uses the regional AWS endpoint.
+    S3_ENDPOINT: z.string().url().optional(),
     SMS_PROVIDER: z.enum(['console', 'httpsms']).default('console'),
     HTTPSMS_API_URL: z.string().url().optional(),
     HTTPSMS_API_KEY: z.string().optional(),
@@ -60,7 +62,9 @@ let cached: Env | undefined;
 /** Parses process.env once; exits with a readable list of problems (fail fast). */
 export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
   if (cached && source === process.env) return cached;
-  const parsed = envSchema.safeParse(source);
+  // `KEY=` lines in .env arrive as "", which would fail .url()/.min(); treat them as unset.
+  const cleaned = Object.fromEntries(Object.entries(source).filter(([, v]) => v !== undefined && v.trim() !== ''));
+  const parsed = envSchema.safeParse(cleaned);
   if (!parsed.success) {
     const lines = parsed.error.issues.map((i) => `  - ${i.path.join('.')}: ${i.message}`);
     console.error(`Invalid environment configuration:\n${lines.join('\n')}`);

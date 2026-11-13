@@ -63,3 +63,26 @@ cd server && DATABASE_URL=postgresql://iccms_migrator:...@localhost:5432/iccms n
 ```bash
 cd server && npm test
 ```
+
+## M4 — Batches, Files, Storage Path and Traceability (2026-11-13)
+
+**Implemented**
+- `common/hashing/hashing.ts` (canonical JSON, record hash, trace hash, chain verify, trace signature); `common/pagination.ts`.
+- `modules/trace` (append inside the caller's transaction with a batch row lock; verify; signed URL).
+- `infra/s3/s3.service.ts`, `modules/files` (presign with signed uploader metadata, attach checks, download URL).
+- `modules/storage` (path rules, unit ranking, atomic reserve/release/resize).
+- `modules/batches` (create, list, detail, edit window, edit requests, tags, images, storage, receive, label, timeline, shelf life).
+- `modules/sync` (ordered, idempotent outbox, role checks per op type).
+- `modules/public-pages` + `views/trace.hbs` (served at `/t`, CSP, no PII).
+- `infra/events/event-bus.service.ts` (quality-scans stub).
+
+**Files modified:** `src/app.module.ts`, `src/main.ts` (prefix exclude for `/t`), `src/config/env.schema.ts`, `.env.example`, docs.
+
+**Tests:** 140 unit tests pass (TESTING.md). DB/S3/phone checks deferred.
+
+**Limitations / pending:** receive has no trip binding yet (D-50); receiving photos have no dimensions (D-46); events are not sent to Kafka until M8; temperature summary on the trace page is a placeholder until M8.
+
+**Repro**
+```bash
+cd server && npm test
+```

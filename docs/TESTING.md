@@ -62,6 +62,26 @@ The M1 test suite was **not run**, by user instruction (D-26). What was actually
 - admin-created phone user logs in by OTP; invited email user receives the mail
 - API boot (needs a reachable Postgres)
 
+### M4 — 2026-11-13
+`cd server && npm test`: **13 suites, 140 tests, all pass.** `npm run build` and `eslint` pass.
+
+| Suite | M4 test item covered |
+|-------|----------------------|
+| `common/hashing/hashing.spec.ts` | Chain verifies; still verifies after jsonb-style key reordering; **tampered payload → invalid at that seq**; re-hashed row caught by the next link; deleted event; changed timestamp; trace signature accept/reject (wrong code, key, length, type) |
+| `modules/batches/batch-rules.spec.ts` | **Edit at 29 min ok, 30 ok, 31 refused**; IST day for codes; code format; fish core temp −2..+10; fish vs produce field rules |
+| `modules/batches/batches.service.spec.ts` | **Operator from another site → 403**; 31 min → 409 `EDIT_WINDOW_CLOSED` with no write; 29 min → applied; offline edit by device times; idempotent create replay; same UUID from another user → 409 |
+| `modules/storage/storage-rules.spec.ts` | **Fish → blast chiller, banana → ripening chamber, spinach → blast chiller**; grade C → cold room + sell first; unit ranking (type, capacity, temperature, active, best fit) |
+| `modules/files/files.spec.ts` | **Presign rejects wrong type (400) / size (413)**; uploader signed into the PUT; attach refuses wrong purpose, missing object, other user's upload; download access |
+| `modules/sync/sync.service.spec.ts` | **Duplicate op → same result, handler called once, one row**; 4xx stored, 5xx not stored; payload validation; role rules; UNSUPPORTED not stored; foreign clientOpId |
+| `modules/public-pages/trace-view.spec.ts` | Labels for every event type; no tag UIDs, keys or user ids on the public page |
+| `config/env.schema.spec.ts` | Empty `KEY=` values treated as unset; short trace key fails fast |
+
+**Deferred M4 checks (NOT RUN; need Postgres + S3):**
+- Tamper a `trace_events` row as the master DB user, then `/t/:code/verify` → `valid:false` (logic covered by unit tests above)
+- Invalid signature → 404 over HTTP
+- Full batch lifecycle through the API; concurrent code allocation; storage capacity under concurrency
+- Trace page rendered on a phone browser
+
 ## Measured metrics
 None yet.
 

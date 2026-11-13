@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>{{product.name}} · {{code}} · I-CCMS Trace</title>
+<style>
+  :root { --bg:#F4F8FA; --surface:#FFFFFF; --text:#0F1C24; --muted:#55666F; --line:#D0DCE3; --primary:#0B4F6C;
+          --safe:#15803D; --watch:#B45309; --critical:#B91C1C; --chip:#E8F0F4; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#0A141A; --surface:#111E26; --text:#E6F1F5; --muted:#93A8B3; --line:#24404D; --primary:#4FC3E8;
+            --safe:#4ADE80; --watch:#FBBF24; --critical:#F87171; --chip:#18303B; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 640px; margin: 0 auto; padding: 16px; }
+  header { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:12px; }
+  .brand { font-weight:700; color:var(--primary); letter-spacing:.02em; }
+  .badge { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; font-weight:600; font-size:14px; }
+  .ok { background: color-mix(in srgb, var(--safe) 15%, transparent); color: var(--safe); }
+  .bad { background: color-mix(in srgb, var(--critical) 15%, transparent); color: var(--critical); }
+  .card { background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:16px; margin-bottom:12px; }
+  h1 { font-size:22px; margin:0 0 2px; }
+  .muted { color:var(--muted); font-size:14px; }
+  .code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size:14px; }
+  dl { display:grid; grid-template-columns: max-content 1fr; gap:6px 16px; margin:12px 0 0; }
+  dt { color:var(--muted); font-size:14px; } dd { margin:0; font-weight:500; }
+  .grade { font-weight:700; } .grade-A { color:var(--safe); } .grade-B { color:var(--watch); } .grade-C { color:var(--critical); }
+  ol { list-style:none; margin:0; padding:0; }
+  li { position:relative; padding:0 0 14px 22px; border-left:2px solid var(--line); margin-left:6px; }
+  li:last-child { border-left-color: transparent; padding-bottom:0; }
+  li::before { content:""; position:absolute; left:-7px; top:4px; width:12px; height:12px; border-radius:50%; background:var(--primary); }
+  .ev { font-weight:600; } .chip { display:inline-block; background:var(--chip); border-radius:6px; padding:0 6px; font-size:13px; margin-left:4px; }
+  footer { text-align:center; font-size:13px; color:var(--muted); margin-top:16px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <span class="brand">I-CCMS Trace</span>
+    {{#if verified}}
+      <span class="badge ok" title="Every event's SHA-256 hash links to the previous one and was recomputed just now">✔ Verified</span>
+    {{else}}
+      <span class="badge bad" title="The hash chain does not match the stored records">✖ Not verified</span>
+    {{/if}}
+  </header>
+
+  <section class="card">
+    <h1>{{product.name}}</h1>
+    <div class="muted">{{product.nameHi}} · {{product.nameMr}}</div>
+    <dl>
+      <dt>Batch</dt><dd class="code">{{code}}</dd>
+      <dt>{{sourceLabel}}</dt><dd>{{origin.name}}</dd>
+      <dt>{{timeLabel}}</dt><dd>{{caughtOrHarvestedAt}}</dd>
+      <dt>Weight</dt><dd>{{weightKg}} kg</dd>
+      <dt>Grade</dt><dd>{{#if grade}}<span class="grade grade-{{grade}}">{{grade}}</span>{{else}}Not graded yet{{/if}}</dd>
+      <dt>Status</dt><dd>{{status}}</dd>
+    </dl>
+  </section>
+
+  <section class="card">
+    <strong>Temperature</strong>
+    <p class="muted" style="margin:4px 0 0">{{temperatureNote}}</p>
+  </section>
+
+  <section class="card">
+    <strong>Journey</strong>
+    <ol style="margin-top:12px">
+      {{#each events}}
+        <li>
+          <div><span class="ev">{{label}}</span>{{#if detail}}<span class="chip">{{detail}}</span>{{/if}}</div>
+          <div class="muted">{{when}}</div>
+        </li>
+      {{/each}}
+    </ol>
+  </section>
+
+  <footer>
+    {{count}} events · chain checked {{checkedAt}}<br>
+    Times shown in India Standard Time.
+  </footer>
+</main>
+</body>
+</html>

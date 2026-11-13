@@ -13,6 +13,11 @@ import { VersionGateGuard } from './common/guards/version-gate.guard';
 import { AuditInterceptor } from './common/interceptors/audit.interceptor';
 import { PrismaModule } from './infra/prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { BatchesModule } from './modules/batches/batches.module';
+import { FilesModule } from './modules/files/files.module';
+import { PublicPagesModule } from './modules/public-pages/public-pages.module';
+import { SyncModule } from './modules/sync/sync.module';
+import { TraceModule } from './modules/trace/trace.module';
 import { HealthModule } from './modules/health/health.module';
 import { HooksModule } from './modules/hooks/hooks.module';
 import { MastersModule } from './modules/masters/masters.module';
@@ -36,6 +41,11 @@ import { UsersModule } from './modules/users/users.module';
     HooksModule,
     UsersModule,
     MastersModule,
+    TraceModule,
+    FilesModule,
+    BatchesModule,
+    SyncModule,
+    PublicPagesModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: AllExceptionsFilter },

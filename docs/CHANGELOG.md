@@ -2,6 +2,16 @@
 
 All notable changes, per milestone (Keep a Changelog style).
 
+## [m04] - 2026-11-13
+### Added
+- Batches: idempotent create with client UUID, list/search/detail, 30-min edit window, edit requests + manager approval, NFC/QR/UHF tags, image attach, storage path + unit recommendation, storage assignment with atomic capacity, receiving, label data, timeline, shelf-life read.
+- Hash-chained `trace_events` with verification; signed trace URL; public trace page `/t/:code` and `/t/:code/verify`.
+- S3 presigned uploads with signed uploader metadata; `/files/url`.
+- `/sync` offline outbox for batch op types, idempotent through `sync_ops`.
+- `quality-scans` event stub; cursor pagination helper.
+### Changed
+- `TRACE_SIGNING_KEY` is required; empty env values count as unset.
+
 ## [m03] - 2026-11-13
 ### Added
 - Supabase JWT verification (JWKS) and the guard chain: version gate (426), auth + linked user, flavor/role, driver device, roles, per-user rate limit.
