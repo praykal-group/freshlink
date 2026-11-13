@@ -104,3 +104,25 @@ cd server && npm test
 cd ml/service && python -m venv .venv && .venv/Scripts/pip install -r requirements.txt -r requirements-dev.txt && .venv/Scripts/python -m pytest -q
 cd server && npm test
 ```
+
+## M6 — ML Service II: Demand Forecast and Route Optimiser (2026-11-13)
+
+**Implemented**
+- `ml/service/app/core/routing/`: `travel.py`, `problem.py`, `ga.py` (DEAP GA + cheapest insertion + local search), `baseline.py` (OR-Tools); `schemas/routing.py`, `routers/routing.py`.
+- `ml/service/app/core/forecast/`: `calendar.py`, `simulate.py`, `features.py`, `model.py`, `weather.py`; `schemas/forecast.py`, `routers/forecast.py`; registry supports multi-file models.
+- `ml/training/forecast/`: `train_forecast.py`, `simulate_sales.py`, `agmarknet.py`, `open_meteo.py`; `ml/training/routing/`: `solomon.py`, `benchmark.py`; committed `metrics-m06.json` for both.
+- `scripts/register_model.py` and `fetch_models.py` handle the forecast directory model.
+- Backend: `infra/ml/ml.module.ts`; `modules/forecast` (service, controller); `workers/jobs/forecast.job.ts`; worker module wiring.
+
+**Bugs found and fixed:** plain GA far behind OR-Tools on 100-customer instances → memetic polish (D-69); a test parsed `...Z` timestamps with Python 3.10 `fromisoformat` (test fixed); Dockerfile needed `libgomp1` for LightGBM.
+
+**Tests:** ML 74 pass; backend 168 pass (TESTING.md).
+
+**Limitations / pending:** Solomon results are on synthetic instances; forecast metrics are on simulated data; the trained forecast model is not registered (D-72); nightly job is a timer until BullMQ (D-71).
+
+**Repro**
+```bash
+ml/service/.venv/Scripts/python ml/training/forecast/train_forecast.py --out ml/training/forecast/out
+ml/service/.venv/Scripts/python ml/training/routing/benchmark.py --out ml/training/routing/out
+cd ml/service && .venv/Scripts/python -m pytest -q
+```

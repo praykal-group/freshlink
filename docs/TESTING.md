@@ -105,6 +105,38 @@ The M1 test suite was **not run**, by user instruction (D-26). What was actually
 
 **Deferred M5 checks (NOT RUN):** backend e2e against the real ML container; latency on a `t3.large`-equivalent; a batch with 3 photos graded through the API (needs a model, S3 and a database).
 
+### M6 — 2026-11-13
+**ML service:** `pytest -q` → **74 passed** (Python 3.10 locally). **Backend:** `npm test` → **16 suites, 168 tests, all pass**; build + lint pass.
+
+| File | Covers |
+|------|--------|
+| `tests/test_routing.py` | Haversine sanity (Mumbai–Pune ≈ 120 km), peak/night speed factor, OSRM + Google parsing (mocked), fallback to haversine; route evaluation (waiting, lateness, overload, spoilage, wrong vehicle, shift end); encode/decode with fixed prefix; prefix + `mustKeepVehicle` kept; **property test: 50 random instances with a planted feasible plan → GA result has 0 overload and 0 lateness on all 50**; GA ≥ 10 % shorter than the manual order; API contract; **REPLAN 10 vehicles / 50 stops < 10 s**; OR-Tools baseline contract; 4 validation errors |
+| `tests/test_forecast.py` | Simulator determinism; festival uplift; feature shapes; seasonal naive; MAPE; Open-Meteo parse + fallback; API without a model (SEASONAL_NAIVE, 7 days, lower ≤ pred ≤ upper); provided vs simulated history; validation; a real LightGBM model registered as a multi-file model is used; bad hash → not loaded |
+| `server/src/modules/forecast/forecast.spec.ts` | IST "tomorrow"; newest-run-per-day selection; next 02:00 IST; run → ML request shape + 14 rows stored under one run id; ML failure → 503, nothing stored; one background job at a time |
+
+**Measured — demand forecast (ML-03, target MAPE < 15 %).** `ml/training/forecast/train_forecast.py`, data **simulated** (Section 2): 60 series (6 sites × 10 products), 2023-01-01…2025-12-31, time split by origin (test origins 2025-09-25…2025-12-24, validation the 3 months before), 38,220 test forecasts. File: `ml/training/forecast/metrics-m06.json`.
+| Model | Test MAPE |
+|-------|-----------|
+| Ensemble (LSTM weight 0.1, chosen on validation) | **8.79 %** |
+| LightGBM | 8.73 % |
+| LSTM | 10.33 % |
+| Seasonal naive | 11.29 % |
+80 % interval (±14.0 %) covered **79.8 %** of test actuals. Note: on test the ensemble is 0.06 points worse than LightGBM alone; the weight was not re-tuned on test. **These numbers are on simulated data and say nothing yet about real sales.** The trained model served a real `ENSEMBLE` forecast through the API (28 rows, 24 ms); it is not registered in `registry.json` (D-72).
+
+**Measured — route optimiser (ML-04).** `ml/training/routing/benchmark.py`, laptop CPU, GA time limit 8 s, OR-Tools 30 s. File: `ml/training/routing/metrics-m06.json`.
+| Case | GA | OR-Tools | Gap (distance) |
+|------|----|----------|----------------|
+| C101-like (synthetic, 100 customers) | 1599.7 (2.4 s; 8.5 late-min, same as OR-Tools) | 1409.2 (31 s) | +13.5 % |
+| R101-like (synthetic) | 2305.1, feasible (3.3 s) | 2042.1, feasible (30 s) | +12.9 % |
+| RC101-like (synthetic) | 2086.3, feasible (1.9 s) | 1822.6, feasible (30 s) | +14.5 % |
+Real Solomon files were **not** used (not downloaded; place them in `ml/training/data/routing/` and re-run). Before the memetic polish (D-69) the gaps were +93 %, +84 %, +82 %.
+| ML-04 target | Measured |
+|--------------|----------|
+| Replan < 10 s, 10 vehicles / 50 stops | **0.81 s** (benchmark), < 10 s in the API test |
+| ≥ 10 % distance saving vs manual order | **57.1 %** (Chh. Sambhajinagar synthetic case: GA 884.6 km feasible vs manual 2060.3 km with 4,582 late-min) |
+
+**Deferred M6 checks (NOT RUN):** forecasts stored for all seeded centres/products through the API (needs a database); routing with OSRM/Google against live services.
+
 ## Measured metrics
 None yet.
 

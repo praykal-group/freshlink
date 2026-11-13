@@ -2,6 +2,13 @@
 
 All notable changes, per milestone (Keep a Changelog style).
 
+## [m06] - 2026-11-13
+### Added
+- ML: demand forecast (`/v1/forecast/run`): simulated sales world, festival calendar, shared features, LightGBM + LSTM (ONNX) ensemble with intervals, seasonal-naive fallback, Open-Meteo hook, multi-file models in the registry.
+- ML: route optimiser (`/v1/routes/optimize`, `/v1/routes/baseline`): haversine/OSRM/Google travel matrices, DVRPTW evaluator, cheapest-insertion seed, DEAP GA with memetic polish, REPLAN with fixed prefixes, OR-Tools baseline.
+- Training: `train_forecast.py`, `simulate_sales.py`, `agmarknet.py`, `open_meteo.py`, routing `benchmark.py` + Solomon loader; measured metrics committed.
+- Backend: forecast module (`GET /forecasts`, `POST /forecasts/run` + job status), nightly 02:00 IST job in the worker, shared `MlModule`.
+
 ## [m05] - 2026-11-13
 ### Added
 - ML service: hash-verified model registry, YOLOv8 ONNX grading (letterbox, decoder, class-wise NMS, grade rule), Cox PH from exported parameters, Q10 fallback, `/v1/vision/grade`, `/v1/shelf-life/predict`, `/v1/models`, error envelope, 45 tests.

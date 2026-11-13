@@ -140,3 +140,19 @@ Recomputed on grading, dispute resolution and (from M8) on threshold breaches an
 | POST | `/v1/vision/grade` | `{batchId, category: FISH\|PRODUCE, imageUrls[3]}` → `{batchId, grade, confidence, defects[{class, conf, box, areaPct}], perImage[{index, grade, confidence, itemDetected, defects}], modelVersion, latencyMs}`. 503 `MODEL_NOT_AVAILABLE` (with `details.reason`) when no hash-verified model is loaded; 422 for image fetch/decode errors |
 | POST | `/v1/shelf-life/predict` | `{items[1..200]: {batchId, productCode, category, grade?, hoursSinceHarvest, meanTempC, degreeMinutesAbove, humidityPct?, ethylenePpm?, shockEvents, baseShelfLifeH, q10, refTempC}}` → `{results[{batchId, remainingH, survivalCurve[{h,p}], method: COX\|Q10_FALLBACK, modelVersion, censored}], latencyMs}`. `baseShelfLifeH`, `q10`, `refTempC` are product reference values sent by the backend (D-53) |
 Errors: `{"error":{"code","message","details"}}`; 401 without/with a wrong token; 422 `VALIDATION_FAILED`.
+
+### Forecast (MANAGER, ADMIN; M6)
+| Method | Path | Notes |
+|--------|------|-------|
+| GET | `/forecasts?siteId&productId&from&to` | `from`/`to` = `YYYY-MM-DD`, at most 92 days. Newest run's value per (site, product, day): `[{siteId, productId, date, predictedKg, lowerKg, upperKg, modelVersion, runId}]` |
+| POST | `/forecasts/run` | `{startDate?, siteIds?, productIds?}` → **202** `{id, status: RUNNING, startedAt}`. Forecasts active DISTRIBUTION_CENTRE sites × active products for 7 days (default start = tomorrow IST). One run at a time (409 `FORECAST_RUNNING`) |
+| GET | `/forecasts/jobs/:id` | `RUNNING` / `DONE {result:{runId, rows, modelVersion, method, …}}` / `FAILED {error}` |
+The worker process also runs the forecast every night at 02:00 IST.
+
+### ML service additions (internal)
+| Method | Path | Contract |
+|--------|------|----------|
+| POST | `/v1/forecast/run` | `{siteIds, productIds, startDate, horizonDays 1..7, history?[{siteId, productId, date, kg, priceInr?}], siteCoords?{id:{lat,lng}}}` → `{runId, rows[{siteId, productId, date, predictedKg, lowerKg, upperKg, historySource: PROVIDED\|SIMULATED}], modelVersion, method: ENSEMBLE\|LIGHTGBM\|SEASONAL_NAIVE\|MIXED, latencyMs}`. A series uses provided history only with 30 complete days ending the day before `startDate`; otherwise the simulated world (Section 2). No registered model → seasonal naive. Max 500 series |
+| POST | `/v1/routes/optimize` | `{mode: INITIAL\|REPLAN, depot, vehicles[{id, capacityKg, start?, shiftEnd?}], stops[{id, lat, lng, demandKg, windowStart?, windowEnd?, serviceMin, shelfLifeH?, mustKeepVehicle?}], fixedPrefix?{vehicleId:[stopId…]} (REPLAN only), departAt?, timeLimitS ≤ 8, seed?}` → `{routes[{vehicleId, stops[{id, eta, lateMin}], distanceKm, loadKg}], fitness, distanceKm, feasible, violations{lateMin, overloadKg, spoilMin, wrongVehicle}, solver: GA, generations, stoppedBy, travelProvider, travelFallbackReason, latencyMs}`. 422: `UNKNOWN_VEHICLE`, `INVALID_MODE`, `INVALID_PREFIX`, `INVALID_WINDOW`, `DUPLICATE_ID` |
+| POST | `/v1/routes/baseline` | Same body (INITIAL only) → same response with `solver: OR_TOOLS`. 503 `BASELINE_UNAVAILABLE` where OR-Tools is not installed (production image) |
+Travel times: `ROUTING_PROVIDER` = `haversine` (default; road factor 1.3, IST time-of-day speeds), `osrm` (`OSRM_URL`) or `google` (`GOOGLE_MAPS_API_KEY`); any provider failure falls back to haversine and is reported in `travelFallbackReason`.

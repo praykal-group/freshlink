@@ -19,6 +19,7 @@ class State:
         self.registry: Optional[Registry] = None
         self.vision: Dict[str, VisionModel] = {}
         self.cox: Optional[CoxModel] = None
+        self.forecast = None  # ForecastModel | None (lazy import keeps lightgbm optional for other tests)
 
     def load(self, models_dir: Optional[Path] = None) -> None:
         models_dir = models_dir or Path(os.environ.get("MODELS_DIR", DEFAULT_MODELS_DIR))
@@ -35,6 +36,17 @@ class State:
             except Exception as e:  # noqa: BLE001 - a broken model must not crash the service
                 log.exception("could not load %s", name)
                 reg.mark_failed(name, f"load error: {e}")
+
+        self.forecast = None
+        entry = reg.resolve("forecast")
+        if entry:
+            try:
+                from .forecast.model import ForecastModel
+
+                self.forecast = ForecastModel(entry.path, f"forecast:{entry.version}")
+            except Exception as e:  # noqa: BLE001
+                log.exception("could not load forecast model")
+                reg.mark_failed("forecast", f"load error: {e}")
 
         entry = reg.resolve("shelf_life_cox")
         if entry:

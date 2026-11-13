@@ -1,0 +1,21 @@
+{
+  "dataSource": "simulated (Section 2)",
+  "split": {
+    "testOrigins": "2025-09-25..2025-12-24",
+    "valOrigins": "2025-06-27..2025-09-17"
+  },
+  "series": 60,
+  "testForecasts": 38220,
+  "mapeTest": {
+    "ensemble": 8.79,
+    "lightgbm": 8.73,
+    "lstm": 10.33,
+    "seasonalNaive": 11.29
+  },
+  "lstmWeight": 0.1,
+  "intervalPct": 0.1402,
+  "intervalCoverageTest": 0.798,
+  "lgbmRounds": 122,
+  "trainSeconds": 122.2,
+  "trainedAt": "2026-11-13T11:03:27Z"
+}

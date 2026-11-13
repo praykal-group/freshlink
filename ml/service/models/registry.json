@@ -11,6 +11,10 @@
     "shelf_life_cox": {
       "active": null,
       "versions": {}
+    },
+    "forecast": {
+      "active": null,
+      "versions": {}
     }
   }
 }

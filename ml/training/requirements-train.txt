@@ -7,3 +7,8 @@ pandas>=2.2,<3
 numpy>=1.26,<3
 pillow>=10,<13
 pyyaml>=6,<7
+lightgbm>=4.3,<5         # forecast
+deap>=1.4,<2             # routing GA (benchmarks)
+ortools>=9.10,<10        # routing baseline (benchmarks)
+# LSTM training (CPU wheel is enough):  pip install torch --index-url https://download.pytorch.org/whl/cpu
+torch>=2.4

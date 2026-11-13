@@ -55,18 +55,21 @@ def main() -> int:
             print(f"{name}: no active version, skipped")
             continue
         meta = spec["versions"][version]
-        dest = MODELS / name / version / meta["file"]
-        if dest.exists() and sha256(dest) == meta["sha256"]:
-            print(f"{name} {version}: present, sha256 ok")
-            continue
-        print(f"{name} {version}: downloading")
-        download(name, version, meta["file"], dest)
-        if sha256(dest) != meta["sha256"]:
-            dest.unlink()
-            print(f"{name} {version}: SHA256 MISMATCH, file removed")
-            failed += 1
-        else:
-            print(f"{name} {version}: ok")
+        # Single-file models have file/sha256; directory models (forecast) have files {name: sha256}.
+        wanted = meta["files"].items() if isinstance(meta.get("files"), dict) else [(meta["file"], meta["sha256"])]
+        for fname, expected in wanted:
+            dest = MODELS / name / version / fname
+            if dest.exists() and sha256(dest) == expected:
+                print(f"{name} {version} {fname}: present, sha256 ok")
+                continue
+            print(f"{name} {version} {fname}: downloading")
+            download(name, version, fname, dest)
+            if sha256(dest) != expected:
+                dest.unlink()
+                print(f"{name} {version} {fname}: SHA256 MISMATCH, file removed")
+                failed += 1
+            else:
+                print(f"{name} {version} {fname}: ok")
     return 1 if failed else 0
 
 

@@ -1,7 +1,11 @@
 FROM python:3.12-slim
 WORKDIR /srv
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# libgomp1: OpenMP runtime needed by LightGBM on slim images.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libgomp1 \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip install --no-cache-dir -r requirements.txt
 COPY app ./app
 COPY models ./models
 USER nobody

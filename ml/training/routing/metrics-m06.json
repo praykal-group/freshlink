@@ -1,0 +1,114 @@
+{
+  "solomon": [
+    {
+      "instance": "C101-like",
+      "source": "synthetic",
+      "customers": 100,
+      "ga": {
+        "fitness": 10054.81,
+        "distance": 1599.72,
+        "lateMin": 8.5,
+        "overload": 0.0,
+        "feasible": false,
+        "seconds": 2.43,
+        "generations": 30,
+        "stoppedBy": "patience"
+      },
+      "ortools": {
+        "fitness": 9864.26,
+        "distance": 1409.18,
+        "lateMin": 8.5,
+        "overload": 0.0,
+        "feasible": false,
+        "seconds": 31.0
+      },
+      "gapFitnessPct": 1.93,
+      "gapDistancePct": 13.52
+    },
+    {
+      "instance": "R101-like",
+      "source": "synthetic",
+      "customers": 100,
+      "ga": {
+        "fitness": 2305.13,
+        "distance": 2305.13,
+        "lateMin": 0.0,
+        "overload": 0.0,
+        "feasible": true,
+        "seconds": 3.34,
+        "generations": 30,
+        "stoppedBy": "patience"
+      },
+      "ortools": {
+        "fitness": 2042.09,
+        "distance": 2042.09,
+        "lateMin": 0.0,
+        "overload": 0.0,
+        "feasible": true,
+        "seconds": 30.02
+      },
+      "gapFitnessPct": 12.88,
+      "gapDistancePct": 12.88
+    },
+    {
+      "instance": "RC101-like",
+      "source": "synthetic",
+      "customers": 100,
+      "ga": {
+        "fitness": 2086.32,
+        "distance": 2086.32,
+        "lateMin": 0.0,
+        "overload": 0.0,
+        "feasible": true,
+        "seconds": 1.94,
+        "generations": 30,
+        "stoppedBy": "patience"
+      },
+      "ortools": {
+        "fitness": 1822.56,
+        "distance": 1822.56,
+        "lateMin": 0.0,
+        "overload": 0.0,
+        "feasible": true,
+        "seconds": 30.01
+      },
+      "gapFitnessPct": 14.47,
+      "gapDistancePct": 14.47
+    }
+  ],
+  "city": {
+    "case": "Chh. Sambhajinagar synthetic, 10 vehicles / 50 stops, haversine x1.3",
+    "manual": {
+      "fitness": 4702897.24,
+      "distance": 2060.26,
+      "lateMin": 4581.6,
+      "overload": 0.0,
+      "feasible": false,
+      "seconds": 0
+    },
+    "ga": {
+      "fitness": 884.6,
+      "distance": 884.6,
+      "lateMin": 0.0,
+      "overload": 0.0,
+      "feasible": true,
+      "seconds": 1.02,
+      "generations": 30,
+      "stoppedBy": "patience"
+    },
+    "distanceSavingPct": 57.06
+  },
+  "replan": {
+    "vehicles": 10,
+    "stops": 50,
+    "fitness": 897.1,
+    "distance": 897.1,
+    "lateMin": 0.0,
+    "overload": 0.0,
+    "feasible": true,
+    "seconds": 0.81,
+    "generations": 30,
+    "stoppedBy": "patience"
+  },
+  "measuredAt": "2026-11-13T11:04:17Z"
+}

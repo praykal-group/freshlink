@@ -25,7 +25,7 @@ from typing import Any, Dict, Optional
 
 log = logging.getLogger("registry")
 
-MODEL_NAMES = ("vision_fish", "vision_produce", "shelf_life_cox")
+MODEL_NAMES = ("vision_fish", "vision_produce", "shelf_life_cox", "forecast")
 
 
 @dataclass
@@ -73,7 +73,23 @@ class Registry:
         if not meta:
             self.status[name] = ModelStatus(name, active, False, "active version missing from registry")
             return None
-        path = self.models_dir / name / active / meta.get("file", "")
+        version_dir = self.models_dir / name / active
+        files = meta.get("files")
+        if isinstance(files, dict):
+            # Multi-file model (forecast): every listed file must exist and match; path = the directory.
+            for fname, expected in files.items():
+                fpath = version_dir / fname
+                if not fpath.is_file():
+                    self.status[name] = ModelStatus(name, active, False, f"file not found: {fname} (run scripts/fetch_models.sh)")
+                    return None
+                if sha256_file(fpath) != expected:
+                    self.status[name] = ModelStatus(name, active, False, "sha256 mismatch; refusing to load")
+                    log.error("model %s/%s file %s failed sha256 check", name, active, fname)
+                    return None
+            self.status[name] = ModelStatus(name, active, True, None, meta.get("metrics") or {})
+            return ModelEntry(name, active, version_dir, meta)
+
+        path = version_dir / meta.get("file", "")
         if not path.is_file():
             self.status[name] = ModelStatus(name, active, False, f"file not found: {path.name} (run scripts/fetch_models.sh)")
             return None

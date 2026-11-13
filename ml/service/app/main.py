@@ -11,7 +11,7 @@ from fastapi.responses import JSONResponse
 
 from .core.errors import MlError
 from .core.state import state
-from .routers import shelf_life, vision
+from .routers import forecast, routing, shelf_life, vision
 
 logging.basicConfig(level=os.environ.get("LOG_LEVEL", "INFO").upper(), format="%(asctime)s %(levelname)s %(name)s %(message)s")
 
@@ -64,3 +64,5 @@ def models() -> dict:
 
 app.include_router(vision.router)
 app.include_router(shelf_life.router)
+app.include_router(forecast.router)
+app.include_router(routing.router)

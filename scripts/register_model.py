@@ -19,7 +19,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 MODELS = ROOT / "ml" / "service" / "models"
-NAMES = ("vision_fish", "vision_produce", "shelf_life_cox")
+NAMES = ("vision_fish", "vision_produce", "shelf_life_cox", "forecast")
+# `forecast` is a directory model: <file> is the training output folder.
+FORECAST_FILES = ("lgbm.txt", "meta.json", "lstm.onnx")
 
 
 def sha256(path: Path) -> str:
@@ -42,6 +44,9 @@ def main() -> None:
     args = ap.parse_args()
 
     src = Path(args.file)
+    if args.name == "forecast":
+        register_forecast(args, src)
+        return
     if not src.is_file():
         sys.exit(f"not a file: {src}")
     if args.name.startswith("vision_") and not args.classes:
@@ -75,6 +80,33 @@ def main() -> None:
     reg_path.write_text(json.dumps(reg, indent=2) + "\n", encoding="utf-8")
     print(f"registered {args.name} {args.version} sha256={entry['sha256']}{' (active)' if args.activate else ''}")
     print(f"upload: {dest.relative_to(ROOT)} -> models/{args.name}/{args.version}/{dest.name}")
+
+
+def register_forecast(args, src: Path) -> None:
+    if not (src.is_dir() and (src / "lgbm.txt").is_file() and (src / "meta.json").is_file()):
+        sys.exit("forecast needs the training output folder with lgbm.txt and meta.json (lstm.onnx optional)")
+    reg_path = MODELS / "registry.json"
+    reg = json.loads(reg_path.read_text(encoding="utf-8"))
+    spec = reg.setdefault("models", {}).setdefault("forecast", {"active": None, "versions": {}})
+    if args.version in spec["versions"]:
+        sys.exit(f"forecast {args.version} already registered; versions are immutable, use a new one")
+    dest_dir = MODELS / "forecast" / args.version
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    files = {}
+    for name in FORECAST_FILES:
+        if (src / name).is_file():
+            shutil.copy2(src / name, dest_dir / name)
+            files[name] = sha256(dest_dir / name)
+    metrics_path = Path(args.metrics) if args.metrics else src / "metrics.json"
+    spec["versions"][args.version] = {
+        "files": files,
+        "metrics": json.loads(metrics_path.read_text(encoding="utf-8")) if metrics_path.is_file() else {},
+        "registeredAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+    }
+    if args.activate:
+        spec["active"] = args.version
+    reg_path.write_text(json.dumps(reg, indent=2) + "\n", encoding="utf-8")
+    print(f"registered forecast {args.version} files={sorted(files)}{' (active)' if args.activate else ''}")
 
 
 if __name__ == "__main__":
