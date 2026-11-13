@@ -4,7 +4,7 @@
  * Dev phone numbers come from env (SEED_*_PHONE) so real test SIMs can be used for OTP login.
  * Product limits are indicative reference values for the prototype; see docs/DATABASE.md.
  */
-import { createHash } from 'node:crypto';
+import { hashSync } from 'bcryptjs';
 import {
   BuyerType,
   Grade,
@@ -18,7 +18,7 @@ import {
 
 const prisma = new PrismaClient();
 const env = (k: string, d: string) => process.env[k] || d;
-const sha256 = (s: string) => createHash('sha256').update(s).digest('hex');
+
 
 // ── Sites (Chh. Sambhajinagar region + one coastal dock) ──
 const sites = [
@@ -143,7 +143,7 @@ async function main() {
     const data = { capacityKg: v.capacityKg, reeferMinTemp: v.min, reeferMaxTemp: v.max, homeSiteId: siteId[v.home] };
     const vehicle = await prisma.vehicle.upsert({ where: { regNo: v.regNo }, update: data, create: { ...data, regNo: v.regNo } });
     const code = `DEV-${String(i + 1).padStart(3, '0')}`;
-    const dev = { vehicleId: vehicle.id, mqttUsername: code.toLowerCase(), secretHash: sha256(`${code}:${deviceSecret}`) };
+    const dev = { vehicleId: vehicle.id, mqttUsername: code.toLowerCase(), secretHash: hashSync(`${code}:${deviceSecret}`, 10) };
     await prisma.iotDevice.upsert({ where: { deviceCode: code }, update: dev, create: { ...dev, deviceCode: code } });
   }
 

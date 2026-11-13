@@ -15,7 +15,8 @@ export const envSchema = z
     MIGRATION_DATABASE_URL: z.string().optional(),
     ML_SERVICE_URL: z.string().url().default('http://localhost:8000'),
     ML_INTERNAL_TOKEN: z.string().min(8),
-    SUPABASE_URL: z.string().url().optional(),
+    SUPABASE_URL: z.string().url(),
+    // Defaults to ${SUPABASE_URL}/auth/v1/.well-known/jwks.json
     SUPABASE_JWKS_URL: z.string().url().optional(),
     SUPABASE_SERVICE_ROLE_KEY: z.string().optional(),
     SUPABASE_SEND_SMS_HOOK_SECRET: z.string().optional(),
@@ -27,11 +28,22 @@ export const envSchema = z
     HTTPSMS_API_URL: z.string().url().optional(),
     HTTPSMS_API_KEY: z.string().optional(),
     HTTPSMS_FROM_NUMBER: z.string().optional(),
+    HTTPSMS_WEBHOOK_SECRET: z.string().optional(),
     SMTP_HOST: z.string().optional(),
     SMTP_PORT: z.coerce.number().int().optional(),
     SMTP_FROM: z.string().optional(),
   })
   .superRefine((env, ctx) => {
+    if (
+      env.SMS_PROVIDER === 'httpsms' &&
+      !(env.HTTPSMS_API_URL && env.HTTPSMS_API_KEY && env.HTTPSMS_FROM_NUMBER)
+    ) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['SMS_PROVIDER'],
+        message: 'httpsms needs HTTPSMS_API_URL, HTTPSMS_API_KEY and HTTPSMS_FROM_NUMBER',
+      });
+    }
     if (env.NODE_ENV === 'production' && env.SMS_PROVIDER === 'console') {
       ctx.addIssue({
         code: 'custom',

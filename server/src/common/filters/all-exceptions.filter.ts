@@ -29,7 +29,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
   catch(exception: unknown, host: ArgumentsHost): void {
     const ctx = host.switchToHttp();
-    const req = ctx.getRequest<Request & { id?: string }>();
+    const req = ctx.getRequest<Request>();
     const res = ctx.getResponse<Response>();
 
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -73,6 +73,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
     }
 
     if (status >= 500) this.logger.error(exception);
-    res.status(status).json({ error: { code, message, details, requestId: req.id } });
+    res.status(status).json({ error: { code, message, details, requestId: req.id === undefined ? undefined : String(req.id) } });
   }
 }

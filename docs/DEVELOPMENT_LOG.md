@@ -44,3 +44,22 @@ cd client && flutter run --flavor driver -t lib/main_driver.dart --dart-define-f
 psql "$MASTER_URL" -v app_password=... -v migrator_password=... -f server/prisma/sql/roles.sql
 cd server && DATABASE_URL=postgresql://iccms_migrator:...@localhost:5432/iccms npm run db:deploy && npm run db:seed
 ```
+
+## M3 — Backend Foundation, Authentication and RBAC (2026-11-13)
+
+**Implemented**
+- `common/auth/`: `JwtVerifier` (jose, injected key source), `AuthUser`/`AppRequest`, decorators (`@Public`, `@Roles`, `@AllowUnverifiedEmail`, `@SkipDeviceCheck`, `@CurrentUser`), `Ownership` helpers.
+- `common/guards/`: `VersionGateGuard`, `SupabaseAuthGuard`, `FlavorRoleGuard`, `DeviceGuard`, `RolesGuard`, `UserThrottlerGuard`, registered in that order.
+- `common/interceptors/audit.interceptor.ts`; `common/cache/ttl-cache.ts` (TTL cache + rate limiter, D-35).
+- `infra/supabase/supabase-admin.service.ts` (create phone user, invite email, ban/unban, email-confirmed lookup).
+- Modules: `auth` (/me*), `users` (admin), `sms` (console + httpSMS), `hooks` (Supabase Send SMS Hook, httpSMS webhook), `masters` (CRUD + bundle/ETag), `remote-config` (typed keys).
+- `main.ts`: raw body for hook signatures, Swagger (non-prod), trust proxy. Env: `SUPABASE_URL` required; httpSMS settings validated together.
+
+**Tests:** 78 unit tests pass (TESTING.md). e2e deferred.
+
+**Limitations / pending:** caches and rate limits are in-process (D-35); no Supabase project yet; the "SMS gateway down" alert is a log line until M8; API not booted (no DB credentials).
+
+**Repro**
+```bash
+cd server && npm test
+```

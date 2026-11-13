@@ -1,13 +1,15 @@
 import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Logger } from 'nestjs-pino';
 import { AppModule } from './app.module';
 import { loadEnv } from './config/env.schema';
 
 async function bootstrap() {
   const env = loadEnv();
-  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  // rawBody: the Send SMS Hook signature is computed over the exact bytes Supabase sent.
+  const app = await NestFactory.create(AppModule, { bufferLogs: true, rawBody: true });
   app.useLogger(app.get(Logger));
   app.setGlobalPrefix('api/v1');
   app.useGlobalPipes(
@@ -17,6 +19,22 @@ async function bootstrap() {
     .map((o) => o.trim())
     .filter(Boolean);
   app.enableCors({ origin: origins.length ? origins : false });
+  app.getHttpAdapter().getInstance().set('trust proxy', 'loopback'); // real client IP behind nginx
+
+  if (env.NODE_ENV !== 'production') {
+    const doc = new DocumentBuilder()
+      .setTitle('I-CCMS API')
+      .setVersion('0.3.0')
+      .addBearerAuth()
+      .addGlobalParameters(
+        { name: 'X-App-Flavor', in: 'header', required: false, schema: { enum: ['driver', 'operator', 'manager', 'web'] } },
+        { name: 'X-Device-Id', in: 'header', required: false, schema: { type: 'string' } },
+        { name: 'X-App-Version-Code', in: 'header', required: false, schema: { type: 'integer' } },
+      )
+      .build();
+    SwaggerModule.setup('api/docs', app, SwaggerModule.createDocument(app, doc));
+  }
+
   app.enableShutdownHooks();
   await app.listen(env.PORT);
 }
