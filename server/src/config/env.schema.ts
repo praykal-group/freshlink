@@ -11,7 +11,7 @@ export const envSchema = z
     APP_BASE_URL: z.string().url().default('http://localhost:3000'),
     CORS_ORIGINS: z.string().default(''),
     LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
-    DATABASE_URL: z.string().optional(),
+    DATABASE_URL: z.string().startsWith('postgresql://'),
     MIGRATION_DATABASE_URL: z.string().optional(),
     ML_SERVICE_URL: z.string().url().default('http://localhost:8000'),
     ML_INTERNAL_TOKEN: z.string().min(8),

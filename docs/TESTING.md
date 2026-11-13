@@ -29,6 +29,22 @@ The M1 test suite was **not run**, by user instruction (D-26). What was actually
 - `flutter build apk --debug --flavor driver|operator|manager`
 - Isolation script fails on a deliberate bad import
 
+### M2 — 2026-11-13
+| Check | Result |
+|-------|--------|
+| `prisma validate` | Pass |
+| `prisma migrate diff --from-empty` → init migration | Generated: 36 tables |
+| `prisma generate` + `npm run build` | Pass |
+| `eslint` on src + seed | Pass |
+| `tsc --strict` on `prisma/seed.ts` | Pass |
+
+**Deferred M2 checks (NOT RUN — no dev database credentials):**
+- `prisma migrate reset` on a clean DB
+- seed twice → no duplicates
+- as `iccms_app`: `UPDATE trace_events` → permission denied, `INSERT` → ok
+- unique constraints (batch code, tag uid) enforced
+- required indexes present (`pg_indexes`)
+
 ## Measured metrics
 None yet.
 

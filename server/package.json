@@ -13,7 +13,16 @@
     "dev:api": "ts-node-dev --respawn --transpile-only src/main.ts",
     "dev:worker": "ts-node-dev --respawn --transpile-only src/worker.ts",
     "lint": "eslint \"src/**/*.ts\"",
-    "test": "jest"
+    "test": "jest",
+    "prisma:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "db:reset": "prisma migrate reset --force",
+    "db:seed": "prisma db seed",
+    "postinstall": "prisma generate"
+  },
+  "prisma": {
+    "seed": "ts-node --transpile-only prisma/seed.ts"
   },
   "jest": {
     "preset": "ts-jest",
@@ -25,6 +34,7 @@
     "@nestjs/common": "^11.2.10",
     "@nestjs/core": "^11.2.10",
     "@nestjs/platform-express": "^11.2.10",
+    "@prisma/client": "^6.19.3",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
     "nestjs-pino": "^5.3.1",
@@ -40,7 +50,9 @@
     "eslint": "^10.14.0",
     "jest": "^30.5.2",
     "pino-pretty": "^13.2.0",
+    "prisma": "^6.19.3",
     "ts-jest": "^29.4.15",
+    "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "~5.8",
     "typescript-eslint": "^8.72.2"

@@ -1,0 +1,1108 @@
+// I-CCMS database schema (PROJECT_IMPLEMENTATION.md Section 7).
+// Conventions: snake_case via @map/@@map, uuid PKs, timestamptz, numeric(12,3) for kg/money.
+// CHECK constraints and partial unique indexes that Prisma cannot express live in
+// migrations/*_constraints/migration.sql.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ───────────────────────────── Enums ─────────────────────────────
+
+enum UserRole {
+  ADMIN
+  MANAGER
+  OPERATOR
+  DRIVER
+}
+
+enum AuthMethod {
+  PHONE
+  GOOGLE
+  EMAIL
+}
+
+enum UserStatus {
+  INVITED
+  ACTIVE
+  DISABLED
+}
+
+enum Language {
+  en
+  hi
+  mr
+}
+
+enum AppFlavor {
+  driver
+  operator
+  manager
+  web
+}
+
+enum SiteType {
+  DOCK
+  FARM_GATE
+  COLD_STORAGE
+  WAREHOUSE
+  DISTRIBUTION_CENTRE
+}
+
+enum StorageUnitType {
+  BLAST_CHILLER
+  RIPENING_CHAMBER
+  COLD_ROOM
+}
+
+enum VehicleStatus {
+  AVAILABLE
+  IN_USE
+  MAINTENANCE
+  INACTIVE
+}
+
+enum DeviceStatus {
+  ACTIVE
+  INACTIVE
+  FAULTY
+}
+
+enum ProductCategory {
+  FISH
+  PRODUCE
+}
+
+enum BatchSourceType {
+  FISHERY
+  FARM
+}
+
+enum BatchStatus {
+  REGISTERED
+  GRADED
+  STORED
+  ALLOCATED
+  LOADED
+  IN_TRANSIT
+  DIVERTED
+  DELIVERED
+  PARTIALLY_DELIVERED
+  REJECTED
+  SPOILED
+}
+
+enum Grade {
+  A
+  B
+  C
+}
+
+enum TagType {
+  NFC
+  UHF_RFID
+  QR
+}
+
+enum ImageView {
+  TOP
+  SIDE
+  CLOSEUP
+  RECEIVING
+  DAMAGE
+}
+
+enum GradeSource {
+  AUTO
+  MANUAL
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ShelfLifeMethod {
+  COX
+  Q10_FALLBACK
+}
+
+enum ShelfLifeTrigger {
+  BREACH
+  SCHEDULED
+  GRADE
+  MANUAL
+}
+
+enum OrderStatus {
+  DRAFT
+  APPROVED
+  PLANNED
+  IN_TRANSIT
+  DELIVERED
+  CANCELLED
+}
+
+enum OrderOrigin {
+  PLANNER
+  ERP
+  CSV
+  MANUAL
+}
+
+enum TripStatus {
+  PLANNED
+  ASSIGNED
+  PRE_CHECK_DONE
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum StopType {
+  PICKUP
+  DROP
+  DIVERSION_DROP
+  RESCUE_PICKUP
+  RESCUE_DROP
+  COLD_STORAGE_DROP
+}
+
+enum StopStatus {
+  PENDING
+  ARRIVED
+  COMPLETED
+  SKIPPED
+  CANCELLED
+}
+
+enum RouteReason {
+  INITIAL
+  DELAY
+  INCIDENT
+  DIVERSION
+  RESCUE
+  MANUAL
+}
+
+enum RoutePlanStatus {
+  PROPOSED
+  ACCEPTED
+  DECLINED
+  SUPERSEDED
+}
+
+enum TripEventType {
+  PRE_TRIP_CHECK
+  START
+  INCIDENT_DELAY
+  INCIDENT_BREAKDOWN
+  INCIDENT_ACCIDENT
+  INCIDENT_ROADBLOCK
+  INCIDENT_REEFER_FAULT
+  SOS
+  ARRIVE
+  COMPLETE
+}
+
+enum PodOutcome {
+  ACCEPTED
+  PARTIAL
+  REJECTED
+}
+
+enum AlertType {
+  TEMP_EXCURSION
+  HUMIDITY
+  ETHYLENE
+  SHOCK
+  SPOILAGE_RISK
+  DEVICE_OFFLINE
+  SOS
+  REEFER_MAINTENANCE
+  DRIVER_FIX
+}
+
+enum AlertSeverity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+enum AlertStatus {
+  OPEN
+  ACKNOWLEDGED
+  ESCALATED
+  RESOLVED
+}
+
+enum NotificationChannel {
+  PUSH
+  SMS
+  EMAIL
+  IN_APP
+}
+
+enum NotificationStatus {
+  QUEUED
+  SENT
+  FAILED
+}
+
+enum IncidentKind {
+  TEMP_DRIFT
+  REEFER_FAILURE
+  SPOILAGE_RISK
+  DELAY
+  BREAKDOWN
+}
+
+enum IncidentAction {
+  DRIVER_FIX
+  DIVERT_BUYER
+  DIVERT_COLD_STORAGE
+  RESCUE_PICKUP
+  REPLAN
+  MANUAL
+}
+
+enum IncidentStatus {
+  OPEN
+  ACTION_IN_PROGRESS
+  RESOLVED
+  FAILED
+}
+
+enum BuyerType {
+  CANNING
+  PROCESSING
+  LOCAL_MARKET
+  DISCOUNT_RETAIL
+  COLD_STORAGE
+}
+
+enum OfferStatus {
+  SENT
+  ACCEPTED
+  REJECTED
+  EXPIRED
+  CANCELLED
+}
+
+enum ReleaseChannel {
+  stable
+  beta
+}
+
+enum InstallStatus {
+  STARTED
+  SUCCEEDED
+  FAILED
+}
+
+// ───────────────────────────── Identity ─────────────────────────────
+
+model User {
+  id                    String     @id @default(uuid()) @db.Uuid
+  supabaseUid           String?    @unique @map("supabase_uid") @db.Uuid
+  phone                 String?    @unique // E.164
+  email                 String?    @unique // stored lower-case
+  emailVerifiedAt       DateTime?  @map("email_verified_at") @db.Timestamptz(6)
+  authMethod            AuthMethod @map("auth_method")
+  name                  String
+  role                  UserRole
+  siteId                String?    @map("site_id") @db.Uuid
+  language              Language   @default(en)
+  emergencyContactPhone String?    @map("emergency_contact_phone")
+  status                UserStatus @default(INVITED)
+  createdAt             DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  site           Site?                @relation(fields: [siteId], references: [id])
+  devices        DeviceRegistration[]
+  batchesCreated Batch[]              @relation("BatchCreatedBy")
+  tagsAttached   BatchTag[]
+  editRequests   BatchEditRequest[]   @relation("EditRequestedBy")
+  editReviews    BatchEditRequest[]   @relation("EditReviewedBy")
+  gradeResolves  QualityGrade[]
+  ordersApproved DispatchOrder[]
+  trips          Trip[]
+  tripLoads      TripBatch[]
+  alertAcks      Alert[]
+  notifications  Notification[]
+  traceEvents    TraceEvent[]
+  syncOps        SyncOp[]
+  auditLogs      AuditLog[]
+  configUpdates  AppConfig[]
+
+  @@index([role])
+  @@index([siteId])
+  @@map("users")
+}
+
+model DeviceRegistration {
+  id             String    @id @default(uuid()) @db.Uuid
+  userId         String    @map("user_id") @db.Uuid
+  deviceId       String    @map("device_id")
+  flavor         AppFlavor
+  fcmToken       String?   @map("fcm_token")
+  appVersionCode Int?      @map("app_version_code")
+  active         Boolean   @default(true)
+  lastSeenAt     DateTime? @map("last_seen_at") @db.Timestamptz(6)
+  createdAt      DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id])
+
+  // partial UNIQUE(user_id, flavor) WHERE active is in the constraints migration
+  @@unique([deviceId, flavor])
+  @@map("device_registrations")
+}
+
+// ───────────────────────────── Masters ─────────────────────────────
+
+model Site {
+  id        String   @id @default(uuid()) @db.Uuid
+  code      String   @unique
+  name      String
+  type      SiteType
+  lat       Float
+  lng       Float
+  address   String?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  users          User[]
+  storageUnits   StorageUnit[]
+  vehicles       Vehicle[]
+  batchesSourced Batch[]          @relation("BatchSourceSite")
+  batchesHere    Batch[]          @relation("BatchCurrentSite")
+  forecasts      DemandForecast[]
+  ordersFrom     DispatchOrder[]  @relation("OrderSource")
+  ordersTo       DispatchOrder[]  @relation("OrderDestination")
+  depotTrips     Trip[]
+  stops          TripStop[]
+
+  @@index([type])
+  @@map("sites")
+}
+
+model StorageUnit {
+  id         String          @id @default(uuid()) @db.Uuid
+  siteId     String          @map("site_id") @db.Uuid
+  code       String
+  type       StorageUnitType
+  tempMin    Decimal         @map("temp_min") @db.Decimal(5, 2)
+  tempMax    Decimal         @map("temp_max") @db.Decimal(5, 2)
+  capacityKg Decimal         @map("capacity_kg") @db.Decimal(12, 3)
+  usedKg     Decimal         @default(0) @map("used_kg") @db.Decimal(12, 3)
+  active     Boolean         @default(true)
+  createdAt  DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime        @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  site    Site        @relation(fields: [siteId], references: [id])
+  batches Batch[]
+  devices IotDevice[]
+
+  @@unique([siteId, code])
+  @@map("storage_units")
+}
+
+model Vehicle {
+  id                   String        @id @default(uuid()) @db.Uuid
+  regNo                String        @unique @map("reg_no")
+  capacityKg           Decimal       @map("capacity_kg") @db.Decimal(12, 3)
+  reeferMinTemp        Decimal       @map("reefer_min_temp") @db.Decimal(5, 2)
+  reeferMaxTemp        Decimal       @map("reefer_max_temp") @db.Decimal(5, 2)
+  homeSiteId           String        @map("home_site_id") @db.Uuid
+  status               VehicleStatus @default(AVAILABLE)
+  baselinePulldownRate Float?        @map("baseline_pulldown_rate") // °C/min
+  createdAt            DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt            DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  homeSite     Site           @relation(fields: [homeSiteId], references: [id])
+  devices      IotDevice[]
+  trips        Trip[]
+  alerts       Alert[]
+  reeferHealth ReeferHealth[]
+
+  @@map("vehicles")
+}
+
+model IotDevice {
+  id            String       @id @default(uuid()) @db.Uuid
+  deviceCode    String       @unique @map("device_code")
+  vehicleId     String?      @map("vehicle_id") @db.Uuid
+  storageUnitId String?      @map("storage_unit_id") @db.Uuid
+  mqttUsername  String       @unique @map("mqtt_username")
+  secretHash    String       @map("secret_hash")
+  status        DeviceStatus @default(ACTIVE)
+  lastSeenAt    DateTime?    @map("last_seen_at") @db.Timestamptz(6)
+  createdAt     DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime     @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  vehicle     Vehicle?     @relation(fields: [vehicleId], references: [id])
+  storageUnit StorageUnit? @relation(fields: [storageUnitId], references: [id])
+
+  @@map("iot_devices")
+}
+
+model Product {
+  id                  String          @id @default(uuid()) @db.Uuid
+  code                String          @unique
+  name                String
+  nameHi              String          @map("name_hi")
+  nameMr              String          @map("name_mr")
+  category            ProductCategory
+  isClimacteric       Boolean         @map("is_climacteric")
+  isEthyleneSensitive Boolean         @map("is_ethylene_sensitive")
+  safeTempMin         Decimal         @map("safe_temp_min") @db.Decimal(5, 2)
+  safeTempMax         Decimal         @map("safe_temp_max") @db.Decimal(5, 2)
+  humidityMin         Decimal         @map("humidity_min") @db.Decimal(5, 2)
+  humidityMax         Decimal         @map("humidity_max") @db.Decimal(5, 2)
+  ethyleneMaxPpm      Decimal?        @map("ethylene_max_ppm") @db.Decimal(8, 3)
+  shockMaxG           Decimal         @map("shock_max_g") @db.Decimal(6, 2)
+  baseShelfLifeH      Decimal         @map("base_shelf_life_h") @db.Decimal(8, 2)
+  q10                 Decimal         @db.Decimal(5, 2)
+  unitPrice           Decimal         @map("unit_price") @db.Decimal(12, 3)
+  active              Boolean         @default(true)
+  createdAt           DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime        @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  batches   Batch[]
+  forecasts DemandForecast[]
+  orders    DispatchOrder[]
+
+  @@map("products")
+}
+
+model AppConfig {
+  key       String   @id
+  value     Json
+  updatedBy String?  @map("updated_by") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  updater User? @relation(fields: [updatedBy], references: [id])
+
+  @@map("app_config")
+}
+
+// ───────────────────────────── Batches ─────────────────────────────
+
+model Batch {
+  id                  String          @id @db.Uuid // client-generated UUID
+  code                String          @unique
+  productId           String          @map("product_id") @db.Uuid
+  sourceType          BatchSourceType @map("source_type")
+  sourceSiteId        String          @map("source_site_id") @db.Uuid
+  currentSiteId       String?         @map("current_site_id") @db.Uuid
+  storageUnitId       String?         @map("storage_unit_id") @db.Uuid
+  vesselId            String?         @map("vessel_id")
+  farmRef             String?         @map("farm_ref")
+  caughtOrHarvestedAt DateTime        @map("caught_or_harvested_at") @db.Timestamptz(6)
+  weightKg            Decimal         @map("weight_kg") @db.Decimal(12, 3)
+  iceToFishRatio      Decimal?        @map("ice_to_fish_ratio") @db.Decimal(6, 3)
+  initialCoreTemp     Decimal?        @map("initial_core_temp") @db.Decimal(5, 2)
+  maturityIndex       Decimal?        @map("maturity_index") @db.Decimal(5, 2)
+  brix                Decimal?        @db.Decimal(5, 2)
+  fieldTemp           Decimal?        @map("field_temp") @db.Decimal(5, 2)
+  fieldHumidity       Decimal?        @map("field_humidity") @db.Decimal(5, 2)
+  status              BatchStatus     @default(REGISTERED)
+  currentGrade        Grade?          @map("current_grade")
+  remainingShelfLifeH Decimal?        @map("remaining_shelf_life_h") @db.Decimal(8, 2)
+  shelfLifeUpdatedAt  DateTime?       @map("shelf_life_updated_at") @db.Timestamptz(6)
+  createdBy           String          @map("created_by") @db.Uuid
+  deviceId            String          @map("device_id")
+  capturedAt          DateTime        @map("captured_at") @db.Timestamptz(6)
+  capturedLat         Float?          @map("captured_lat")
+  capturedLng         Float?          @map("captured_lng")
+  recordHash          String          @map("record_hash") @db.Char(64)
+  createdAt           DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime        @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  product      Product             @relation(fields: [productId], references: [id])
+  sourceSite   Site                @relation("BatchSourceSite", fields: [sourceSiteId], references: [id])
+  currentSite  Site?               @relation("BatchCurrentSite", fields: [currentSiteId], references: [id])
+  storageUnit  StorageUnit?        @relation(fields: [storageUnitId], references: [id])
+  creator      User                @relation("BatchCreatedBy", fields: [createdBy], references: [id])
+  tags         BatchTag[]
+  images       BatchImage[]
+  grades       QualityGrade[]
+  editRequests BatchEditRequest[]
+  shelfLife    ShelfLifeEstimate[]
+  exposure     BatchExposure?
+  orders       OrderBatch[]
+  trips        TripBatch[]
+  pods         ProofOfDelivery[]
+  alerts       Alert[]
+  traceEvents  TraceEvent[]
+
+  @@index([currentSiteId, status])
+  @@index([productId, status])
+  @@index([createdAt(sort: Desc)])
+  @@index([remainingShelfLifeH])
+  @@map("batches")
+}
+
+model BatchTag {
+  id         String   @id @default(uuid()) @db.Uuid
+  batchId    String   @map("batch_id") @db.Uuid
+  tagType    TagType  @map("tag_type")
+  tagUid     String   @unique @map("tag_uid")
+  attachedBy String   @map("attached_by") @db.Uuid
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  batch    Batch @relation(fields: [batchId], references: [id])
+  attacher User  @relation(fields: [attachedBy], references: [id])
+
+  @@index([batchId])
+  @@map("batch_tags")
+}
+
+model BatchImage {
+  id         String    @id @default(uuid()) @db.Uuid
+  batchId    String    @map("batch_id") @db.Uuid
+  view       ImageView
+  s3Key      String    @map("s3_key")
+  sizeBytes  Int       @map("size_bytes")
+  width      Int
+  height     Int
+  capturedAt DateTime  @map("captured_at") @db.Timestamptz(6)
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  batch Batch @relation(fields: [batchId], references: [id])
+
+  @@index([batchId])
+  @@map("batch_images")
+}
+
+model QualityGrade {
+  id            String      @id @default(uuid()) @db.Uuid
+  batchId       String      @map("batch_id") @db.Uuid
+  grade         Grade
+  defects       Json        @default("[]")
+  confidence    Decimal     @db.Decimal(5, 4)
+  modelVersion  String      @map("model_version")
+  source        GradeSource
+  disputed      Boolean     @default(false)
+  disputeReason String?     @map("dispute_reason")
+  resolvedBy    String?     @map("resolved_by") @db.Uuid
+  createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime    @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  batch    Batch @relation(fields: [batchId], references: [id])
+  resolver User? @relation(fields: [resolvedBy], references: [id])
+
+  @@index([batchId, createdAt(sort: Desc)])
+  @@map("quality_grades")
+}
+
+model BatchEditRequest {
+  id          String       @id @default(uuid()) @db.Uuid
+  batchId     String       @map("batch_id") @db.Uuid
+  requestedBy String       @map("requested_by") @db.Uuid
+  changes     Json
+  reason      String
+  status      ReviewStatus @default(PENDING)
+  reviewedBy  String?      @map("reviewed_by") @db.Uuid
+  reviewedAt  DateTime?    @map("reviewed_at") @db.Timestamptz(6)
+  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime     @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  batch     Batch @relation(fields: [batchId], references: [id])
+  requester User  @relation("EditRequestedBy", fields: [requestedBy], references: [id])
+  reviewer  User? @relation("EditReviewedBy", fields: [reviewedBy], references: [id])
+
+  @@index([status])
+  @@map("batch_edit_requests")
+}
+
+model ShelfLifeEstimate {
+  id            String           @id @default(uuid()) @db.Uuid
+  batchId       String           @map("batch_id") @db.Uuid
+  remainingH    Decimal          @map("remaining_h") @db.Decimal(8, 2)
+  survivalCurve Json             @default("[]") @map("survival_curve")
+  method        ShelfLifeMethod
+  modelVersion  String           @map("model_version")
+  trigger       ShelfLifeTrigger
+  createdAt     DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime         @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  batch Batch @relation(fields: [batchId], references: [id])
+
+  @@index([batchId, createdAt(sort: Desc)])
+  @@map("shelf_life_estimates")
+}
+
+model BatchExposure {
+  batchId            String   @id @map("batch_id") @db.Uuid
+  degreeMinutesAbove Decimal  @default(0) @map("degree_minutes_above") @db.Decimal(12, 3)
+  minutesAboveLimit  Int      @default(0) @map("minutes_above_limit")
+  meanTemp           Decimal? @map("mean_temp") @db.Decimal(5, 2)
+  maxTemp            Decimal? @map("max_temp") @db.Decimal(5, 2)
+  shockEvents        Int      @default(0) @map("shock_events")
+  maxEthylenePpm     Decimal? @map("max_ethylene_ppm") @db.Decimal(8, 3)
+  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  batch Batch @relation(fields: [batchId], references: [id])
+
+  @@map("batch_exposure")
+}
+
+// ───────────────────────────── Planning ─────────────────────────────
+
+model DemandForecast {
+  id           String   @id @default(uuid()) @db.Uuid
+  siteId       String   @map("site_id") @db.Uuid
+  productId    String   @map("product_id") @db.Uuid
+  forecastDate DateTime @map("forecast_date") @db.Date
+  predictedKg  Decimal  @map("predicted_kg") @db.Decimal(12, 3)
+  lowerKg      Decimal  @map("lower_kg") @db.Decimal(12, 3)
+  upperKg      Decimal  @map("upper_kg") @db.Decimal(12, 3)
+  modelVersion String   @map("model_version")
+  runId        String   @map("run_id") @db.Uuid
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  site    Site    @relation(fields: [siteId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+
+  @@unique([siteId, productId, forecastDate, runId])
+  @@map("demand_forecasts")
+}
+
+model DispatchOrder {
+  id                String      @id @default(uuid()) @db.Uuid
+  code              String      @unique
+  sourceSiteId      String      @map("source_site_id") @db.Uuid
+  destinationSiteId String      @map("destination_site_id") @db.Uuid
+  productId         String      @map("product_id") @db.Uuid
+  quantityKg        Decimal     @map("quantity_kg") @db.Decimal(12, 3)
+  windowStart       DateTime    @map("window_start") @db.Timestamptz(6)
+  windowEnd         DateTime    @map("window_end") @db.Timestamptz(6)
+  status            OrderStatus @default(DRAFT)
+  origin            OrderOrigin
+  externalRef       String?     @map("external_ref")
+  approvedBy        String?     @map("approved_by") @db.Uuid
+  createdAt         DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime    @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  sourceSite      Site         @relation("OrderSource", fields: [sourceSiteId], references: [id])
+  destinationSite Site         @relation("OrderDestination", fields: [destinationSiteId], references: [id])
+  product         Product      @relation(fields: [productId], references: [id])
+  approver        User?        @relation(fields: [approvedBy], references: [id])
+  batches         OrderBatch[]
+  stops           TripStop[]
+
+  @@unique([origin, externalRef])
+  @@index([status, windowStart])
+  @@map("dispatch_orders")
+}
+
+model OrderBatch {
+  orderId     String  @map("order_id") @db.Uuid
+  batchId     String  @map("batch_id") @db.Uuid
+  allocatedKg Decimal @map("allocated_kg") @db.Decimal(12, 3)
+
+  order DispatchOrder @relation(fields: [orderId], references: [id])
+  batch Batch         @relation(fields: [batchId], references: [id])
+
+  @@id([orderId, batchId])
+  @@map("order_batches")
+}
+
+// ───────────────────────────── Trips ─────────────────────────────
+
+model Trip {
+  id                  String     @id @default(uuid()) @db.Uuid
+  code                String     @unique
+  vehicleId           String     @map("vehicle_id") @db.Uuid
+  driverId            String?    @map("driver_id") @db.Uuid
+  depotSiteId         String     @map("depot_site_id") @db.Uuid
+  status              TripStatus @default(PLANNED)
+  plannedStart        DateTime   @map("planned_start") @db.Timestamptz(6)
+  startedAt           DateTime?  @map("started_at") @db.Timestamptz(6)
+  completedAt         DateTime?  @map("completed_at") @db.Timestamptz(6)
+  boundDeviceId       String?    @map("bound_device_id")
+  currentRouteVersion Int        @default(1) @map("current_route_version")
+  distanceKm          Decimal?   @map("distance_km") @db.Decimal(10, 3)
+  co2Kg               Decimal?   @map("co2_kg") @db.Decimal(12, 3)
+  createdAt           DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt           DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  vehicle    Vehicle     @relation(fields: [vehicleId], references: [id])
+  driver     User?       @relation(fields: [driverId], references: [id])
+  depotSite  Site        @relation(fields: [depotSiteId], references: [id])
+  stops      TripStop[]
+  batches    TripBatch[]
+  routePlans RoutePlan[]
+  events     TripEvent[]
+  alerts     Alert[]
+  incidents  Incident[]
+
+  @@index([driverId, status])
+  @@index([status, plannedStart])
+  @@map("trips")
+}
+
+model TripStop {
+  id           String     @id @default(uuid()) @db.Uuid
+  tripId       String     @map("trip_id") @db.Uuid
+  seq          Int
+  routeVersion Int        @map("route_version")
+  type         StopType
+  siteId       String?    @map("site_id") @db.Uuid
+  buyerId      String?    @map("buyer_id") @db.Uuid
+  orderId      String?    @map("order_id") @db.Uuid
+  lat          Float
+  lng          Float
+  windowStart  DateTime?  @map("window_start") @db.Timestamptz(6)
+  windowEnd    DateTime?  @map("window_end") @db.Timestamptz(6)
+  eta          DateTime?  @db.Timestamptz(6)
+  arrivedAt    DateTime?  @map("arrived_at") @db.Timestamptz(6)
+  completedAt  DateTime?  @map("completed_at") @db.Timestamptz(6)
+  status       StopStatus @default(PENDING)
+  createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  trip  Trip              @relation(fields: [tripId], references: [id])
+  site  Site?             @relation(fields: [siteId], references: [id])
+  buyer BackupBuyer?      @relation(fields: [buyerId], references: [id])
+  order DispatchOrder?    @relation(fields: [orderId], references: [id])
+  pods  ProofOfDelivery[]
+
+  @@index([tripId, routeVersion, seq])
+  @@map("trip_stops")
+}
+
+model TripBatch {
+  tripId     String    @map("trip_id") @db.Uuid
+  batchId    String    @map("batch_id") @db.Uuid
+  loadedBy   String    @map("loaded_by") @db.Uuid
+  loadedAt   DateTime  @map("loaded_at") @db.Timestamptz(6)
+  unloadedAt DateTime? @map("unloaded_at") @db.Timestamptz(6)
+
+  trip   Trip  @relation(fields: [tripId], references: [id])
+  batch  Batch @relation(fields: [batchId], references: [id])
+  loader User  @relation(fields: [loadedBy], references: [id])
+
+  @@id([tripId, batchId])
+  @@map("trip_batches")
+}
+
+model RoutePlan {
+  id          String          @id @default(uuid()) @db.Uuid
+  tripId      String          @map("trip_id") @db.Uuid
+  version     Int
+  reason      RouteReason
+  stops       Json
+  polyline    String?
+  fitness     Float
+  status      RoutePlanStatus @default(PROPOSED)
+  respondedAt DateTime?       @map("responded_at") @db.Timestamptz(6)
+  createdAt   DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime        @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  trip Trip @relation(fields: [tripId], references: [id])
+
+  @@unique([tripId, version])
+  @@map("route_plans")
+}
+
+model TripEvent {
+  id         String        @id @db.Uuid // client-generated UUID
+  tripId     String        @map("trip_id") @db.Uuid
+  type       TripEventType
+  payload    Json          @default("{}")
+  photoKey   String?       @map("photo_key")
+  voiceKey   String?       @map("voice_key")
+  lat        Float?
+  lng        Float?
+  occurredAt DateTime      @map("occurred_at") @db.Timestamptz(6)
+  createdAt  DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  trip Trip @relation(fields: [tripId], references: [id])
+
+  @@index([tripId, occurredAt])
+  @@map("trip_events")
+}
+
+model ProofOfDelivery {
+  id            String     @id @db.Uuid // client-generated UUID
+  tripStopId    String     @map("trip_stop_id") @db.Uuid
+  batchId       String     @map("batch_id") @db.Uuid
+  outcome       PodOutcome
+  acceptedKg    Decimal    @map("accepted_kg") @db.Decimal(12, 3)
+  reason        String?
+  receiverName  String     @map("receiver_name")
+  signatureKey  String     @map("signature_key")
+  photoKey      String     @map("photo_key")
+  scannedTagUid String     @map("scanned_tag_uid")
+  capturedAt    DateTime   @map("captured_at") @db.Timestamptz(6)
+  lat           Float
+  lng           Float
+  createdAt     DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  tripStop TripStop @relation(fields: [tripStopId], references: [id])
+  batch    Batch    @relation(fields: [batchId], references: [id])
+
+  @@unique([tripStopId, batchId])
+  @@map("proof_of_delivery")
+}
+
+// ───────────────────────────── Alerts & incidents ─────────────────────────────
+
+model Alert {
+  id             String        @id @default(uuid()) @db.Uuid
+  type           AlertType
+  severity       AlertSeverity
+  tripId         String?       @map("trip_id") @db.Uuid
+  vehicleId      String?       @map("vehicle_id") @db.Uuid
+  batchId        String?       @map("batch_id") @db.Uuid
+  message        String
+  data           Json          @default("{}")
+  status         AlertStatus   @default(OPEN)
+  acknowledgedBy String?       @map("acknowledged_by") @db.Uuid
+  acknowledgedAt DateTime?     @map("acknowledged_at") @db.Timestamptz(6)
+  escalatedAt    DateTime?     @map("escalated_at") @db.Timestamptz(6)
+  resolvedAt     DateTime?     @map("resolved_at") @db.Timestamptz(6)
+  createdAt      DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  trip          Trip?          @relation(fields: [tripId], references: [id])
+  vehicle       Vehicle?       @relation(fields: [vehicleId], references: [id])
+  batch         Batch?         @relation(fields: [batchId], references: [id])
+  acknowledger  User?          @relation(fields: [acknowledgedBy], references: [id])
+  notifications Notification[]
+  incidents     Incident[]
+
+  @@index([status, createdAt(sort: Desc)])
+  @@index([tripId])
+  @@map("alerts")
+}
+
+model Notification {
+  id          String              @id @default(uuid()) @db.Uuid
+  alertId     String?             @map("alert_id") @db.Uuid
+  userId      String              @map("user_id") @db.Uuid
+  channel     NotificationChannel
+  status      NotificationStatus  @default(QUEUED)
+  providerRef String?             @map("provider_ref")
+  error       String?
+  createdAt   DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime            @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  alert Alert? @relation(fields: [alertId], references: [id])
+  user  User   @relation(fields: [userId], references: [id])
+
+  @@index([alertId])
+  @@map("notifications")
+}
+
+model Incident {
+  id            String          @id @default(uuid()) @db.Uuid
+  tripId        String          @map("trip_id") @db.Uuid
+  alertId       String?         @map("alert_id") @db.Uuid
+  kind          IncidentKind
+  decidedAction IncidentAction? @map("decided_action")
+  status        IncidentStatus  @default(OPEN)
+  decisionLog   Json            @default("[]") @map("decision_log")
+  resolvedAt    DateTime?       @map("resolved_at") @db.Timestamptz(6)
+  createdAt     DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime        @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  trip   Trip             @relation(fields: [tripId], references: [id])
+  alert  Alert?           @relation(fields: [alertId], references: [id])
+  offers DiversionOffer[]
+
+  @@index([status])
+  @@index([tripId])
+  @@map("incidents")
+}
+
+model BackupBuyer {
+  id                 String    @id @default(uuid()) @db.Uuid
+  name               String
+  type               BuyerType
+  phone              String
+  email              String?
+  lat                Float
+  lng                Float
+  acceptedProductIds String[]  @map("accepted_product_ids") @db.Uuid
+  minGrade           Grade     @map("min_grade")
+  discountPct        Decimal   @map("discount_pct") @db.Decimal(5, 2)
+  openingHours       Json      @map("opening_hours") // {"mon":[["06:00","20:00"]], ...}
+  capacityKg         Decimal?  @map("capacity_kg") @db.Decimal(12, 3)
+  active             Boolean   @default(true)
+  createdAt          DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  offers DiversionOffer[]
+  stops  TripStop[]
+
+  @@index([type, active])
+  @@index([acceptedProductIds], type: Gin)
+  @@map("backup_buyers")
+}
+
+model DiversionOffer {
+  id          String      @id @default(uuid()) @db.Uuid
+  incidentId  String      @map("incident_id") @db.Uuid
+  buyerId     String      @map("buyer_id") @db.Uuid
+  batchIds    String[]    @map("batch_ids") @db.Uuid
+  quantityKg  Decimal     @map("quantity_kg") @db.Decimal(12, 3)
+  tokenHash   String      @unique @map("token_hash") @db.Char(64)
+  status      OfferStatus @default(SENT)
+  expiresAt   DateTime    @map("expires_at") @db.Timestamptz(6)
+  respondedAt DateTime?   @map("responded_at") @db.Timestamptz(6)
+  createdAt   DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime    @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  incident Incident    @relation(fields: [incidentId], references: [id])
+  buyer    BackupBuyer @relation(fields: [buyerId], references: [id])
+
+  @@index([incidentId])
+  @@map("diversion_offers")
+}
+
+// ───────────────────────────── Trace (W-4) ─────────────────────────────
+
+/// Insert-only for the app role (see prisma/sql/roles.sql). No updated_at on purpose.
+model TraceEvent {
+  id          BigInt   @id @default(autoincrement())
+  batchId     String   @map("batch_id") @db.Uuid
+  seq         Int
+  eventType   String   @map("event_type")
+  payload     Json
+  actorUserId String?  @map("actor_user_id") @db.Uuid
+  occurredAt  DateTime @map("occurred_at") @db.Timestamptz(6)
+  prevHash    String   @map("prev_hash") @db.Char(64)
+  hash        String   @db.Char(64)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  batch Batch @relation(fields: [batchId], references: [id])
+  actor User? @relation(fields: [actorUserId], references: [id])
+
+  @@unique([batchId, seq])
+  @@map("trace_events")
+}
+
+// ───────────────────────────── Maintenance ─────────────────────────────
+
+model ReeferHealth {
+  id             String   @id @default(uuid()) @db.Uuid
+  vehicleId      String   @map("vehicle_id") @db.Uuid
+  periodStart    DateTime @map("period_start") @db.Timestamptz(6)
+  periodEnd      DateTime @map("period_end") @db.Timestamptz(6)
+  pulldownRate   Float    @map("pulldown_rate")
+  baselineRate   Float    @map("baseline_rate")
+  degradationPct Float    @map("degradation_pct")
+  flagged        Boolean  @default(false)
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  vehicle Vehicle @relation(fields: [vehicleId], references: [id])
+
+  @@index([vehicleId, periodStart(sort: Desc)])
+  @@map("reefer_health")
+}
+
+// ───────────────────────────── App updates ─────────────────────────────
+
+model AppRelease {
+  id                String         @id @default(uuid()) @db.Uuid
+  flavor            AppFlavor
+  channel           ReleaseChannel @default(stable)
+  versionName       String         @map("version_name")
+  versionCode       Int            @map("version_code")
+  minSupportedCode  Int            @map("min_supported_code")
+  mandatory         Boolean        @default(false)
+  notesMd           String         @default("") @map("notes_md")
+  features          Json           @default("[]")
+  improvements      Json           @default("[]")
+  fixes             Json           @default("[]")
+  apkUrl            String         @map("apk_url")
+  apkName           String         @map("apk_name")
+  sha256            String         @db.Char(64)
+  sizeBytes         BigInt         @map("size_bytes")
+  signingCertSha256 String         @map("signing_cert_sha256")
+  githubReleaseId   BigInt         @unique @map("github_release_id")
+  publishedAt       DateTime       @map("published_at") @db.Timestamptz(6)
+  isActive          Boolean        @default(true) @map("is_active")
+  createdAt         DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime       @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@unique([flavor, channel, versionCode])
+  @@map("app_releases")
+}
+
+model AppInstall {
+  id        String        @id @default(uuid()) @db.Uuid
+  deviceId  String        @map("device_id")
+  flavor    AppFlavor
+  fromCode  Int           @map("from_code")
+  toCode    Int           @map("to_code")
+  status    InstallStatus
+  createdAt DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime      @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@index([flavor, createdAt])
+  @@map("app_installs")
+}
+
+// ───────────────────────────── Sync, integrations, audit ─────────────────────────────
+
+model SyncOp {
+  clientOpId String   @id @map("client_op_id") @db.Uuid
+  userId     String   @map("user_id") @db.Uuid
+  type       String
+  result     Json
+  receivedAt DateTime @default(now()) @map("received_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("sync_ops")
+}
+
+model IntegrationClient {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  keyHash   String   @unique @map("key_hash") @db.Char(64)
+  scopes    String[]
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("integration_clients")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid()) @db.Uuid
+  actorId   String?  @map("actor_id") @db.Uuid
+  action    String
+  entity    String
+  entityId  String   @map("entity_id")
+  before    Json?
+  after     Json?
+  ip        String?
+  requestId String?  @map("request_id")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  actor User? @relation(fields: [actorId], references: [id])
+
+  @@index([entity, entityId])
+  @@map("audit_logs")
+}

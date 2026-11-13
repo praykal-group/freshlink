@@ -1,11 +1,11 @@
 # Project Status
 
-**Current milestone:** M2 — Database Schema, Migrations and Seed (next)
+**Current milestone:** M3 — Backend Foundation, Authentication and RBAC (next)
 
 | # | Milestone | Status | Date | Commit |
 |---|-----------|--------|------|--------|
 | M1 | Repository, Architecture and Tooling | Code done, verification not run (D-26) | 2026-11-13 | see `git log --grep m01` |
-| M2 | Database Schema, Migrations and Seed | Not started | | |
+| M2 | Database Schema, Migrations and Seed | Code done, DB tests not run (no DB credentials) | 2026-11-13 | see `git log --grep m02` |
 | M3 | Backend Foundation, Authentication and RBAC | Not started | | |
 | M4 | Batches, Files, Storage Path and Traceability | Not started | | |
 | M5 | ML Service I: Vision Grading and Shelf-Life | Not started | | |
@@ -24,5 +24,6 @@
 - Docker is not installed on the dev PC, so `deploy/docker-compose.dev.yml` has not been run.
 
 ## Next steps
-- M2: Prisma schema (Section 7), roles.sql, seed, DATABASE.md.
+- Apply migrations + seed to a dev Postgres and run the M2 DB checks (TESTING.md).
+- M3: Supabase auth, guards, SMS hook, masters, remote config.
 - Run the deferred M1 checks when Docker is available (listed in TESTING.md).

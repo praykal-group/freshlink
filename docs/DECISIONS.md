@@ -39,3 +39,7 @@ Format: ID · date · decision · reason · alternatives. D-01…D-24 come from 
 | D-28 | 2026-11-13 | `PROJECT_IMPLEMENTATION.md` lives in `docs/`, not the repo root | It was already committed there | Move to root |
 | D-29 | 2026-11-13 | M1 flavor routers use `MaterialApp` named routes behind a `FlavorRouter` interface; no router package yet | No new dependency in a skeleton; revisit in M10 | go_router now |
 | D-30 | 2026-11-13 | Backend dev deps: TypeScript 5.8, ts-node-dev (watch), jest + ts-jest, eslint + typescript-eslint, pino-pretty (dev logs only) | Standard minimal NestJS toolchain without the Nest CLI | @nestjs/cli + swc |
+| D-31 | 2026-11-13 | Prisma **6** (`prisma-client-js`), not Prisma 7 | Prisma 7 requires driver adapters + `prisma.config.ts`; v6 is simpler for this project | Prisma 7, Drizzle |
+| D-32 | 2026-11-13 | Initial migration generated offline with `prisma migrate diff --from-empty`; CHECKs/partial index/revoke in a hand-written second migration | No dev DB credentials available during M2; Prisma cannot express those constraints | `prisma migrate dev` against a live DB |
+| D-33 | 2026-11-13 | Seed users are `ACTIVE` with `supabase_uid` NULL; M3 links them to Supabase users | Lets M3 create/link Supabase accounts for existing rows | Seed as `INVITED` |
+| D-34 | 2026-11-13 | Added deps: `@prisma/client`, `prisma`, `ts-node` (seed runner) | Mandated ORM (D-04); ts-node was only transitively present | tsx |
