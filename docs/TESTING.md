@@ -216,9 +216,41 @@ No ERROR lines in the API or worker logs during the run.
 
 **Deferred M9 checks (NOT RUN):** driver accepting the proposed route and PoD at the diversion / handover stop through the API (needs a Supabase login; covered by unit tests); the reefer-health job on real pull-down data (needs ≥ 20 min per window and 4 weeks of history; unit-tested only); `/reports/*` and `/incidents/*` over HTTP with a manager token (the report service was run directly against the stack); real SMS delivery to buyers (console provider).
 
+### M10 — 2026-11-15
+`cd client && flutter analyze` → **no issues**. `flutter test` → **92 tests, all pass** (Flutter 3.44.0 on Windows).
+
+| File | M10 test item covered |
+|------|----------------------|
+| `test/core/utils_test.dart` | **Validators** (Indian mobile, OTP, email, password, numeric ranges from the products master with decimal comma); **backoff** 5 s doubling to the 30-min cap, jitter bounds; transient vs permanent errors; **single flight** (10 callers → 1 run) |
+| `test/core/api_client_test.dart` | Section 6.1 headers + bearer; **token refresh single-flight: 10 concurrent 401s → 1 refresh, each request retried once**; no second retry after a failed refresh; GET retried 3× with backoff, POST never; error envelope → AppException; 426 → UpgradeRequired; WRONG_APP_FOR_ROLE / SESSION_ON_OTHER_DEVICE → SessionRevoked |
+| `test/core/sync_engine_test.dart` | **Outbox ordering** by capture time (not insertion); chunks of 50; **airplane mode → reconnect, including a lost response → synced exactly once** (server de-duplicates on clientOpId, the client deletes only after APPLIED); **retry/backoff** schedule; REJECTED → needs attention and holds back only that entity; UNSUPPORTED stays queued; permanent 4xx → attention; files upload first and their S3 key replaces the placeholder, a failed file blocks only its op; write + enqueue are one transaction; concurrent runs share one pass; pending-count stream; discard only rejected ops |
+| `test/core/database_encryption_test.dart` | **SQLCipher**: no SQLite header / plaintext on disk, reopens with its key, a wrong key fails at open |
+| `test/core/theme_test.dart` | **WCAG AA ≥ 4.5:1 for every text/background pair in use, light and dark** (30 pairs); contrast math against reference values; every flavor builds light + dark with its own accent and button height; **no `Color(0x` outside `lib/core/theme`** |
+| `test/session_test.dart` | `/me/session` → `/me` → SignedIn; **wrong-role login (server 403 WRONG_APP_FOR_ROLE, or a role the app does not allow) → signed out with a clear reason, also through the real UI** (phone → OTP → back on login with the message); NOT_REGISTERED / SESSION_ON_OTHER_DEVICE; **session survives a restart offline** (cached profile, driver/operator only); unconfirmed manager email → verify screen; 401 mid-session → one refresh; revocation during use; each flavor lands on its own home with its own module tag |
+| `test/text_scale_test.dart` | **Widget tests at text scale 2.0 on a 360×640 dp phone, in English, Hindi and Marathi**: phone login, OTP with an error, manager login (dark), verify email, settings with pending changes, sync queue with "needs attention", flavor home, update-required, async error / empty, status chips, skeletons — no overflow |
+
+**Builds (measured):**
+
+| Check | Result |
+|-------|--------|
+| `scripts/build_apk.sh <flavor> dev` (release, obfuscated, android-arm + arm64) | driver 44.2 MB, operator 44.2 MB, manager 43.7 MB — all three built. Signed with the **debug** key (no upload keystore yet) |
+| `scripts/verify_apk_isolation.sh` | **OK for all 3** — each `libapp.so` (arm64-v8a and armeabi-v7a) contains only its own `iccms-module-<flavor>` tag |
+| `scripts/check_flavor_isolation.sh` | OK |
+| APK badging (`aapt2 dump badging`) | `in.iccms.driver` "I-CCMS Driver", `in.iccms.operator` "I-CCMS Operator", `in.iccms.manager` "I-CCMS Control Tower"; per-flavor permissions as Section 11 (+ INTERNET, network state, wake lock, vibrate, FCM receive from plugins; biometric permissions removed) |
+| `flutter build web -t lib/main_manager.dart --base-href /console/` | Built (45 MB incl. CanvasKit). Served locally and opened in a browser: login screen renders (dark theme, indigo accent), switching to Hindi re-renders the screen in Devanagari, the console logs "Supabase not configured" as expected |
+
+**Found and fixed during the milestone:** pinned versions did not resolve against Flutter 3.44's own pins (intl, meta) → D-117; drift's default integer dates dropped milliseconds (capture-order sorting) → ISO text dates; dark-theme SOS / filled-secondary text was 2.4:1 and 1.8:1 (white or theme text on light status colours) → choose white or dark ink by contrast; the error card overflowed by 7 px in Hindi at 2.0 → scrollable; after a wrong-role OTP login the app stayed on the OTP screen, so the reason was never shown → back to login; a revoked session was signed out twice → idempotent; AGP 9 rejected `resValue` → `buildFeatures.resValues`; `flutter_local_notifications` 23 needs Android SDK 37 → 22.3.3 (D-122); the isolation script's loose pattern gave a false failure on the manager ARMv7 binary → exact tags (D-127).
+
+**Deferred M10 checks (NOT RUN):**
+- **Install side by side on one device:** the AVD (`my_android_emulator`, Android 16 x86_64) did not finish booting headless from this session (stuck after loading the system image, WHPX available); no phone was connected. Run `adb install dist/iccms-driver-0.1.0-1.apk` (and operator, manager) on a phone.
+- **Google sign-in on the release manager APK**, real phone OTP / email login, session refresh after 1 h, airplane-mode write on a device: need the Supabase dev project, the Google OAuth Android clients (debug + release SHA-1) and the upload keystore — none exist yet. The same flows are covered by unit/widget tests against fakes.
+- FCM push / Crashlytics on a device: no Firebase project configured.
+- Hindi and Marathi strings need a native-speaker review (D-124).
+
 ## Measured metrics
 - M8 pipeline (dev stack on one Windows PC, time scale 60): breach → shelf life 110–152 ms; 500 devices × 10 packets → 5,000 / 5,000 stored; warm publish → Kafka p95 222 ms. Sensor → Influx p95 **not verified** (see M8).
 - M9 incident engine (dev stack, time scale 60): diversion route proposed 217–509 ms after a buyer accepts; 26 / 26 live checks.
+- M10 release APK sizes (arm + arm64, obfuscated, M10 screens only): driver 44.2 MB, operator 44.2 MB, manager 43.7 MB. The M12 target (driver < 40 MB) is not met yet; per-ABI splits would roughly halve each file.
 
 ## Known issues
 - kafkajs prints `TimeoutNegativeWarning: -17946… is a negative number` from `RequestQueue.scheduleCheckPendingRequests` (its default `throttledUntil = -1`). Harmless, Node clamps it to 1 ms; third-party issue, not fixed here.

@@ -2,6 +2,15 @@
 
 All notable changes, per milestone (Keep a Changelog style).
 
+## [m10] - 2026-11-15
+### Added
+- Flutter core: design tokens (colours light/dark, typography with bundled Poppins + Noto Sans/Devanagari, spacing, motion), app theme per flavor, contrast test.
+- Shared widgets: buttons, cards with status strip, inputs with unit + voice slot, status/grade chips, AsyncView with skeleton/empty/error, offline banner, stale label.
+- ApiClient (headers, single-flight token refresh, GET retry, 426 / revoked-session events, error envelope), secure storage, Supabase auth (phone OTP, Google native/web, email + password, reset, verify email), session with `/me/session` → `/me` and wrong-role sign-out.
+- Drift database on SQLCipher; outbox + sync engine (files first, capture order, chunks of 50, backoff, needs-attention) + scheduler; realtime Socket.IO client; FCM + local notifications + Crashlytics from env options.
+- Localisation EN / HI / MR; splash, login per flavor, OTP, verify email, settings, sync queue, update-required screens; go_router with session guard; flavor routers.
+- Android: per-flavor manifests and icons, release signing from key.properties, backup off, cleartext only in debug; `scripts/build_apk.sh`, `scripts/verify_apk_isolation.sh`, `scripts/gen_launcher_icons.py`; BUILD_GUIDE.md.
+
 ## [m09] - 2026-11-14
 ### Added
 - Incident engine (worker, Kafka `alerts` consumer `incident-engine`): classifier, spoilage gate on every shelf-life estimate, DRIVER_FIX with a 15-min re-check, cold storage → rescue → buyer chain, DELAY replans, MANUAL escalation, append-only decision log, one active incident per trip.

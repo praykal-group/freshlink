@@ -207,3 +207,23 @@ node --env-file=.env dist/main.js > api.log 2>&1 &
 node --env-file=.env dist/worker.js > worker.log 2>&1 &     # .env with TELEMETRY_TIME_SCALE=60
 WORKER_LOG=worker.log API_LOG=api.log node --env-file=.env -r ts-node/register/transpile-only test/incidents/run.ts
 ```
+
+## M10 — Mobile Foundation: Core, Design System, Auth, Offline Sync (2026-11-15)
+
+**Implemented** (`client/`, the spec's `mobile/`)
+- `lib/core/`: `config` (flavors, env), `theme` (tokens, theme), `errors`, `utils` (validators, backoff, single flight), `network/api_client.dart`, `storage` (secure store, drift DB + SQLCipher connection, key), `sync` (outbox repository, engine, API, scheduler), `auth` (backend interface, Supabase backend, session controller), `realtime`, `push`, `l10n`, `router`, `providers.dart`.
+- `lib/shared/`: widgets (button, status chips + card, text field, async view/skeleton/empty/error, offline banner) and screens (auth: phone, OTP, manager, verify email; app: splash, update required, flavor home, settings, sync queue).
+- `lib/l10n/app_{en,hi,mr}.arb`; `lib/apps/<flavor>/router.dart`; `main_<flavor>.dart` without colour literals.
+- Android flavors: manifests, icons, signing, desugaring; scripts and BUILD_GUIDE.md.
+
+**Bugs found and fixed during the milestone:** see TESTING.md (M10): version resolution, millisecond dates, dark-theme contrast, Hindi overflow, wrong-role reason never shown after OTP, double sign-out, AGP 9 resValues, notifications plugin needing SDK 37, isolation-script false failure.
+
+**Tests:** 92 Flutter tests; 3 release APKs + web console built; isolation verified.
+
+**Limitations / pending:** no Supabase / Google / Firebase project or upload keystore yet, so real logins, push and the release-key Google sign-in are untested on a device; the emulator did not boot headless here; APKs are 44 MB (driver target < 40 MB in M12); HI/MR strings need review.
+
+**Repro**
+```bash
+cd client && flutter pub get && dart run build_runner build --delete-conflicting-outputs && flutter analyze && flutter test
+scripts/build_apk.sh driver dev && scripts/verify_apk_isolation.sh driver
+```

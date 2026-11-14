@@ -1,8 +1,20 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
+
+// Release signing (Section 11): android/key.properties (gitignored) points to the upload keystore
+// OUTSIDE the repo. CI writes it from ANDROID_KEYSTORE_* secrets. Without it, release builds are
+// signed with the debug key and the build prints a warning: such APKs are for local testing only
+// and can never update an installed production app.
+val keyProps = Properties().apply {
+    val f = rootProject.file("key.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
+}
+val hasReleaseKey = listOf("storeFile", "storePassword", "keyAlias", "keyPassword").all { !keyProps.getProperty(it).isNullOrBlank() }
 
 android {
     namespace = "in.iccms.app"
@@ -10,6 +22,8 @@ android {
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
+        // flutter_local_notifications needs java.time on Android 8–13.
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -22,7 +36,23 @@ android {
         versionName = flutter.versionName
     }
 
-    // One codebase, three APKs (Section 11). Each flavor has its own id, name and manifest.
+    // AGP 9 turns resValue() off by default; the flavors use it for their app_name.
+    buildFeatures {
+        resValues = true
+    }
+
+    signingConfigs {
+        if (hasReleaseKey) {
+            create("release") {
+                storeFile = file(keyProps.getProperty("storeFile"))
+                storePassword = keyProps.getProperty("storePassword")
+                keyAlias = keyProps.getProperty("keyAlias")
+                keyPassword = keyProps.getProperty("keyPassword")
+            }
+        }
+    }
+
+    // One codebase, three APKs (Section 11). Each flavor has its own id, name, icon and manifest.
     flavorDimensions += "app"
     productFlavors {
         create("driver") {
@@ -44,11 +74,18 @@ android {
 
     buildTypes {
         release {
-            // Release signing (key.properties) is added in M10.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            if (hasReleaseKey) {
+                signingConfig = signingConfigs.getByName("release")
+            } else {
+                logger.warn("WARNING: android/key.properties not found - release APKs are signed with the DEBUG key (local testing only).")
+                signingConfig = signingConfigs.getByName("debug")
+            }
         }
     }
+}
+
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
 }
 
 kotlin {
