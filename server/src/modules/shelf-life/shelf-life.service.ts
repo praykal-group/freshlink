@@ -23,6 +23,12 @@ const ML_TIMEOUT_MS = 2500;
 @Injectable()
 export class ShelfLifeService {
   private readonly logger = new Logger(ShelfLifeService.name);
+  private readonly listeners: ((batchId: string, remainingH: number) => Promise<void>)[] = [];
+
+  /** Called after every stored estimate (the incident engine's spoilage gate registers here). */
+  onEstimate(listener: (batchId: string, remainingH: number) => Promise<void>) {
+    this.listeners.push(listener);
+  }
 
   constructor(
     private readonly prisma: PrismaService,
@@ -102,6 +108,9 @@ export class ShelfLifeService {
     });
 
     await this.cargo.batchUpdated({ batchId, remainingShelfLifeH: result.remainingH, method: result.method, trigger });
+    for (const l of this.listeners) {
+      await l(batchId, result.remainingH).catch((e: Error) => this.logger.error({ msg: 'shelf-life listener failed', batchId, error: e.message }));
+    }
     return { ...estimate, remainingH: Number(estimate.remainingH) };
   }
 }

@@ -19,6 +19,9 @@ import { QueueModule } from './infra/queue/queues';
 import { REDIS, RedisModule } from './infra/redis/redis.module';
 import type Redis from 'ioredis';
 import { AlertsModule } from './modules/alerts/alerts.module';
+import { BuyersModule } from './modules/buyers/buyers.module';
+import { IncidentsModule } from './modules/incidents/incidents.module';
+import { ReportsModule } from './modules/reports/reports.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { TelemetryModule } from './modules/telemetry/telemetry.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -83,6 +86,9 @@ import { UsersModule } from './modules/users/users.module';
     NotificationsModule,
     AlertsModule,
     TelemetryModule,
+    BuyersModule,
+    IncidentsModule,
+    ReportsModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: AllExceptionsFilter },

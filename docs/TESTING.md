@@ -189,8 +189,36 @@ The following changes are in the code: the producer and topics now connect at wo
 
 **Deferred M8 checks (NOT RUN):** SRV-02 rerun as above; FCM push and SMTP email to real devices/addresses (no Firebase credentials / SMTP configured: channels skipped, SMS on the console provider); Socket.IO events across two API instances through the Redis adapter; the simulator scenarios against the stack.
 
+### M9 — 2026-11-14
+`cd server && npm test` → **27 suites, 282 tests, all pass.** Build + lint pass.
+
+| File | M9 test item covered |
+|------|----------------------|
+| `incidents/rules.spec.ts` | Classifier (reefer OFF / fast warming → REEFER_FAILURE, slow drift → TEMP_DRIFT, driver reports, SOS ignored); slope; spoilage gate; DELAY feasibility; **buyer closed at ETA / wrong product / grade too low / inactive / no capacity / unreachable → excluded with the reason**; opening hours in IST incl. past midnight; ranking (discount, ETA; nearest for cold storage); rescue matching; reefer pull-down rate, window starts, 30 % flag; excursions, CTE mapping, report ranges; CSV escaping incl. formula injection; Kafka trigger mapping |
+| `incidents/incidents.spec.ts` | Engine on an in-memory Prisma: **reefer_failure → cold storage when reachable, else rescue (two-trip replan), else buyer**; **offer expiry → next buyer**; **all rejected → MANUAL + CRITICAL alert with SMS**; accepted offer → DIVERTED + DIVERSION route, resolved at the drop; **temp_drift_recoverable → DRIVER_FIX → RESOLVED without diversion**; not recovered → SPOILAGE_RISK; escalation during a driver fix; one incident per trip; DELAY → REPLAN → resolved on accept; **decision log complete**. OffersService: only the token hash stored, SMS link, timeout job; **reused / expired token → 410**, unknown → 404 |
+| `trips/trips.spec.ts` | + PoD at a RESCUE_DROP hands batches to the rescue trip (RESCUED, IN_TRANSIT, rescue pickup completed), whole batches only |
+
+**Live dev stack** (API + worker on the Docker stack, worker at `TELEMETRY_TIME_SCALE=60`, real MQTT packets in the simulator's binary format, console SMS): `server/test/incidents/run.ts` → **26 / 26 checks pass** (second run; the first run had 25 / 26, see below).
+
+| Scenario | Checks (all PASS) |
+|----------|-------------------|
+| 1 reefer_failure, cold storage reachable | REEFER_FAILURE; offer to the nearest cold storage (Waluj); buyer SMS has the 43-char link; public page 200; accept 200; **reused token 410**; route v2 PROPOSED with `COLD_STORAGE_DROP` first, 509 ms after the accept (route only after acceptance); both batches DIVERTED + 2 hash-chained DIVERTED events; driver silent for `ackMinutes` → managers texted; decision log CLASSIFIED → COLD_STORAGE_SEARCH → OFFER_SENT → OFFER_ACCEPTED → ROUTE_PROPOSED |
+| 2 reefer_failure, no cold storage | RESCUE_PICKUP by the truck ~4 km away; failing trip's new route starts with `RESCUE_DROP`, rescue trip's with `RESCUE_PICKUP` |
+| 3 reefer_failure, no cold storage, no rescue | Excluded with reasons: closed (CLOSED_AT_ETA), tomato-only (PRODUCT_NOT_ACCEPTED), grade-A-only (GRADE_TOO_LOW); first offer to CIDCO (20 %); reject on the page; same token again → 410; next buyer offered; it expires → none left → MANUAL; CRITICAL alert + manager SMS; **expired token → 410** |
+| 4 temp_drift_recoverable | TEMP_DRIFT → DRIVER_FIX alert to the driver; temperature back to 3 °C → re-check → RESOLVED, 0 offers, log CLASSIFIED → DRIVER_FIX → DRIVER_FIX_RECOVERED |
+| 5 reports | **Compliance 1-min log equals an independent per-minute average of the raw InfluxDB readings** (36 raw points, 2 minutes); excursion minutes and min/max agree with the raw data; HTML and CSV render; traceability CSV lists the DIVERTED SHIPPING events |
+
+No ERROR lines in the API or worker logs during the run.
+
+**First live run: 25 / 26.** "Expired token → 410" failed because the test read offer links only from the worker log, but the offer after a buyer's reject is sent by the API process (the reject is handled there). The test now reads both logs and accepts a token only if its SHA-256 matches an offer created in that scenario; no product change was needed.
+
+**Bugs found while preparing the live test (fixed):** the classifier's slope was measured in real time, so at time scale 60 a slow drift looked 60× faster and would have been a reefer failure (D-115); unit tests picked up `TELEMETRY_TIME_SCALE=60` from `.env` through Prisma (D-114).
+
+**Deferred M9 checks (NOT RUN):** driver accepting the proposed route and PoD at the diversion / handover stop through the API (needs a Supabase login; covered by unit tests); the reefer-health job on real pull-down data (needs ≥ 20 min per window and 4 weeks of history; unit-tested only); `/reports/*` and `/incidents/*` over HTTP with a manager token (the report service was run directly against the stack); real SMS delivery to buyers (console provider).
+
 ## Measured metrics
 - M8 pipeline (dev stack on one Windows PC, time scale 60): breach → shelf life 110–152 ms; 500 devices × 10 packets → 5,000 / 5,000 stored; warm publish → Kafka p95 222 ms. Sensor → Influx p95 **not verified** (see M8).
+- M9 incident engine (dev stack, time scale 60): diversion route proposed 217–509 ms after a buyer accepts; 26 / 26 live checks.
 
 ## Known issues
 - kafkajs prints `TimeoutNegativeWarning: -17946… is a negative number` from `RequestQueue.scheduleCheckPendingRequests` (its default `throttledUntil = -1`). Harmless, Node clamps it to 1 ms; third-party issue, not fixed here.

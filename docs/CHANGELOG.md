@@ -2,6 +2,18 @@
 
 All notable changes, per milestone (Keep a Changelog style).
 
+## [m09] - 2026-11-14
+### Added
+- Incident engine (worker, Kafka `alerts` consumer `incident-engine`): classifier, spoilage gate on every shelf-life estimate, DRIVER_FIX with a 15-min re-check, cold storage → rescue → buyer chain, DELAY replans, MANUAL escalation, append-only decision log, one active incident per trip.
+- Backup buyers CRUD (`/buyers`), candidate filtering/ranking, diversion offers with one-time SMS links, 10-min timeout chain, public offer page `/offer/:token`.
+- Rerouting via ML REPLAN with fixed prefix: diversion / cold-storage stops, two-trip rescue (handover drop + rescue pickup), `route.proposed` + push, driver-response escalation; PoD handover moves batches to the rescue trip (`RESCUED`).
+- `/incidents` list/detail/offers, manager override `POST /incidents/:id/action`, `POST /incidents/:id/resolve`.
+- Reports: batch compliance (HTML/CSV/JSON from InfluxDB 1-min), FSMA 204-style traceability CSV, emissions (JSON/CSV), reefer health; weekly reefer-health job (SYN-17).
+- Migration `20261114010000_incident_rescue_trip`; live test `server/test/incidents/run.ts`.
+### Changed
+- Accepting a route cancels orders that are on no live route any more; alerts can SMS managers and be resolved by the system.
+- Unit tests pin `TELEMETRY_TIME_SCALE=1` (Jest setup).
+
 ## [m08] - 2026-11-14
 ### Added
 - Dev stack: Kafka 3.8.1 (KRaft), Redis 7.4, Mosquitto 2.0.20 (password file + per-device ACL), InfluxDB 2.7 (30-day `telemetry` bucket).

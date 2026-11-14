@@ -209,5 +209,46 @@ Raising an alert: realtime `alert.raised`, Kafka `alerts` event `ALERT_RAISED`, 
 ### Telemetry (M8)
 `GET /trips/:id/telemetry?from=<ISO>&to=<ISO>&every=1m` (MANAGER, ADMIN) → reefer series from InfluxDB (per window: mean values, max shock) plus `band` = the strictest safe limits of the cargo on board. `every` ∈ `1m|5m|15m|1h` (default `1m`); range at most 31 days (`RANGE_TOO_LONG`). Device ingestion is MQTT only: topic `iccms/telemetry/<username>`, 40-byte binary or JSON (`simulator/binary_format.md`).
 
+### Buyers (MANAGER, ADMIN; M9, W-1)
+| Method | Path | Notes |
+|--------|------|-------|
+| GET | `/buyers?type&active&productId&cursor` | Backup buyer registry |
+| GET | `/buyers/:id` | |
+| POST | `/buyers` | `{name, type: CANNING\|PROCESSING\|LOCAL_MARKET\|DISCOUNT_RETAIL\|COLD_STORAGE, phone (E.164), email?, lat, lng, acceptedProductIds[], minGrade, discountPct 0–100, openingHours, capacityKg?, active?}`. `openingHours` = `{"mon":[["06:00","20:00"]], ...}` with keys `sun..sat`, IST; a range ending before it starts runs past midnight; `"23:59"` as an end means end of day. Unknown products → 422 `UNKNOWN_PRODUCT` |
+| PATCH | `/buyers/:id` | Partial update, same rules |
+| DELETE | `/buyers/:id` | Soft delete (`active=false`); offers and stops keep the buyer |
+
+### Incidents (MANAGER, ADMIN; M9, W-2)
+| Method | Path | Notes |
+|--------|------|-------|
+| GET | `/incidents?status&tripId&cursor` | `steps` = number of decision-log entries |
+| GET | `/incidents/:id` | Incident + full `decisionLog` + offers (with buyer) + rescue trip code |
+| GET | `/incidents/:id/offers` | Offers in the order they were sent (`status`: SENT, ACCEPTED, REJECTED, EXPIRED, CANCELLED; no token) |
+| POST | `/incidents/:id/action` | Manager override `{action, buyerId?, rescueTripId?, note?}`: `DRIVER_FIX`; `DIVERT_BUYER`/`DIVERT_COLD_STORAGE` + `buyerId` (agreed outside the system: recorded as an accepted offer, route proposed at once; cold storage must be type COLD_STORAGE); `RESCUE_PICKUP` + `rescueTripId` (must be an eligible truck, else 422 `RESCUE_NOT_POSSIBLE` with the reason); `REPLAN` (same stops from the current position); `MANUAL`. Open offers are cancelled first. Closed incident → 409 `INCIDENT_CLOSED` |
+| POST | `/incidents/:id/resolve` | `{note?, failed?}` → RESOLVED, or FAILED when the cargo was lost |
+
+**Engine (worker).** Triggers: critical `TEMP_EXCURSION` alerts and driver incident reports (Kafka `alerts`, consumer group `incident-engine`), the spoilage gate (after every shelf-life estimate: remaining shelf life < remaining stop ETA + `safetyMarginH`) and the DRIVER_FIX re-check. One active incident per trip; later triggers are added to its log.
+- `TEMP_DRIFT` (reefer ON, slope ≤ `driftSlopeMax` °C/10 min over the last 30 min) → `DRIVER_FIX` alert to the driver → re-check after 15 min: back in range → RESOLVED, else `SPOILAGE_RISK`.
+- `REEFER_FAILURE` (reefer OFF, faster warming, or driver report) → nearest reachable cold storage (offer) → rescue truck within `rescueRadiusKm` with a compatible reefer and free capacity (two route proposals: `RESCUE_DROP` on the failing trip, `RESCUE_PICKUP` first on the rescue trip) → buyer offers → `MANUAL`.
+- `SPOILAGE_RISK` → buyer offers → `MANUAL`. `DELAY`/road block: still feasible → REPLAN of the same stops; else buyer offers. `BREAKDOWN`/accident → rescue → `MANUAL`.
+- `MANUAL` raises a CRITICAL `SPOILAGE_RISK` alert to managers (push, verified email, SMS).
+- Every step is appended to `decisionLog`: `{at, step, reason, inputs?, candidates?, chosen?, by?}`. Steps: `CLASSIFIED, TRIGGER_NOTED, ESCALATED, DRIVER_FIX, DRIVER_FIX_RECOVERED, DRIVER_FIX_FAILED, DELAY_CHECK, COLD_STORAGE_SEARCH, RESCUE_SEARCH, RESCUE_PLANNED, BUYER_SEARCH, OFFER_SENT, OFFER_ACCEPTED, OFFER_REJECTED, OFFER_EXPIRED, ROUTE_PROPOSED, ROUTE_ACCEPTED, MANUAL, MANUAL_OVERRIDE, NO_CARGO, RESOLVED, FAILED`. Searches list eligible candidates and the excluded ones with a reason (`INACTIVE, ALREADY_OFFERED, WRONG_TYPE, PRODUCT_NOT_ACCEPTED, GRADE_TOO_LOW, CLOSED_AT_ETA, NO_CAPACITY, NOT_REACHABLE_BEFORE_SPOILAGE`; rescue: `SAME_TRIP, NO_POSITION, TOO_FAR, NO_CAPACITY, INCOMPATIBLE_TEMPERATURE, NOT_REACHABLE_BEFORE_SPOILAGE`).
+- Reroutes are `route_plans` with status PROPOSED + their stops, sent as `route.proposed` (trip room, managers) and a push to the driver; the trip switches when the driver accepts (`POST /trips/:id/routes/:version/accept`). No answer within `ackMinutes` → managers are told (push, email, SMS). Accepting a route cancels orders whose drop is on no live route any more.
+- PoD at a `RESCUE_DROP` hands the batches over to the rescue trip (outcome ACCEPTED only; trace `RESCUED`; batches stay IN_TRANSIT) and completes the rescue truck's `RESCUE_PICKUP`. PoD at a diversion / cold-storage / rescue drop resolves the incident.
+
+### Diversion offer page (public, no JWT, outside `/api/v1`; W-1)
+The buyer gets an SMS: `APP_BASE_URL/offer/<token>` (32 random bytes, base64url; only its SHA-256 is stored), valid `offerMinutes` (default 10).
+- `GET /offer/:token` → HTML offer (product, quantity, grade, discount, shelf life left, deadline) with Accept / Reject buttons. Unknown → 404; expired or already answered → 410.
+- `POST /offer/:token/accept` / `POST /offer/:token/reject` → HTML confirmation. A token answers once (conditional update): a second answer, or an answer after expiry → 410.
+- Accept → batches `DIVERTED` (trace `DIVERTED`), new route with the buyer (`DIVERSION_DROP`) or cold storage (`COLD_STORAGE_DROP`) stop first, proposed to the driver. Reject or expiry → next candidate.
+
+### Reports (MANAGER, ADMIN; M9, SYN-15/16/17)
+| Method | Path | Notes |
+|--------|------|-------|
+| GET | `/reports/batches/:id/compliance?format=html\|csv\|json` | HACCP-style record: per trip leg the 1-min temperature log from InfluxDB (mean per minute, same query as the trip chart), min/mean/max, excursions outside the product's safe range, cargo alerts; all trace events with hashes and the chain verdict; PoD. CSV = the 1-min log (`batch_code, product, trip_code, time_utc, time_ist, temp_c, humidity_pct, safe_min_c, safe_max_c, in_range`). If InfluxDB cannot be read the report still opens with a note |
+| GET | `/reports/traceability?from&to&format=csv` | FSMA 204-style KDE export (≤ 92 days, ≤ 50,000 events): `event_time_utc, cte, event_type, traceability_lot_code, product_code, product_description, quantity, unit, location, reference_trip, outcome, trace_seq, record_hash`. CTE mapping: REGISTERED → FIRST_LAND_BASED_RECEIVING (fish) / HARVESTING (produce); STORED → COOLING; DEPARTED, DIVERTED, RESCUED → SHIPPING; RECEIVED, DELIVERED → RECEIVING; other events are not CTEs |
+| GET | `/reports/emissions?from&to&format=json\|csv` | Completed trips (≤ 366 days): distance, `co2Kg` stored at completion, totals, and the current factor + source |
+| GET | `/reports/reefer-health` | Per vehicle: baseline pull-down rate and the last 8 weekly rows (rate, degradation %, flagged) |
+
 ### Realtime (Socket.IO, path `/rt`)
-Connect with `auth: {token: <Supabase access token>, flavor}`. Same checks as HTTP (valid JWT, linked ACTIVE user, role allowed for the flavor), else `error {code: UNAUTHORIZED}` + disconnect. Rooms: `user:<id>` always, `role:manager` for MANAGER/ADMIN. `trip.join {tripId}` → ack `{ok:true}` for managers or the trip's driver, `{ok:false, code:FORBIDDEN}` otherwise; `trip.leave {tripId}`. Server events used so far: `trip.updated`, `route.updated`, `cargo.status`, `alert.raised`, `alert.updated`, `incident.updated`, `vehicle.position` (managers; latest truck position + temperature). Since M8 the worker emits through Redis, so events reach clients on any API instance.
+Connect with `auth: {token: <Supabase access token>, flavor}`. Same checks as HTTP (valid JWT, linked ACTIVE user, role allowed for the flavor), else `error {code: UNAUTHORIZED}` + disconnect. Rooms: `user:<id>` always, `role:manager` for MANAGER/ADMIN. `trip.join {tripId}` → ack `{ok:true}` for managers or the trip's driver, `{ok:false, code:FORBIDDEN}` otherwise; `trip.leave {tripId}`. Server events used so far: `trip.updated`, `route.updated`, `cargo.status`, `alert.raised`, `alert.updated`, `incident.updated` (managers + trip room), `route.proposed` (trip room + managers; the driver also gets a push), `offer.updated` (managers), `vehicle.position` (managers; latest truck position + temperature). Since M8 the worker emits through Redis, so events reach clients on any API instance.

@@ -74,6 +74,27 @@ export class TelemetryService {
     return raw ? (JSON.parse(raw) as TelemetryMessage) : null;
   }
 
+  /**
+   * Raw temperature (and door state) of a vehicle's pod between two instants, oldest first.
+   * Used for the drift slope (incident classifier) and the reefer pull-down rate (SYN-17).
+   */
+  async vehicleTemps(vehicleId: string, from: Date, to: Date): Promise<{ at: number; tempC: number; doorOpen: boolean | null }[]> {
+    if (!UUID.test(vehicleId)) throw new AppError('VALIDATION_FAILED', 'Bad vehicle id', HttpStatus.BAD_REQUEST);
+    if (!this.influx.configured) return [];
+    const rows = await this.influx.query<{ _time: string; _field: string; _value: number | boolean }>(`from(bucket: "${this.influx.bucket}")
+  |> range(start: ${from.toISOString()}, stop: ${to.toISOString()})
+  |> filter(fn: (r) => r._measurement == "reefer" and r.vehicle_id == "${vehicleId}")
+  |> filter(fn: (r) => r._field == "temp_c" or r._field == "door_open")`);
+    const byTime = new Map<string, { at: number; tempC?: number; doorOpen: boolean | null }>();
+    for (const r of rows) {
+      const row = byTime.get(r._time) ?? { at: Date.parse(r._time), doorOpen: null };
+      if (r._field === 'temp_c') row.tempC = Number(r._value);
+      else row.doorOpen = Boolean(r._value);
+      byTime.set(r._time, row);
+    }
+    return [...byTime.values()].filter((r): r is { at: number; tempC: number; doorOpen: boolean | null } => r.tempC !== undefined).sort((a, b) => a.at - b.at);
+  }
+
   /** Phone GPS (DA-FR-10) → InfluxDB `driver_gps`; the newest point also goes to the live map. */
   async writeGps(tripId: string, driverId: string, points: GpsPoint[]) {
     if (!points.length) return { written: 0 };

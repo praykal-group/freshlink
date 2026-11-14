@@ -1,6 +1,6 @@
 # Project Status
 
-**Current milestone:** M9 — Incident Engine, Backup Buyers, Diversion and Rescue (next)
+**Current milestone:** M10 — Mobile Foundation: Core, Design System, Auth, Offline Sync (next)
 
 | # | Milestone | Status | Date | Commit |
 |---|-----------|--------|------|--------|
@@ -12,7 +12,7 @@
 | M6 | ML Service II: Demand Forecast and Route Optimiser | Done: forecast MAPE 8.79 % (simulated data), routing feasible & < 10 s, GA 13–15 % behind OR-Tools (synthetic Solomon-style); ML 74 + backend 168 tests pass | 2026-11-13 | see `git log --grep m06` |
 | M7 | Orders, FEFO Planning, Trips and Dispatch | Code + tests done (backend 210 pass, incl. a real Socket.IO room test); the seeded-day run through the API is not run (no database) | 2026-11-13 | see `git log --grep m07` |
 | M8 | Telemetry Pipeline, Alerts and Notifications | Code + unit tests done (245 pass); live Docker stack: 6 of 7 pipeline steps pass (breach → shelf life 152 ms, single alert, escalation, CRC drop, 500 devices zero loss, tiering). **SRV-02 latency not verified**: measured runs failed (3.5 s / 6.4 s, cold worker, 1 s timestamp resolution); fix written, rerun skipped (no live sensors) | 2026-11-14 | see `git log --grep m08` |
-| M9 | Incident Engine, Backup Buyers, Diversion and Rescue | Not started | | |
+| M9 | Incident Engine, Backup Buyers, Diversion and Rescue | Done on the dev stack: all three incident paths (cold storage / rescue / buyer → MANUAL) and drift recovery end to end with simulated MQTT packets, 26/26 live checks; 282 unit tests. Driver route acceptance + PoD via API not run (no Supabase login) | 2026-11-14 | see `git log --grep m09` |
 | M10 | Mobile Foundation: Core, Design System, Auth, Offline Sync | Not started | | |
 | M11 | Operator APK | Not started | | |
 | M12 | Driver APK | Not started | | |
@@ -35,4 +35,5 @@
 - Run the seeded day forecast → orders → approved → trips → loaded → started → delivered through the API once a database exists (TESTING.md).
 - Re-run `server/test/pipeline/run.ts` to verify SRV-02 (sensor → Influx p95 ≤ 500 ms) with the new ms-accurate measurement (TESTING.md, M8).
 - The dev stack now runs in Docker: the deferred M1–M4/M7 database checks can be run against it.
-- M9: incident engine, backup buyers, diversion and rescue (consumes the M8 `alerts` topic).
+- M10: Flutter core, design system, auth, offline outbox and flavor builds.
+- Run the M9 driver-side steps (accept reroute, PoD at the diversion / handover stop) once a Supabase dev project exists.

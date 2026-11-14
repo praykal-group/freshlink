@@ -1,10 +1,11 @@
-import { HttpStatus, Injectable } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger, Optional } from '@nestjs/common';
 import type { BatchStatus } from '@prisma/client';
 import type { AuthUser } from '../../common/auth/auth-user';
 import { AppError } from '../../common/errors/app-error';
 import { EventBus } from '../../infra/events/event-bus.service';
 import { PrismaService } from '../../infra/prisma/prisma.service';
 import { FilesService } from '../files/files.service';
+import { IncidentsService } from '../incidents/incidents.service';
 import { TraceService } from '../trace/trace.service';
 import type { PodDto, PodItemDto } from '../trips/dto/trip.dto';
 import { TripsService } from '../trips/trips.service';
@@ -30,12 +31,15 @@ export const batchStatusFor = (outcome: PodItemDto['outcome']): BatchStatus =>
 /** Proof of delivery (DA-FR-11/12). Rows are idempotent on their client UUIDs. */
 @Injectable()
 export class PodService {
+  private readonly logger = new Logger(PodService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly trips: TripsService,
     private readonly files: FilesService,
     private readonly trace: TraceService,
     private readonly events: EventBus,
+    @Optional() private readonly incidents?: IncidentsService,
   ) {}
 
   async submit(user: AuthUser, tripId: string, stopId: string, dto: PodDto) {
@@ -77,12 +81,38 @@ export class PodService {
       fail(tag ? 'TAG_MISMATCH' : 'INVALID_POD', 'Some PoD items are not valid', tag ? HttpStatus.CONFLICT : HttpStatus.UNPROCESSABLE_ENTITY, { problems });
     }
 
+    // RESCUE_DROP = handover to the rescue truck (W-2 b): the batches move to that trip, not delivered.
+    const rescueTripId = stop.type === 'RESCUE_DROP' ? await this.incidents?.rescueTripFor(tripId) : null;
+    if (stop.type === 'RESCUE_DROP') {
+      if (!rescueTripId) fail('NO_RESCUE_TRIP', 'No rescue truck is assigned to this handover', HttpStatus.CONFLICT);
+      if (fresh.some((i) => i.outcome !== 'ACCEPTED')) fail('INVALID_POD', 'A rescue handover moves whole batches (outcome ACCEPTED)', HttpStatus.UNPROCESSABLE_ENTITY);
+    }
+    const rescueTrip = rescueTripId ? await this.prisma.trip.findUniqueOrThrow({ where: { id: rescueTripId }, select: { id: true, code: true } }) : null;
+
     const factor = await this.trips.emissionFactor();
     const capturedAt = new Date(dto.capturedAt);
     const result = await this.prisma.$transaction(async (tx) => {
       if (stop.status === 'PENDING') await tx.tripStop.update({ where: { id: stopId }, data: { status: 'ARRIVED', arrivedAt: capturedAt } });
       for (const item of fresh) {
         const b = byId.get(item.batchId)!;
+        if (rescueTrip) {
+          await tx.proofOfDelivery.create({
+            data: {
+              id: item.id, tripStopId: stopId, batchId: item.batchId, outcome: 'ACCEPTED', acceptedKg: item.acceptedKg, reason: item.reason,
+              receiverName: dto.receiverName, signatureKey: dto.signatureKey, photoKey: dto.photoKey, scannedTagUid: item.scannedTagUid,
+              capturedAt, lat: dto.lat, lng: dto.lng,
+            },
+          });
+          await tx.tripBatch.update({ where: { tripId_batchId: { tripId, batchId: item.batchId } }, data: { unloadedAt: capturedAt } });
+          await tx.tripBatch.upsert({
+            where: { tripId_batchId: { tripId: rescueTrip.id, batchId: item.batchId } },
+            update: { unloadedAt: null },
+            create: { tripId: rescueTrip.id, batchId: item.batchId, loadedBy: user.id, loadedAt: capturedAt },
+          });
+          await tx.batch.update({ where: { id: item.batchId }, data: { status: 'IN_TRANSIT' } });
+          await this.trace.append(tx, item.batchId, 'RESCUED', { fromTripCode: trip.code, toTripCode: rescueTrip.code, receiverName: dto.receiverName, weightKg: Number(b.weightKg) }, user.id, capturedAt);
+          continue;
+        }
         await tx.proofOfDelivery.create({
           data: {
             id: item.id, tripStopId: stopId, batchId: item.batchId, outcome: item.outcome, acceptedKg: item.acceptedKg, reason: item.reason,
@@ -117,12 +147,22 @@ export class PodService {
         await tx.tripStop.update({ where: { id: stopId }, data: { status: 'COMPLETED', completedAt: capturedAt } });
         if (stop.orderId) await tx.dispatchOrder.update({ where: { id: stop.orderId }, data: { status: 'DELIVERED' } });
       }
+      // The rescue truck's pickup is done once the cargo has been handed over.
+      if (rescueTrip && stopDone) {
+        await tx.tripStop.updateMany({
+          where: { tripId: rescueTrip.id, type: 'RESCUE_PICKUP', status: { in: ['PENDING', 'ARRIVED'] } },
+          data: { status: 'COMPLETED', completedAt: capturedAt },
+        });
+      }
       const tripCompleted = await this.trips.completeIfDone(tx, tripId, factor);
       return { stopDone, tripCompleted };
     });
 
     await this.events.publish('order-transactions', stopId, { type: 'POD', tripId, stopId, items: fresh.map((i) => ({ batchId: i.batchId, outcome: i.outcome })) });
     if (result.tripCompleted) await this.trips.publishTripDone(trip);
+    if (result.stopDone) {
+      await this.incidents?.onDropCompleted(tripId, stop.type).catch((e: Error) => this.logger.error({ msg: 'incident hook failed after PoD', tripId, error: e.message }));
+    }
     return { stopId, stored: fresh.map((i) => i.id), replayed: [...known], stopCompleted: result.stopDone, tripCompleted: result.tripCompleted };
   }
 }

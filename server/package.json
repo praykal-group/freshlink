@@ -28,7 +28,10 @@
     "preset": "ts-jest",
     "testEnvironment": "node",
     "rootDir": "src",
-    "testRegex": ".*\\.spec\\.ts$"
+    "testRegex": ".*\\.spec\\.ts$",
+    "setupFiles": [
+      "<rootDir>/../test/unit-setup.ts"
+    ]
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1168.0",

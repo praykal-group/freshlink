@@ -179,3 +179,31 @@ cd server && npx prisma migrate deploy && npx prisma db seed
 cd server && npm run build && node --env-file=.env dist/worker.js   # .env with TELEMETRY_TIME_SCALE=60
 cd server && node --env-file=.env -r ts-node/register/transpile-only test/pipeline/run.ts
 ```
+
+## M9 — Incident Engine, Backup Buyers, Diversion and Rescue (2026-11-14)
+
+**Implemented**
+- `modules/incidents` (pure `incident-rules.ts`, engine service, controller, DTOs), `modules/buyers` (`buyer-rules.ts`, CRUD), `modules/diversions` (`offers.service.ts`, `rerouting.service.ts`, `rescue-rules.ts`, public `offer-page.controller.ts`), `modules/reports` (`report-rules.ts`, service, controller), `modules/maintenance/reefer-health.ts`.
+- Worker: `consumers/incident-engine.ts`; jobs `offer-timeout`, `driver-fix-recheck`, `route-response` (alerts queue), `reefer-health` (Mondays 03:00 IST).
+- Views `offer.hbs`, `compliance.hbs`; `common/csv-write.ts`; `TelemetryService.vehicleTemps`; shelf-life `onEstimate` hook; alerts `smsManagers` + `resolveBySystem`.
+- Trips: order cancellation on route acceptance + incident hooks; PoD: rescue handover.
+- Migration: `incidents.rescue_trip_id`.
+
+**Bugs found and fixed during the milestone**
+- Classifier slope in real time under the test time scale (would misclassify drift as reefer failure) → config time (D-115).
+- Unit tests read `TELEMETRY_TIME_SCALE=60` from `.env` via Prisma → Jest setup pins 1 (D-114).
+- Manager rescue override could only pick the nearest truck → any eligible truck, else 422 with the reason.
+- Offer page said "1 batches" → singular/plural.
+- Live test read offer links only from the worker log (the next offer after a reject is sent by the API) → reads both logs, token checked against the DB.
+
+**Tests:** 282 unit tests; live run 26/26 (TESTING.md, M9).
+
+**Limitations / pending:** driver acceptance and PoD through the API need a Supabase login; reefer health needs real weeks of data; real SMS delivery not tested.
+
+**Repro**
+```bash
+cd server && npx prisma migrate deploy && npm run build
+node --env-file=.env dist/main.js > api.log 2>&1 &
+node --env-file=.env dist/worker.js > worker.log 2>&1 &     # .env with TELEMETRY_TIME_SCALE=60
+WORKER_LOG=worker.log API_LOG=api.log node --env-file=.env -r ts-node/register/transpile-only test/incidents/run.ts
+```

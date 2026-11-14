@@ -7,10 +7,15 @@ import { PrismaService } from '../../infra/prisma/prisma.service';
 import { bullConnection, MAINTENANCE_QUEUE, QUEUE_ALERTS, QUEUE_MAINTENANCE } from '../../infra/queue/queues';
 import { REDIS, requireEnv } from '../../infra/redis/redis.module';
 import { AlertsService, ESCALATION_JOB } from '../../modules/alerts/alerts.service';
+import { ReroutingService, ROUTE_RESPONSE_JOB } from '../../modules/diversions/rerouting.service';
+import { IncidentsService } from '../../modules/incidents/incidents.service';
 import { ForecastService } from '../../modules/forecast/forecast.service';
 import { ShelfLifeService } from '../../modules/shelf-life/shelf-life.service';
 import { REDIS_KEYS } from '../../modules/telemetry/telemetry-message';
 import { ExposureAggregator } from '../consumers/exposure-aggregator';
+import { DRIVER_FIX_RECHECK_JOB, driverFixRecheck } from './driver-fix-recheck.job';
+import { OFFER_TIMEOUT_JOB, offerTimeout } from './offer-timeout.job';
+import { ReeferHealthJob } from './reefer-health.job';
 import { TieringJob } from './tiering';
 
 /** Batches whose shelf life still matters (refreshed every 15 min, D-06). */
@@ -19,9 +24,11 @@ const IST = 'Asia/Kolkata';
 
 /**
  * BullMQ workers in the worker process:
- *   alerts queue       → alert-escalation (delayed, DA-FR-07)
+ *   alerts queue       → alert-escalation (DA-FR-07), offer-timeout (W-1), driver-fix-recheck (W-2),
+ *                        route-response (driver did not answer a reroute) — all delayed jobs
  *   maintenance queue  → device-offline (1 min), exposure-flush (5 min), shelf-life-refresh (15 min),
- *                        telemetry-tiering (01:00 IST), forecast-nightly (02:00 IST)
+ *                        telemetry-tiering (01:00 IST), forecast-nightly (02:00 IST),
+ *                        reefer-health (Mondays 03:00 IST, SYN-17)
  * Intervals in minutes go through TELEMETRY_TIME_SCALE (tests only); the daily crons do not.
  */
 @Injectable()
@@ -37,6 +44,9 @@ export class MaintenanceWorker implements OnApplicationBootstrap, OnApplicationS
     private readonly forecasts: ForecastService,
     private readonly exposure: ExposureAggregator,
     private readonly tiering: TieringJob,
+    private readonly incidents: IncidentsService,
+    private readonly rerouting: ReroutingService,
+    private readonly reeferHealth: ReeferHealthJob,
     @Inject(MAINTENANCE_QUEUE) private readonly maintenance: Queue,
     @Inject(REDIS) private readonly redis: Redis,
   ) {}
@@ -57,6 +67,7 @@ export class MaintenanceWorker implements OnApplicationBootstrap, OnApplicationS
     await every('shelf-life-refresh', 15);
     await cron('telemetry-tiering', '0 1 * * *');
     await cron('forecast-nightly', '0 2 * * *');
+    await cron('reefer-health', '0 3 * * 1');
     this.logger.log('maintenance schedules registered');
   }
 
@@ -65,8 +76,21 @@ export class MaintenanceWorker implements OnApplicationBootstrap, OnApplicationS
   }
 
   private async onAlertJob(job: Job) {
-    if (job.name === ESCALATION_JOB) return { escalated: await this.alerts.escalate((job.data as { alertId: string }).alertId) };
-    return null;
+    switch (job.name) {
+      case ESCALATION_JOB:
+        return { escalated: await this.alerts.escalate((job.data as { alertId: string }).alertId) };
+      case OFFER_TIMEOUT_JOB:
+        return offerTimeout(job, this.incidents);
+      case DRIVER_FIX_RECHECK_JOB:
+        return driverFixRecheck(job, this.incidents);
+      case ROUTE_RESPONSE_JOB: {
+        const { tripId, version } = job.data as { tripId: string; version: number };
+        return { escalated: await this.rerouting.responseTimeout(tripId, version) };
+      }
+      default:
+        this.logger.warn({ msg: 'unknown alerts job', name: job.name });
+        return null;
+    }
   }
 
   private async onMaintenanceJob(job: Job) {
@@ -81,6 +105,8 @@ export class MaintenanceWorker implements OnApplicationBootstrap, OnApplicationS
         return this.tiering.run();
       case 'forecast-nightly':
         return this.forecasts.run();
+      case 'reefer-health':
+        return this.reeferHealth.run();
       default:
         this.logger.warn({ msg: 'unknown maintenance job', name: job.name });
         return null;

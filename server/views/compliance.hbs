@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Compliance · {{batch.code}} · I-CCMS</title>
+<style>
+  :root { --bg:#FFFFFF; --text:#0F1C24; --muted:#55666F; --line:#D0DCE3; --primary:#0B4F6C; --safe:#15803D; --critical:#B91C1C; --head:#EEF4F7; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:14px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 1000px; margin: 0 auto; padding: 16px; }
+  h1 { font-size:20px; margin:0; } h2 { font-size:16px; margin:20px 0 8px; color:var(--primary); }
+  .muted { color:var(--muted); }
+  .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:4px 16px; margin-top:8px; }
+  .ok { color:var(--safe); font-weight:600; } .bad { color:var(--critical); font-weight:600; }
+  .wrap { overflow-x:auto; }
+  table { border-collapse: collapse; width:100%; margin-top:4px; }
+  th, td { border:1px solid var(--line); padding:4px 6px; text-align:left; vertical-align:top; }
+  th { background:var(--head); font-weight:600; }
+  td.num { text-align:right; font-variant-numeric: tabular-nums; }
+  .code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size:12px; word-break: break-all; }
+  @media print { main { max-width:none; padding:0; } h2 { break-after: avoid; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Temperature compliance record · {{batch.code}}</h1>
+  <div class="muted">HACCP-style cold-chain record, recorder data at {{summary.resolution}}. Generated {{generatedIst}} IST.</div>
+
+  <div class="grid">
+    <div><span class="muted">Product</span><br>{{product.name}} ({{product.code}})</div>
+    <div><span class="muted">Safe range</span><br>{{product.safeTempMin}} to {{product.safeTempMax}} °C</div>
+    <div><span class="muted">Weight</span><br>{{batch.weightKg}} kg, grade {{#if batch.grade}}{{batch.grade}}{{else}}not graded{{/if}}</div>
+    <div><span class="muted">Origin</span><br>{{batch.sourceSite.name}}, {{caughtIst}} IST</div>
+    <div><span class="muted">Status</span><br>{{batch.status}}</div>
+    <div><span class="muted">Trace chain</span><br>{{#if chain.valid}}<span class="ok">Verified ({{chain.count}} records)</span>{{else}}<span class="bad">NOT verified</span>{{/if}}</div>
+  </div>
+
+  <h2>Summary</h2>
+  <div class="grid">
+    <div><span class="muted">Readings</span><br>{{summary.count}}</div>
+    <div><span class="muted">Min / mean / max</span><br>{{summaryText.min}} / {{summaryText.mean}} / {{summaryText.max}} °C</div>
+    <div><span class="muted">Excursions</span><br>{{#if hasExcursions}}<span class="bad">{{summary.excursions.length}}</span>{{else}}<span class="ok">none</span>{{/if}}</div>
+  </div>
+
+  {{#each trips}}
+  <h2>Trip {{tripCode}} · {{vehicle}}</h2>
+  <div class="muted">{{fromIst}} to {{toIst}} IST · {{stats.count}} readings · min {{statsText.min}} · mean {{statsText.mean}} · max {{statsText.max}} °C</div>
+  {{#if telemetryNote}}<p class="bad">{{telemetryNote}}</p>{{/if}}
+  {{#if excursions.length}}
+  <div class="wrap"><table>
+    <tr><th>From (IST)</th><th>To (IST)</th><th>Minutes</th><th>Direction</th><th>Peak °C</th></tr>
+    {{#each excursions}}<tr><td>{{fromIst}}</td><td>{{toIst}}</td><td class="num">{{minutes}}</td><td>{{direction}}</td><td class="num">{{peakC}}</td></tr>{{/each}}
+  </table></div>
+  {{/if}}
+  {{#if alerts.length}}
+  <div class="wrap"><table>
+    <tr><th>Alert (IST)</th><th>Type</th><th>Severity</th><th>Status</th><th>Message</th></tr>
+    {{#each alerts}}<tr><td>{{atIst}}</td><td>{{type}}</td><td>{{severity}}</td><td>{{status}}</td><td>{{message}}</td></tr>{{/each}}
+  </table></div>
+  {{/if}}
+  {{/each}}
+
+  <h2>Trace events</h2>
+  <div class="wrap"><table>
+    <tr><th>#</th><th>Time (IST)</th><th>Event</th><th>Details</th><th>Hash</th></tr>
+    {{#each events}}<tr><td class="num">{{seq}}</td><td>{{atIst}}</td><td>{{eventType}}</td><td class="code">{{payloadText}}</td><td class="code">{{hash}}</td></tr>{{/each}}
+  </table></div>
+
+  {{#if pods.length}}
+  <h2>Proof of delivery</h2>
+  <div class="wrap"><table>
+    <tr><th>Time (IST)</th><th>Trip</th><th>Stop</th><th>Place</th><th>Outcome</th><th>Accepted kg</th><th>Receiver</th><th>Reason</th></tr>
+    {{#each pods}}<tr><td>{{atIst}}</td><td>{{tripCode}}</td><td>{{stopType}}</td><td>{{place}}</td><td>{{outcome}}</td><td class="num">{{acceptedKg}}</td><td>{{receiverName}}</td><td>{{reason}}</td></tr>{{/each}}
+  </table></div>
+  {{/if}}
+
+  <p class="muted">The full 1-minute log is in the CSV export of this report (format=csv).</p>
+</main>
+</body>
+</html>

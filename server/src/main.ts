@@ -13,7 +13,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true, rawBody: true });
   app.useLogger(app.get(Logger));
   // Public trace pages live at /t/... (the URL printed on labels), outside the API prefix.
-  app.setGlobalPrefix('api/v1', { exclude: ['t/:code', 't/:code/verify'] });
+  app.setGlobalPrefix('api/v1', { exclude: ['t/:code', 't/:code/verify', 'offer/:token', 'offer/:token/accept', 'offer/:token/reject'] });
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
   );

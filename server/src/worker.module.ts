@@ -14,18 +14,21 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { RealtimeEmitterModule } from './modules/realtime/realtime.module';
 import { RemoteConfigCoreModule } from './modules/remote-config/remote-config.module';
 import { ShelfLifeModule } from './modules/shelf-life/shelf-life.module';
-import { DeviceContextService } from './modules/telemetry/device-context.service';
+import { IncidentsCoreModule } from './modules/incidents/incidents.module';
+import { TelemetryModule } from './modules/telemetry/telemetry.module';
 import { TraceModule } from './modules/trace/trace.module';
 import { ExposureAggregator } from './workers/consumers/exposure-aggregator';
+import { IncidentEngineConsumer } from './workers/consumers/incident-engine';
 import { MqttBridge } from './workers/consumers/mqtt-bridge';
 import { TelemetryWriter } from './workers/consumers/telemetry-writer';
 import { ThresholdProcessor } from './workers/consumers/threshold-processor';
 import { MaintenanceWorker } from './workers/jobs/maintenance.worker';
+import { ReeferHealthJob } from './workers/jobs/reefer-health.job';
 import { TieringJob } from './workers/jobs/tiering';
 
 /**
  * Worker process (Section 5.1): MQTT bridge, Kafka consumers (telemetry-writer,
- * threshold-processor, exposure-aggregator) and BullMQ jobs. No HTTP listener.
+ * threshold-processor, exposure-aggregator, incident-engine) and BullMQ jobs. No HTTP listener.
  */
 @Module({
   imports: [
@@ -44,7 +47,9 @@ import { TieringJob } from './workers/jobs/tiering';
     TraceModule,
     ShelfLifeModule,
     ForecastModule,
+    TelemetryModule,
+    IncidentsCoreModule,
   ],
-  providers: [DeviceContextService, S3Service, MqttBridge, TelemetryWriter, ThresholdProcessor, ExposureAggregator, TieringJob, MaintenanceWorker],
+  providers: [S3Service, MqttBridge, TelemetryWriter, ThresholdProcessor, ExposureAggregator, IncidentEngineConsumer, TieringJob, ReeferHealthJob, MaintenanceWorker],
 })
 export class WorkerModule {}

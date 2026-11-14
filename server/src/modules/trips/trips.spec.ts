@@ -150,10 +150,10 @@ describe('PodService.submit', () => {
 
   function podSetup(tag = '04A1B2C3') {
     const tx = {
-      tripStop: { update: jest.fn() },
+      tripStop: { update: jest.fn(), updateMany: jest.fn() },
       proofOfDelivery: { create: jest.fn(), findMany: jest.fn().mockResolvedValue([{ batchId: B1 }]) },
       batch: { update: jest.fn() },
-      tripBatch: { update: jest.fn(), findMany: jest.fn().mockResolvedValue([{ batchId: B1 }]) },
+      tripBatch: { update: jest.fn(), upsert: jest.fn(), findMany: jest.fn().mockResolvedValue([{ batchId: B1 }]) },
       dispatchOrder: { update: jest.fn() },
     };
     const prisma = {
@@ -202,6 +202,23 @@ describe('PodService.submit', () => {
   it('the batch code from the label QR also counts as a scan', async () => {
     const s = podSetup('E200-OTHER');
     expect(await code(s.service.submit(driver, TRIP, STOP, dto({ scannedTagUid: 'FSH-1' }) as never))).toBe('OK');
+  });
+
+  it('RESCUE_DROP hands the batches over to the rescue trip (RESCUED trace, still IN_TRANSIT) and closes its pickup', async () => {
+    const s = podSetup();
+    s.prisma.tripStop.findUnique.mockResolvedValue({ id: STOP, tripId: TRIP, routeVersion: 1, type: 'RESCUE_DROP', status: 'ARRIVED', siteId: null, orderId: null, site: null });
+    Object.assign(s.prisma, { trip: { findUniqueOrThrow: jest.fn().mockResolvedValue({ id: 'trip-2', code: 'TRP-2' }) } });
+    const incidents = { rescueTripFor: jest.fn().mockResolvedValue('trip-2'), onDropCompleted: jest.fn().mockResolvedValue(undefined) };
+    const service = new PodService(s.prisma as never, s.trips as never, { verifyOwnUpload: jest.fn() } as never, s.trace as never, { publish: jest.fn() } as never, incidents as never);
+
+    expect(await code(service.submit(driver, TRIP, STOP, dto() as never))).toBe('422 INVALID_POD'); // whole batches only
+    await service.submit(driver, TRIP, STOP, dto({ outcome: 'ACCEPTED', acceptedKg: 100, reason: undefined }) as never);
+    expect(s.tx.batch.update).toHaveBeenCalledWith({ where: { id: B1 }, data: { status: 'IN_TRANSIT' } });
+    expect(s.tx.tripBatch.upsert).toHaveBeenCalledWith(expect.objectContaining({ create: expect.objectContaining({ tripId: 'trip-2', batchId: B1, loadedBy: 'drv-1' }) }));
+    expect(s.trace.append).toHaveBeenCalledWith(s.tx, B1, 'RESCUED', expect.objectContaining({ toTripCode: 'TRP-2' }), 'drv-1', expect.any(Date));
+    expect(s.trace.append).not.toHaveBeenCalledWith(s.tx, B1, 'DELIVERED', expect.anything(), expect.anything(), expect.anything());
+    expect(s.tx.tripStop.updateMany).toHaveBeenCalledWith(expect.objectContaining({ where: expect.objectContaining({ tripId: 'trip-2', type: 'RESCUE_PICKUP' }) }));
+    expect(incidents.onDropCompleted).toHaveBeenCalledWith(TRIP, 'RESCUE_DROP');
   });
 
   it('replayed PoD rows are not stored twice', async () => {

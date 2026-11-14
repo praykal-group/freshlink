@@ -82,7 +82,7 @@ describe('MaintenanceWorker.checkOffline', () => {
     await redis.hset('telemetry:lastseen', 'DEV-002', String(now - 60_000)); // fresh
     const prisma = { iotDevice: { findMany: jest.fn().mockResolvedValue([device('DEV-001', 60), device('DEV-002', 60), device('DEV-003', 2)]) } };
     const alerts = { raise: jest.fn().mockResolvedValue({}) };
-    const w = new MaintenanceWorker({} as never, prisma as never, alerts as never, {} as never, {} as never, {} as never, {} as never, {} as never, redis as never);
+    const w = new MaintenanceWorker({} as never, prisma as never, alerts as never, {} as never, {} as never, {} as never, {} as never, {} as never, {} as never, {} as never, {} as never, redis as never);
     expect(await w.checkOffline(now)).toBe(1);
     expect(alerts.raise).toHaveBeenCalledWith(expect.objectContaining({ type: 'DEVICE_OFFLINE', severity: 'WARNING', tripId: 'trip-DEV-001' }));
     expect(await w.checkOffline(now + 60_000)).toBe(0); // same outage: no second alert

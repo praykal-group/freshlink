@@ -750,7 +750,8 @@ model Trip {
   routePlans RoutePlan[]
   events     TripEvent[]
   alerts     Alert[]
-  incidents  Incident[]
+  incidents  Incident[] @relation("IncidentTrip")
+  rescues    Incident[] @relation("IncidentRescueTrip")
 
   @@index([driverId, status])
   @@index([status, plannedStart])
@@ -921,13 +922,16 @@ model Incident {
   decidedAction IncidentAction? @map("decided_action")
   status        IncidentStatus  @default(OPEN)
   decisionLog   Json            @default("[]") @map("decision_log")
+  /** RESCUE_PICKUP: the trip whose truck takes over the cargo (D-103). */
+  rescueTripId  String?         @map("rescue_trip_id") @db.Uuid
   resolvedAt    DateTime?       @map("resolved_at") @db.Timestamptz(6)
   createdAt     DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt     DateTime        @updatedAt @map("updated_at") @db.Timestamptz(6)
 
-  trip   Trip             @relation(fields: [tripId], references: [id])
-  alert  Alert?           @relation(fields: [alertId], references: [id])
-  offers DiversionOffer[]
+  trip       Trip             @relation("IncidentTrip", fields: [tripId], references: [id])
+  rescueTrip Trip?            @relation("IncidentRescueTrip", fields: [rescueTripId], references: [id])
+  alert      Alert?           @relation(fields: [alertId], references: [id])
+  offers     DiversionOffer[]
 
   @@index([status])
   @@index([tripId])

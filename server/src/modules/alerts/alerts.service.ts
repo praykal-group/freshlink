@@ -25,6 +25,8 @@ export interface RaiseInput {
   data?: Record<string, unknown>;
   /** Notify the trip's driver too (critical cargo alerts, DRIVER_FIX). */
   notifyDriver?: boolean;
+  /** Also text the managers (incident engine: no candidates left, manual action needed). */
+  smsManagers?: boolean;
 }
 
 export const alertView = (a: Alert) => a;
@@ -81,7 +83,7 @@ export class AlertsService implements OnModuleInit {
     try {
       if (driverId) await this.notifications.toDriver(driverId, notice);
       // Managers: push + email for critical; in-app only for warnings (Section 6.5).
-      if (critical) await this.notifications.toManagers(notice);
+      if (critical) await this.notifications.toManagers(notice, { withSms: !!input.smsManagers });
       else this.realtime.toManagers('alert.raised', payload);
     } catch (e) {
       this.logger.error({ msg: 'alert notification failed', alertId: alert.id, error: (e as Error).message });
@@ -142,6 +144,15 @@ export class AlertsService implements OnModuleInit {
     await this.queue?.remove(id).catch(() => undefined);
     this.emitUpdate(updated);
     return updated;
+  }
+
+  /** Closed by the system (e.g. the driver fix worked: temperature back in range). */
+  async resolveBySystem(id: string) {
+    const flipped = await this.prisma.alert.updateMany({ where: { id, status: { not: 'RESOLVED' } }, data: { status: 'RESOLVED', resolvedAt: new Date() } });
+    if (!flipped.count) return false;
+    await this.queue?.remove(id).catch(() => undefined);
+    this.emitUpdate(await this.prisma.alert.findUniqueOrThrow({ where: { id } }));
+    return true;
   }
 
   private emitUpdate(a: Alert) {

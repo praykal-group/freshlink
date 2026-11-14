@@ -9,6 +9,7 @@ import { EventBus } from '../../infra/events/event-bus.service';
 import { PrismaService } from '../../infra/prisma/prisma.service';
 import { AlertsService } from '../alerts/alerts.service';
 import { FilesService } from '../files/files.service';
+import { IncidentsService } from '../incidents/incidents.service';
 import { RealtimeService } from '../realtime/realtime.service';
 import { RemoteConfigService } from '../remote-config/remote-config.service';
 import { SmsService } from '../sms/sms.service';
@@ -43,6 +44,7 @@ export class TripsService {
     private readonly events: EventBus,
     private readonly alerts: AlertsService,
     @Optional() private readonly telemetry?: TelemetryService,
+    @Optional() private readonly incidents?: IncidentsService,
   ) {}
 
   // ───────────── access ─────────────
@@ -307,7 +309,7 @@ export class TripsService {
     if (dto.type === 'SOS') {
       await this.raiseSos(user, trip, event.id, dto);
     } else {
-      // M9: the incident engine consumes these (replan / divert / rescue).
+      // The incident engine (worker, Kafka topic alerts) classifies these: replan / divert / rescue (M9).
       this.realtime.toManagers('incident.updated', { tripId: id, tripCode: trip.code, eventId: event.id, type: dto.type, lat: dto.lat, lng: dto.lng, reported: true });
       await this.events.publish('alerts', id, { type: 'DRIVER_INCIDENT', tripId: id, eventId: event.id, kind: dto.type });
     }
@@ -357,14 +359,26 @@ export class TripsService {
     const result = await this.prisma.$transaction(async (tx) => {
       if (accept) {
         await tx.routePlan.updateMany({ where: { tripId: id, status: 'ACCEPTED' }, data: { status: 'SUPERSEDED' } });
+        const dropped = await tx.tripStop.findMany({ where: { tripId: id, routeVersion: trip.currentRouteVersion, status: { in: ['PENDING', 'ARRIVED'] }, orderId: { not: null } }, select: { orderId: true } });
         await tx.tripStop.updateMany({ where: { tripId: id, routeVersion: trip.currentRouteVersion, status: { in: ['PENDING', 'ARRIVED'] } }, data: { status: 'CANCELLED' } });
         await tx.trip.update({ where: { id }, data: { currentRouteVersion: version } });
+        // Orders whose drop left this route and is not on any live route (this one or a rescue truck's) are cancelled.
+        for (const orderId of new Set(dropped.map((d) => d.orderId as string))) {
+          const live = await tx.tripStop.count({ where: { orderId, status: { in: ['PENDING', 'ARRIVED'] } } });
+          if (!live) await tx.dispatchOrder.updateMany({ where: { id: orderId, status: { in: ['PLANNED', 'IN_TRANSIT'] } }, data: { status: 'CANCELLED' } });
+        }
       }
       return tx.routePlan.update({ where: { id: plan.id }, data: { status: accept ? 'ACCEPTED' : 'DECLINED', respondedAt: now } });
     });
     const payload = { tripId: id, version, status: result.status, reason: plan.reason };
     this.realtime.toTrip(id, 'route.updated', payload);
     this.realtime.toManagers('route.updated', payload);
+    try {
+      if (accept) await this.incidents?.onRouteAccepted(id, version, plan.reason);
+      else await this.incidents?.onRouteDeclined(id, version);
+    } catch (e) {
+      this.logger.error({ msg: 'incident hook failed after route response', tripId: id, error: (e as Error).message });
+    }
     return result;
   }
 
