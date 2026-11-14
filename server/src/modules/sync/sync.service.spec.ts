@@ -44,8 +44,10 @@ describe('orderOps', () => {
 describe('SyncService', () => {
   let prisma: ReturnType<typeof fakePrisma>;
   let batches: { attachTag: jest.Mock; create: jest.Mock };
-  let trips: { load: jest.Mock; recordEvent: jest.Mock; respondRoute: jest.Mock };
+  let trips: { load: jest.Mock; recordEvent: jest.Mock; respondRoute: jest.Mock; loadForUser?: jest.Mock };
   let pod: { submit: jest.Mock };
+  let alerts: { ack: jest.Mock };
+  let telemetry: { writeGps: jest.Mock };
   let sync: SyncService;
 
   beforeEach(() => {
@@ -53,7 +55,9 @@ describe('SyncService', () => {
     batches = { attachTag: jest.fn().mockResolvedValue({ id: 'tag-1' }), create: jest.fn() };
     trips = { load: jest.fn().mockResolvedValue({ loaded: [] }), recordEvent: jest.fn().mockResolvedValue({ id: 'e' }), respondRoute: jest.fn().mockResolvedValue({ status: 'ACCEPTED' }) };
     pod = { submit: jest.fn().mockResolvedValue({ stored: ['p1'] }) };
-    sync = new SyncService(prisma as never, batches as never, trips as never, pod as never);
+    alerts = { ack: jest.fn().mockResolvedValue({ status: 'ACKNOWLEDGED' }) };
+    telemetry = { writeGps: jest.fn().mockResolvedValue({ written: 2 }) };
+    sync = new SyncService(prisma as never, batches as never, trips as never, pod as never, alerts as never, telemetry as never);
   });
 
   it('routes driver/operator op types with their own role rules', async () => {
@@ -123,10 +127,24 @@ describe('SyncService', () => {
     expect(batches.create).not.toHaveBeenCalled();
   });
 
-  it('answers UNSUPPORTED for later-milestone types (GPS_POINTS, ALERT_ACK: M8) without storing them', async () => {
-    const r = await sync.process(driver, [op('77777777-7777-4777-8777-777777777777', 'GPS_POINTS', { points: [] })]);
-    expect(r.results[0].status).toBe('UNSUPPORTED');
-    expect(prisma.syncOp.create).not.toHaveBeenCalled();
+  it('GPS_POINTS (driver, trip in progress) and ALERT_ACK', async () => {
+    const TRIP = '9a8e6a1c-4b2d-4c3e-9a1b-2c3d4e5f6a7b';
+    const ALERT = '3c8e6a1c-4b2d-4c3e-9a1b-2c3d4e5f6a7b';
+    trips.loadForUser = jest.fn().mockResolvedValue({ id: TRIP, status: 'IN_PROGRESS' });
+    const points = [{ lat: 19.8, lng: 75.3, speedKmh: 40, at: '2026-11-14T05:00:00Z' }, { lat: 19.81, lng: 75.31, at: '2026-11-14T05:00:30Z' }];
+    const r = await sync.process(driver, [
+      op('77777777-7777-4777-8777-777777777777', 'GPS_POINTS', { tripId: TRIP, points }),
+      op('78777777-7777-4777-8777-777777777777', 'ALERT_ACK', { alertId: ALERT }),
+    ]);
+    expect(r.results.map((x) => x.status)).toEqual(['APPLIED', 'APPLIED']);
+    expect(telemetry.writeGps).toHaveBeenCalledWith(TRIP, 'dr-1', points);
+    expect(alerts.ack).toHaveBeenCalledWith(driver, ALERT);
+  });
+
+  it('GPS_POINTS for a trip that is not in progress is rejected', async () => {
+    trips.loadForUser = jest.fn().mockResolvedValue({ id: 'x', status: 'COMPLETED' });
+    const r = await sync.process(driver, [op('79777777-7777-4777-8777-777777777777', 'GPS_POINTS', { tripId: '9a8e6a1c-4b2d-4c3e-9a1b-2c3d4e5f6a7b', points: [{ lat: 1, lng: 1, at: '2026-11-14T05:00:00Z' }] })]);
+    expect(r.results[0]).toMatchObject({ status: 'REJECTED', error: { code: 'INVALID_TRIP_STATUS' } });
   });
 
   it('refuses a clientOpId that belongs to another user', async () => {

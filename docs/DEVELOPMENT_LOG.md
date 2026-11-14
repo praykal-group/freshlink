@@ -147,3 +147,35 @@ cd ml/service && .venv/Scripts/python -m pytest -q
 ```bash
 cd server && npm test
 ```
+
+## M8 — Telemetry Pipeline, Alerts and Notifications (2026-11-14)
+
+**Implemented**
+- `deploy/docker-compose.dev.yml`: Kafka (KRaft), Redis, Mosquitto (`deploy/mosquitto/`: config, ACL, password-file entrypoint), InfluxDB; Postgres moved to host port 5433.
+- `simulator/`: `sim.py`, 7 scenarios, `binary_format.md`.
+- `infra/{redis,kafka,influx,queue}`; `common/time-scale.ts`; Redis throttler storage.
+- `modules/telemetry` (packet codec, pure threshold engine, device context cache, trip series), `modules/alerts`, `modules/notifications` (push, mail, fallback chain); SMS gateway-down listener.
+- Worker: `consumers/{mqtt-bridge,telemetry-writer,threshold-processor,exposure-aggregator}`, `jobs/{maintenance.worker,tiering}`; nightly forecast now a BullMQ cron (`forecast.job.ts` removed).
+- Realtime: Redis adapter (API) + emitter (worker). Trips: telemetry endpoint, last reading in cargo status, SOS through alerts. Sync: `GPS_POINTS`, `ALERT_ACK`.
+- `server/test/pipeline/run.ts`: live-stack pipeline test.
+
+**Bugs found and fixed during the milestone**
+- `minutesToMs` loaded the full env (process exit in unit tests) → reads `TELEMETRY_TIME_SCALE` directly.
+- Throttler async options rejected `extraProviders` → inject `REDIS`.
+- Duplicate `type` key in the Kafka alert payload; `Notice.data` type mismatch.
+- First `compose up` was interrupted during `initdb`, leaving an empty, corrupt Postgres volume → removed that fresh volume and re-initialised.
+- Worker crashed on first produce ("does not host this topic-partition", auto-create off) → topics are created before the first produce/subscribe.
+- Load test: MQTT `connack timeout` after ~235 connections through `localhost` (::1 on Windows, Docker Desktop IPv6 forwarding) → `127.0.0.1` everywhere (D-96).
+- SRV-02 measurement used whole-second packet time and a cold worker → producer warm-up at start, ms-accurate bridge → Influx metric, warm-up round in the test (D-99). **Not re-run.**
+
+**Tests:** 245 unit tests pass; live pipeline run 2: 6 of 7 steps pass, latency not verified (TESTING.md, M8).
+
+**Limitations / pending:** SRV-02 rerun; push/email untested without Firebase/SMTP; two-instance realtime not tested; simulator scenarios not run against the stack.
+
+**Repro**
+```bash
+cd deploy && MOSQ_DEVICE_COUNT=500 docker compose -p iccms-dev -f docker-compose.dev.yml up -d
+cd server && npx prisma migrate deploy && npx prisma db seed
+cd server && npm run build && node --env-file=.env dist/worker.js   # .env with TELEMETRY_TIME_SCALE=60
+cd server && node --env-file=.env -r ts-node/register/transpile-only test/pipeline/run.ts
+```

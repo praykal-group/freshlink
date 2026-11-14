@@ -151,8 +151,48 @@ Real Solomon files were **not** used (not downloaded; place them in `ml/training
 
 **Deferred M7 checks (NOT RUN; need Postgres + the ML container):** "a seeded day goes forecast → orders → approved → trips → loaded → started → delivered through the API"; concurrent code allocation; ERP request over HTTP with a real key.
 
+### M8 — 2026-11-14
+`cd server && npm test` → **25 suites, 245 tests, all pass.** Build + lint pass.
+
+| File | M8 test item covered |
+|------|----------------------|
+| `telemetry/packet.spec.ts` | Binary decode of a packet produced by `simulator/sim.py` (byte-identical fixture); TS encode = Python encode; **bad CRC / length / version → dropped with reason**; JSON packets; out-of-range and device mismatch |
+| `telemetry/thresholds.spec.ts` | Strictest limits across mixed cargo; breach start → RAISE only after the persistence window; **exactly one alert per breach**; recovery; shock cooldown; exposure accumulation with the 5-min gap cap |
+| `alerts/alerts.spec.ts` | raise → realtime + Kafka event + driver push (SMS only when push fails) + managers (email only to verified addresses) + escalation job; escalate only while OPEN; driver may ack only own trip's alerts; ack removes the escalation job; SMS gateway down after 3 failures raises `SMS_GATEWAY_DOWN` |
+| `workers/workers.spec.ts` | Telemetry writer → Influx points + latency samples; threshold processor → shelf-life recompute on breach; exposure flush; tiering CSV + archive key; device offline check |
+| `sync`, `trips` specs | `GPS_POINTS` (driver, trip IN_PROGRESS) and `ALERT_ACK`; `cargoStatus` includes the last reading |
+
+**Live dev stack** (Docker 29.9.3: Postgres 16 on :5433, Redis 7.4, Kafka 3.8.1 KRaft, Mosquitto 2.0.20, InfluxDB 2.7, ml): migrations applied; **seed run twice → identical counts** (sites 6, storage units 11, products 10, users 6, vehicles 3, devices 3, buyers 6, config 10), so the seed is idempotent.
+
+**Pipeline test** `server/test/pipeline/run.ts`, worker running with `TELEMETRY_TIME_SCALE=60`:
+
+| Step | Target | Run 1 | Run 2 |
+|------|--------|-------|-------|
+| sensor → Influx p95, 1,000 packets (SRV-02) | ≤ 500 ms | **FAIL 3,546 ms** | **FAIL 6,362 ms** |
+| breach → shelf-life estimate stored (SYN-04) | ≤ 5 s | PASS 110 ms | PASS 152 ms |
+| alert after (scaled) 15-min window, no duplicates (SYN-07) | exactly 1 | PASS 1 | PASS 1 |
+| escalation after (scaled) 5-min ack timeout (DA-FR-07) | ESCALATED | PASS | PASS |
+| binary packet with bad CRC dropped and counted | +1 | PASS 0 → 1 | PASS 1 → 2 |
+| 500 devices × 10 packets, zero loss (seq count in Influx) | 5,000 | **crashed: MQTT `connack timeout`** | **PASS 5,000 / 5,000** |
+| tiering export file created | file exists | not reached | PASS |
+
+**Run 1 → run 2 fix (connack timeout):** a probe showed that through `localhost` only 235 MQTT connections succeeded before timing out; through `127.0.0.1`, all **500 connected in 1.8 s**. On Windows `localhost` resolves to `::1` first, and Docker Desktop's IPv6 port forwarding stalls under load. Fix: all backend service URLs and the Kafka EXTERNAL advertised listener now use `127.0.0.1` (D-96).
+
+**Latency: not met; fix written but NOT re-run.** A breakdown probe on a warm worker measured:
+- publish → bridge: p95 **70 ms**
+- publish → Kafka consumer: p95 **222 ms**
+- writer metric (`now − packet ts`): p95 **1,268 ms**
+
+The writer metric cannot resolve 500 ms, because packet time is whole seconds (`u32 epoch_s`), which adds 0–999 ms of rounding to every sample. The 3.5–6.4 s runs were also cold: the first traffic after a worker start paid for Kafka producer init (`InitProducerId` while the coordinator was loading).
+
+The following changes are in the code: the producer and topics now connect at worker start (`KafkaService.warmUp`); consumers wait at most 100 ms (was 250); there is a new millisecond-accurate metric `metrics:latency:bridge_to_influx_ms`; and step 1 now times publish → bridge itself, excludes one 50-packet warm-up round, and checks p95(publish→bridge) + p95(bridge→Influx) ≤ 500 ms. **This version of step 1 has not been run** (skipped on 2026-11-14: no live sensors). SRV-02 is therefore **not verified**.
+
+**Deferred M8 checks (NOT RUN):** SRV-02 rerun as above; FCM push and SMTP email to real devices/addresses (no Firebase credentials / SMTP configured: channels skipped, SMS on the console provider); Socket.IO events across two API instances through the Redis adapter; the simulator scenarios against the stack.
+
 ## Measured metrics
-None yet.
+- M8 pipeline (dev stack on one Windows PC, time scale 60): breach → shelf life 110–152 ms; 500 devices × 10 packets → 5,000 / 5,000 stored; warm publish → Kafka p95 222 ms. Sensor → Influx p95 **not verified** (see M8).
 
 ## Known issues
-None recorded.
+- kafkajs prints `TimeoutNegativeWarning: -17946… is a negative number` from `RequestQueue.scheduleCheckPendingRequests` (its default `throttledUntil = -1`). Harmless, Node clamps it to 1 ms; third-party issue, not fixed here.
+- kafkajs logs `The group coordinator is not available` / `coordinator is loading` for a few seconds after Kafka starts; consumers retry and join.
+- On Windows use `127.0.0.1`, not `localhost`, for services published by Docker Desktop (see M8).

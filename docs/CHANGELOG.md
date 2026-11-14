@@ -2,6 +2,21 @@
 
 All notable changes, per milestone (Keep a Changelog style).
 
+## [m08] - 2026-11-14
+### Added
+- Dev stack: Kafka 3.8.1 (KRaft), Redis 7.4, Mosquitto 2.0.20 (password file + per-device ACL), InfluxDB 2.7 (30-day `telemetry` bucket).
+- Simulator `simulator/sim.py` with 7 scenarios and the 40-byte binary format (`simulator/binary_format.md`, CRC-32, `seq`).
+- Worker: MQTT → Kafka bridge; consumer groups `telemetry-writer` (InfluxDB), `threshold-processor` (persistence window, breach → shelf-life recompute, alerts) and `exposure-aggregator`; BullMQ escalation, device offline, exposure flush, shelf-life refresh, telemetry tiering (S3 / local) and nightly forecast schedules.
+- Alerts module: `GET /alerts`, `POST /alerts/:id/ack`, `POST /alerts/:id/resolve`; Kafka `alerts` events; escalation to managers after the ack timeout; `SMS_GATEWAY_DOWN` alert.
+- Notifications: in-app, FCM push, SMS fallback, email to verified addresses only.
+- `GET /trips/:id/telemetry`; last reading in `cargo.status`; `/sync` `GPS_POINTS` and `ALERT_ACK`.
+- Socket.IO Redis adapter (API) and Redis emitter (worker); `vehicle.position`, `alert.updated` events.
+- Live pipeline test `server/test/pipeline/run.ts`; `TELEMETRY_TIME_SCALE` for time-scaled runs.
+### Changed
+- Rate limiting stored in Redis; EventBus publishes to Kafka when configured.
+- Nightly forecast runs as a BullMQ cron instead of a timer; SOS goes through the alerts module.
+- Dev Postgres on host port 5433; backend URLs use `127.0.0.1`.
+
 ## [m07] - 2026-11-13
 ### Added
 - FEFO planner (`POST /planning/run`) and route building (`POST /planning/routes`) creating trips, stops and route plan v1.

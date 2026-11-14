@@ -227,6 +227,7 @@ enum AlertType {
   SOS
   REEFER_MAINTENANCE
   DRIVER_FIX
+  SMS_GATEWAY_DOWN
 }
 
 enum AlertSeverity {

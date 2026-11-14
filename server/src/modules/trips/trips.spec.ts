@@ -50,8 +50,9 @@ function setup(t: Record<string, unknown> | null = trip()) {
   const sms = { send: jest.fn().mockResolvedValue({}) };
   const events = { publish: jest.fn() };
   const trace = { append: jest.fn() };
-  const service = new TripsService(prisma as never, trace as never, { release: jest.fn() } as never, { verifyOwnUpload: jest.fn() } as never, sms as never, {} as never, realtime as never, events as never);
-  return { service, prisma, tx, realtime, sms, trace };
+  const alerts = { raise: jest.fn(async (a: Record<string, unknown>) => ({ id: 'alert-1', ...a })) };
+  const service = new TripsService(prisma as never, trace as never, { release: jest.fn() } as never, { verifyOwnUpload: jest.fn() } as never, sms as never, {} as never, realtime as never, events as never, alerts as never);
+  return { service, prisma, tx, realtime, sms, trace, alerts };
 }
 
 describe('TripsService.start', () => {
@@ -102,11 +103,10 @@ describe('TripsService.load (FO-FR-11)', () => {
 });
 
 describe('TripsService SOS (DA-FR-14)', () => {
-  it('creates a CRITICAL alert, notifies managers and texts the emergency contact with the location', async () => {
+  it('raises a CRITICAL alert (manager chain) and texts the emergency contact with the location', async () => {
     const s = setup(trip({ status: 'IN_PROGRESS' }));
     await s.service.recordEvent(driver, TRIP, { id: 'e5555555-5555-4555-8555-555555555555', type: 'SOS', lat: 19.8762, lng: 75.3433, occurredAt: '2026-11-14T05:00:00Z' });
-    expect(s.prisma.alert.create).toHaveBeenCalledWith({ data: expect.objectContaining({ type: 'SOS', severity: 'CRITICAL', tripId: TRIP }) });
-    expect(s.realtime.toManagers).toHaveBeenCalledWith('alert.raised', expect.objectContaining({ type: 'SOS', tripId: TRIP }));
+    expect(s.alerts.raise).toHaveBeenCalledWith(expect.objectContaining({ type: 'SOS', severity: 'CRITICAL', tripId: TRIP, vehicleId: 'veh-1' }));
     expect(s.sms.send).toHaveBeenCalledWith('+919811111111', expect.stringContaining('https://maps.google.com/?q=19.876200,75.343300'), expect.objectContaining({ priority: 'alert' }));
   });
 
@@ -114,7 +114,7 @@ describe('TripsService SOS (DA-FR-14)', () => {
     const s = setup(trip({ status: 'IN_PROGRESS' }));
     s.prisma.tripEvent.findUnique.mockResolvedValueOnce({ id: 'e1', tripId: TRIP });
     await s.service.recordEvent(driver, TRIP, { id: 'e1', type: 'SOS', occurredAt: '2026-11-14T05:00:00Z' } as never);
-    expect(s.prisma.alert.create).not.toHaveBeenCalled();
+    expect(s.alerts.raise).not.toHaveBeenCalled();
   });
 });
 

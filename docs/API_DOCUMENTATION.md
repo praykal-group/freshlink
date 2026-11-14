@@ -195,7 +195,19 @@ ADMIN: `GET /admin/integration-clients`, `POST /admin/integration-clients {name,
 | POST | `/trips/:id/stops/:stopId/pod` | DRIVER | `{receiverName, signatureKey (POD_SIGNATURE upload), photoKey (POD_PHOTO upload), capturedAt, lat, lng, items[{id, batchId, outcome: ACCEPTED\|PARTIAL\|REJECTED, acceptedKg, reason?, scannedTagUid}]}`. The scan must be one of the batch's tag UIDs or its code (409 `TAG_MISMATCH`). ACCEPTED = full weight; PARTIAL 0 < kg < weight (+ reason); REJECTED 0 kg (+ reason). Batch → DELIVERED / PARTIALLY_DELIVERED / REJECTED with a `DELIVERED`/`REJECTED` trace event. Stop COMPLETED when every expected batch has a PoD; its order → DELIVERED. When all stops are done the trip completes: vehicle AVAILABLE, `co2Kg = distanceKm × emissionFactorKgPerKm` (SYN-16). Rows are idempotent on `items[].id` |
 
 ### Sync additions
-`LOAD {tripId, batchIds}` (OPERATOR), `TRIP_EVENT {tripId, ...event}`, `POD {tripId, stopId, ...pod}`, `ROUTE_ACCEPT {tripId, version}` (DRIVER). `GPS_POINTS`, `ALERT_ACK` stay `UNSUPPORTED` until M8.
+`LOAD {tripId, batchIds}` (OPERATOR), `TRIP_EVENT {tripId, ...event}`, `POD {tripId, stopId, ...pod}`, `ROUTE_ACCEPT {tripId, version}` (DRIVER). M8: `GPS_POINTS {tripId, points[1..500]{at, lat, lng, speedKmh?, accuracyM?}}` (DRIVER, trip IN_PROGRESS, written to InfluxDB `driver_gps`), `ALERT_ACK {alertId}` (same rules as `POST /alerts/:id/ack`; replay is idempotent).
+
+### Alerts (M8)
+| Method | Path | Roles | Notes |
+|--------|------|-------|-------|
+| GET | `/alerts` | DRIVER, MANAGER, ADMIN | Filters `status`, `tripId`, cursor pagination. A driver sees only alerts on their own trips |
+| POST | `/alerts/:id/ack` | DRIVER, MANAGER, ADMIN | → ACKNOWLEDGED (idempotent); a driver only for their own trip (403); cancels the pending escalation |
+| POST | `/alerts/:id/resolve` | MANAGER, ADMIN | → RESOLVED (also records the ack if none); cancels the pending escalation |
+
+Raising an alert: realtime `alert.raised`, Kafka `alerts` event `ALERT_RAISED`, driver in-app + push (SMS if push fails), managers in-app + push + email (verified addresses only) + SMS for CRITICAL. Not acknowledged within remote-config `ackMinutes` (default 5) → ESCALATED, managers texted, `alert.updated`.
+
+### Telemetry (M8)
+`GET /trips/:id/telemetry?from=<ISO>&to=<ISO>&every=1m` (MANAGER, ADMIN) → reefer series from InfluxDB (per window: mean values, max shock) plus `band` = the strictest safe limits of the cargo on board. `every` ∈ `1m|5m|15m|1h` (default `1m`); range at most 31 days (`RANGE_TOO_LONG`). Device ingestion is MQTT only: topic `iccms/telemetry/<username>`, 40-byte binary or JSON (`simulator/binary_format.md`).
 
 ### Realtime (Socket.IO, path `/rt`)
-Connect with `auth: {token: <Supabase access token>, flavor}`. Same checks as HTTP (valid JWT, linked ACTIVE user, role allowed for the flavor), else `error {code: UNAUTHORIZED}` + disconnect. Rooms: `user:<id>` always, `role:manager` for MANAGER/ADMIN. `trip.join {tripId}` → ack `{ok:true}` for managers or the trip's driver, `{ok:false, code:FORBIDDEN}` otherwise; `trip.leave {tripId}`. Server events used so far: `trip.updated`, `route.updated`, `cargo.status`, `alert.raised`, `incident.updated`.
+Connect with `auth: {token: <Supabase access token>, flavor}`. Same checks as HTTP (valid JWT, linked ACTIVE user, role allowed for the flavor), else `error {code: UNAUTHORIZED}` + disconnect. Rooms: `user:<id>` always, `role:manager` for MANAGER/ADMIN. `trip.join {tripId}` → ack `{ok:true}` for managers or the trip's driver, `{ok:false, code:FORBIDDEN}` otherwise; `trip.leave {tripId}`. Server events used so far: `trip.updated`, `route.updated`, `cargo.status`, `alert.raised`, `alert.updated`, `incident.updated`, `vehicle.position` (managers; latest truck position + temperature). Since M8 the worker emits through Redis, so events reach clients on any API instance.

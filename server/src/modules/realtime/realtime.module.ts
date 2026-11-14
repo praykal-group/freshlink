@@ -1,13 +1,28 @@
-import { Global, Module } from '@nestjs/common';
+import { Global, Inject, Injectable, Module, OnModuleInit } from '@nestjs/common';
+import { Emitter } from '@socket.io/redis-emitter';
+import type Redis from 'ioredis';
+import { REDIS } from '../../infra/redis/redis.module';
 import { RealtimeGateway } from './realtime.gateway';
 import { RealtimeService } from './realtime.service';
 
-/** API process only (the worker imports RealtimeEmitterModule below without the gateway). */
+/** API process: Socket.IO gateway (with the Redis adapter set up in main.ts). */
 @Global()
 @Module({ providers: [RealtimeService, RealtimeGateway], exports: [RealtimeService] })
 export class RealtimeModule {}
 
-/** Worker process: same RealtimeService API, no Socket.IO server (emits dropped until M8's Redis adapter). */
+@Injectable()
+class EmitterAttacher implements OnModuleInit {
+  constructor(
+    private readonly realtime: RealtimeService,
+    @Inject(REDIS) private readonly redis: Redis,
+  ) {}
+
+  onModuleInit() {
+    this.realtime.attach(new Emitter(this.redis));
+  }
+}
+
+/** Worker process: no server; emits go through Redis to the API's Socket.IO adapter. */
 @Global()
-@Module({ providers: [RealtimeService], exports: [RealtimeService] })
+@Module({ providers: [RealtimeService, EmitterAttacher], exports: [RealtimeService] })
 export class RealtimeEmitterModule {}

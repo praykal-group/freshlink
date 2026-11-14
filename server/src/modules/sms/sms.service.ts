@@ -15,6 +15,12 @@ export interface SendOptions {
 export class SmsService {
   private readonly logger = new Logger(SmsService.name);
   private consecutiveFailures = 0;
+  private readonly downListeners: ((streak: number, lastError: string) => void)[] = [];
+
+  /** Section 15: called once when 3 sends in a row have failed (again only after a success). */
+  onGatewayDown(listener: (streak: number, lastError: string) => void) {
+    this.downListeners.push(listener);
+  }
 
   constructor(
     @Inject(SMS_PROVIDER) private readonly provider: SmsProvider,
@@ -34,9 +40,15 @@ export class SmsService {
       const message = e instanceof SmsSendError ? e.message : (e as Error).message;
       await this.record(opts, 'FAILED', undefined, message);
       this.logger.error({ msg: 'sms failed', provider: this.provider.name, priority: opts.priority, error: message });
-      if (this.consecutiveFailures >= 3) {
-        // Section 15: the manager alert "SMS gateway down" is raised by the alerts module in M8.
+      if (this.consecutiveFailures === 3) {
         this.logger.error({ msg: 'SMS gateway down', consecutiveFailures: this.consecutiveFailures });
+        for (const l of this.downListeners) {
+          try {
+            l(this.consecutiveFailures, message);
+          } catch (err) {
+            this.logger.error(`gateway-down listener failed: ${(err as Error).message}`);
+          }
+        }
       }
       throw e;
     }

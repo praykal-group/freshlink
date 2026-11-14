@@ -1,0 +1,10 @@
+name: temp_drift_recoverable
+# Reefer stays ON but temperature drifts slowly (door seal / airflow); the driver fixes it at 40 min.
+start: {lat: 19.4769, lng: 75.3859}
+end: {lat: 19.8762, lng: 75.3433}
+setpoint_c: 2.0
+initial_temp_c: 2.0
+phases:
+  - {from_min: 0, reefer_on: true}
+  - {from_min: 5, reefer_on: true, drift_c_per_10min: 0.45}
+  - {from_min: 40, reefer_on: true}

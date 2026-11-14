@@ -1,4 +1,4 @@
-import { HttpStatus, Injectable, Logger } from '@nestjs/common';
+import { HttpStatus, Injectable, Logger, Optional } from '@nestjs/common';
 import { Prisma, type Trip, type TripEventType } from '@prisma/client';
 import { randomUUID } from 'node:crypto';
 import type { AuthUser } from '../../common/auth/auth-user';
@@ -7,11 +7,13 @@ import { istAt } from '../../common/ist';
 import { afterCursor, type PageQuery, toPage } from '../../common/pagination';
 import { EventBus } from '../../infra/events/event-bus.service';
 import { PrismaService } from '../../infra/prisma/prisma.service';
+import { AlertsService } from '../alerts/alerts.service';
 import { FilesService } from '../files/files.service';
 import { RealtimeService } from '../realtime/realtime.service';
 import { RemoteConfigService } from '../remote-config/remote-config.service';
 import { SmsService } from '../sms/sms.service';
 import { StorageService } from '../storage/storage.service';
+import { TelemetryService } from '../telemetry/telemetry.service';
 import { TraceService } from '../trace/trace.service';
 import type { ArriveDto, ListTripsQuery, PreCheckDto, TripEventDto } from './dto/trip.dto';
 import { allowedSetpoint, canDo, co2Kg, mapsLink, preCheckProblems, type TripAction } from './trip-rules';
@@ -39,6 +41,8 @@ export class TripsService {
     private readonly config: RemoteConfigService,
     private readonly realtime: RealtimeService,
     private readonly events: EventBus,
+    private readonly alerts: AlertsService,
+    @Optional() private readonly telemetry?: TelemetryService,
   ) {}
 
   // ───────────── access ─────────────
@@ -133,15 +137,15 @@ export class TripsService {
   }
 
   async cargoStatus(user: AuthUser, id: string) {
-    await this.loadForUser(user, id);
+    const trip = await this.loadForUser(user, id);
     const onBoard = await this.prisma.tripBatch.findMany({
       where: { tripId: id, unloadedAt: null },
       include: { batch: { include: { product: { select: { code: true, name: true, nameHi: true, nameMr: true, safeTempMin: true, safeTempMax: true } } } } },
     });
     return {
       tripId: id,
-      // Telemetry (temperature, humidity) joins in M8.
-      telemetry: null,
+      // Latest pod reading (DA-FR-05); null before the first packet or when Redis is unavailable.
+      telemetry: (await this.telemetry?.lastReading(trip.vehicleId)) ?? null,
       batches: onBoard.map(({ batch: b }) => ({
         batchId: b.id,
         code: b.code,
@@ -314,14 +318,15 @@ export class TripsService {
   private async raiseSos(user: AuthUser, trip: Trip, eventId: string, dto: TripEventDto) {
     const driver = await this.prisma.user.findUniqueOrThrow({ where: { id: user.id }, select: { name: true, phone: true, emergencyContactPhone: true } });
     const where = dto.lat !== undefined && dto.lng !== undefined ? mapsLink(dto.lat, dto.lng) : 'location unknown';
-    const alert = await this.prisma.alert.create({
-      data: {
-        type: 'SOS', severity: 'CRITICAL', tripId: trip.id, vehicleId: trip.vehicleId,
-        message: `SOS from ${driver.name} on trip ${trip.code}`,
-        data: { eventId, lat: dto.lat ?? null, lng: dto.lng ?? null, map: where, driverPhone: driver.phone },
-      },
+    // Managers get it through the alert chain (in-app + push + verified email).
+    const alert = await this.alerts.raise({
+      type: 'SOS',
+      severity: 'CRITICAL',
+      tripId: trip.id,
+      vehicleId: trip.vehicleId,
+      message: `SOS from ${driver.name} on trip ${trip.code}. ${where}`,
+      data: { eventId, lat: dto.lat ?? null, lng: dto.lng ?? null, map: where, driverPhone: driver.phone },
     });
-    this.realtime.toManagers('alert.raised', { alertId: alert.id, type: 'SOS', severity: 'CRITICAL', tripId: trip.id, tripCode: trip.code, message: alert.message, map: where });
     if (driver.emergencyContactPhone) {
       try {
         await this.sms.send(driver.emergencyContactPhone, `I-CCMS SOS: ${driver.name} needs help (trip ${trip.code}). ${where}`, { priority: 'alert', alertId: alert.id });
@@ -331,7 +336,6 @@ export class TripsService {
     } else {
       this.logger.warn({ msg: 'SOS: driver has no emergency contact', userId: user.id });
     }
-    await this.events.publish('alerts', trip.id, { type: 'SOS', tripId: trip.id, alertId: alert.id });
   }
 
   // ───────────── driver: route response, arrive ─────────────

@@ -4,7 +4,8 @@ import type { AuthUser } from '../../common/auth/auth-user';
 import { CurrentUser, Roles } from '../../common/auth/decorators';
 import { PageQuery } from '../../common/pagination';
 import { PodService } from '../pod/pod.service';
-import { ArriveDto, AssignTripDto, ListTripsQuery, LoadTripDto, PodDto, PreCheckDto, TripEventDto } from './dto/trip.dto';
+import { TelemetryService } from '../telemetry/telemetry.service';
+import { ArriveDto, AssignTripDto, ListTripsQuery, LoadTripDto, PodDto, PreCheckDto, TelemetryQuery, TripEventDto } from './dto/trip.dto';
 import { TripsService } from './trips.service';
 
 const Id = () => Param('id', ParseUUIDPipe);
@@ -17,6 +18,7 @@ export class TripsController {
   constructor(
     private readonly trips: TripsService,
     private readonly pod: PodService,
+    private readonly telemetrySvc: TelemetryService,
   ) {}
 
   @Get('driver/trips/current')
@@ -53,6 +55,13 @@ export class TripsController {
   @Roles('DRIVER', 'MANAGER', 'ADMIN')
   cargo(@CurrentUser() user: AuthUser, @Id() id: string) {
     return this.trips.cargoStatus(user, id);
+  }
+
+  /** Manager chart (Section 10.6): mean per window + the cargo's safe band. */
+  @Get('trips/:id/telemetry')
+  @Roles('MANAGER', 'ADMIN')
+  async telemetry(@Id() id: string, @Query() q: TelemetryQuery) {
+    return this.telemetrySvc.tripSeries(id, new Date(q.from), new Date(q.to), q.every ?? '1m');
   }
 
   @Post('trips/:id/assign')

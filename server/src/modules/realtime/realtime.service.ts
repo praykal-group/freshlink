@@ -1,5 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
-import type { Server } from 'socket.io';
+
+/** Socket.IO Server (API) or @socket.io/redis-emitter Emitter (worker): both broadcast to rooms. */
+export interface RoomBroadcaster {
+  to(room: string): { emit(event: string, ...args: unknown[]): unknown };
+}
 
 /** Server events (Section 6.4 Realtime). */
 export type RealtimeEvent =
@@ -20,15 +24,16 @@ export const rooms = {
 };
 
 /**
- * Thin emitter injected by business services. The gateway attaches the Socket.IO server at
- * startup; in the worker process (no gateway) emits are no-ops until the M8 Redis adapter.
+ * Thin emitter injected by business services. The API gateway attaches its Socket.IO server; the
+ * worker attaches a Redis emitter, which reaches clients connected to any API instance through the
+ * Socket.IO Redis adapter (D-90).
  */
 @Injectable()
 export class RealtimeService {
   private readonly logger = new Logger(RealtimeService.name);
-  private server?: Server;
+  private server?: RoomBroadcaster;
 
-  attach(server: Server) {
+  attach(server: RoomBroadcaster) {
     this.server = server;
   }
 

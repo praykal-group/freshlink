@@ -1,0 +1,11 @@
+name: ethylene_buildup
+# Ripening bananas: ethylene builds up in the box (dangerous for spinach on the same truck).
+start: {lat: 19.6966, lng: 75.0103}   # Gangapur farm gate
+end: {lat: 19.8762, lng: 75.3433}
+setpoint_c: 14.0
+initial_temp_c: 14.0
+humidity_pct: 92
+base_ethylene_ppm: 0.3
+phases:
+  - {from_min: 0, reefer_on: true}
+  - {from_min: 5, reefer_on: true, ethylene_ppm_per_10min: 0.6}

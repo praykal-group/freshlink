@@ -1,0 +1,11 @@
+name: shock_event
+# Pothole / harsh braking: two shocks above the product limit.
+start: {lat: 19.4769, lng: 75.3859}
+end: {lat: 19.8762, lng: 75.3433}
+setpoint_c: 2.0
+initial_temp_c: 2.0
+phases:
+  - {from_min: 0, reefer_on: true}
+shocks:
+  - {at_min: 12, g: 4.5}
+  - {at_min: 25, g: 6.2}

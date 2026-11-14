@@ -1,0 +1,9 @@
+name: reefer_failure
+# Reefer compressor fails at 10 min: temperature rises towards ambient.
+start: {lat: 19.4769, lng: 75.3859}
+end: {lat: 19.8762, lng: 75.3433}
+setpoint_c: 2.0
+initial_temp_c: 2.0
+phases:
+  - {from_min: 0, reefer_on: true}
+  - {from_min: 10, reefer_on: false, drift_c_per_10min: 0.8}

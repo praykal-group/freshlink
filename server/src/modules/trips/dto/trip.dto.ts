@@ -92,6 +92,31 @@ export class PodDto {
   items: PodItemDto[];
 }
 
+export class TelemetryQuery {
+  @ApiProperty() @IsDateString() from: string;
+  @ApiProperty() @IsDateString() to: string;
+  @ApiPropertyOptional({ enum: ['1m', '5m', '15m', '1h'], default: '1m' }) @IsOptional() @IsIn(['1m', '5m', '15m', '1h']) every?: '1m' | '5m' | '15m' | '1h';
+}
+
+export class GpsPointDto {
+  @ApiProperty() @IsLatitude() lat: number;
+  @ApiProperty() @IsLongitude() lng: number;
+  @ApiPropertyOptional() @IsOptional() @IsNumber() @Min(0) @Max(200) speedKmh?: number;
+  @ApiPropertyOptional() @IsOptional() @IsNumber() @Min(0) @Max(10_000) accuracyM?: number;
+  @ApiProperty() @IsDateString() at: string;
+}
+
+/** Sync GPS_POINTS payload (DA-FR-10): batches of phone fixes, every gpsIntervalSec while a trip is active. */
+export class GpsBatchDto {
+  @ApiProperty({ type: [GpsPointDto] })
+  @IsArray()
+  @ArrayMinSize(1)
+  @ArrayMaxSize(500)
+  @ValidateNested({ each: true })
+  @Type(() => GpsPointDto)
+  points: GpsPointDto[];
+}
+
 export class ListTripsQuery extends PageQuery {
   @ApiPropertyOptional({ enum: TripStatus }) @IsOptional() @IsEnum(TripStatus) status?: TripStatus;
   @ApiPropertyOptional({ description: 'IST day of plannedStart' }) @IsOptional() @Matches(/^\d{4}-\d{2}-\d{2}$/) date?: string;

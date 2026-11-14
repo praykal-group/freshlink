@@ -1,0 +1,12 @@
+name: beacons
+# Pallet movement inside a site (SYN-19): BLE beacons report which batch tags they hear.
+start: {lat: 19.8434, lng: 75.2355}
+end: {lat: 19.8434, lng: 75.2355}
+setpoint_c: 0.0
+initial_temp_c: 0.0
+phases:
+  - {from_min: 0, reefer_on: true}
+beacons:
+  site: CST-WLJ
+  beacons: [dock-door-1, chiller-bc-1, cold-room-cr-1]
+  batch_tags: ["04:A1:B2:C3", "04:A1:B2:C4", "E200-0001"]

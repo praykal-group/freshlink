@@ -11,7 +11,16 @@ import { SupabaseAuthGuard } from './common/guards/supabase-auth.guard';
 import { UserThrottlerGuard } from './common/guards/user-throttler.guard';
 import { VersionGateGuard } from './common/guards/version-gate.guard';
 import { AuditInterceptor } from './common/interceptors/audit.interceptor';
+import { RedisThrottlerStorage } from './common/guards/redis-throttler.storage';
+import { InfluxModule } from './infra/influx/influx.module';
+import { KafkaModule } from './infra/kafka/kafka.module';
 import { PrismaModule } from './infra/prisma/prisma.module';
+import { QueueModule } from './infra/queue/queues';
+import { REDIS, RedisModule } from './infra/redis/redis.module';
+import type Redis from 'ioredis';
+import { AlertsModule } from './modules/alerts/alerts.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
+import { TelemetryModule } from './modules/telemetry/telemetry.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { BatchesModule } from './modules/batches/batches.module';
 import { FilesModule } from './modules/files/files.module';
@@ -42,8 +51,15 @@ import { UsersModule } from './modules/users/users.module';
     ConfigModule,
     loggerModule(),
     PrismaModule,
-    // In-memory store until Redis joins the stack (D-35).
-    ThrottlerModule.forRoot([{ name: 'default', ttl: 60_000, limit: 120 }]),
+    RedisModule,
+    KafkaModule,
+    InfluxModule,
+    QueueModule,
+    // 120 req/min per user, counted in Redis so every API instance shares the limit (Section 6.1).
+    ThrottlerModule.forRootAsync({
+      inject: [REDIS],
+      useFactory: (redis: Redis) => ({ throttlers: [{ name: 'default', ttl: 60_000, limit: 120 }], storage: new RedisThrottlerStorage(redis) }),
+    }),
     AuthModule,
     RemoteConfigModule,
     HealthModule,
@@ -64,6 +80,9 @@ import { UsersModule } from './modules/users/users.module';
     IntegrationsModule,
     PlanningModule,
     TripsModule,
+    NotificationsModule,
+    AlertsModule,
+    TelemetryModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: AllExceptionsFilter },

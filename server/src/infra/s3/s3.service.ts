@@ -51,6 +51,15 @@ export class S3Service {
     return getSignedUrl(this.s3(), new GetObjectCommand({ Bucket: this.bucket, Key: key }), { expiresIn });
   }
 
+  /** Server-side upload (telemetry archive). */
+  async put(key: string, body: Buffer, contentType: string): Promise<void> {
+    await this.s3().send(new PutObjectCommand({ Bucket: this.bucket, Key: key, Body: body, ContentType: contentType }));
+  }
+
+  get configured(): boolean {
+    return !!this.config.get('S3_BUCKET');
+  }
+
   /** null when the object does not exist (not uploaded yet). */
   async head(key: string): Promise<ObjectInfo | null> {
     try {

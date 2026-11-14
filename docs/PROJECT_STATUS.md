@@ -1,6 +1,6 @@
 # Project Status
 
-**Current milestone:** M8 — Telemetry Pipeline, Alerts and Notifications (next)
+**Current milestone:** M9 — Incident Engine, Backup Buyers, Diversion and Rescue (next)
 
 | # | Milestone | Status | Date | Commit |
 |---|-----------|--------|------|--------|
@@ -11,7 +11,7 @@
 | M5 | ML Service I: Vision Grading and Shelf-Life | Code + tests done (ML 45, backend 162 pass); **no trained models**: vision 503, shelf life on Q10 | 2026-11-13 | see `git log --grep m05` |
 | M6 | ML Service II: Demand Forecast and Route Optimiser | Done: forecast MAPE 8.79 % (simulated data), routing feasible & < 10 s, GA 13–15 % behind OR-Tools (synthetic Solomon-style); ML 74 + backend 168 tests pass | 2026-11-13 | see `git log --grep m06` |
 | M7 | Orders, FEFO Planning, Trips and Dispatch | Code + tests done (backend 210 pass, incl. a real Socket.IO room test); the seeded-day run through the API is not run (no database) | 2026-11-13 | see `git log --grep m07` |
-| M8 | Telemetry Pipeline, Alerts and Notifications | Not started | | |
+| M8 | Telemetry Pipeline, Alerts and Notifications | Code + unit tests done (245 pass); live Docker stack: 6 of 7 pipeline steps pass (breach → shelf life 152 ms, single alert, escalation, CRC drop, 500 devices zero loss, tiering). **SRV-02 latency not verified**: measured runs failed (3.5 s / 6.4 s, cold worker, 1 s timestamp resolution); fix written, rerun skipped (no live sensors) | 2026-11-14 | see `git log --grep m08` |
 | M9 | Incident Engine, Backup Buyers, Diversion and Rescue | Not started | | |
 | M10 | Mobile Foundation: Core, Design System, Auth, Offline Sync | Not started | | |
 | M11 | Operator APK | Not started | | |
@@ -24,7 +24,7 @@
 - No vision datasets or shelf-life observations yet, so no YOLOv8 or Cox model exists (D-57). Grading returns 503 until a model is registered.
 - No S3 bucket (or MinIO) configured, so uploads cannot be exercised end to end.
 - No Supabase dev project yet, so the M3 e2e login checks cannot run.
-- Docker is not installed on the dev PC, so `deploy/docker-compose.dev.yml` has not been run.
+- No Firebase service account or SMTP server configured, so push and email are skipped in dev (SMS goes to the console provider).
 
 ## Next steps
 - Apply migrations + seed to a dev Postgres and run the M2 DB checks (TESTING.md).
@@ -33,5 +33,6 @@
 - Collect/label the vision datasets and shelf-life observations, train, register models, and record measured metrics (ml/training/README.md).
 - Place real Solomon C101/R101/RC101 files in `ml/training/data/routing/` and re-run the benchmark (results so far are on synthetic Solomon-style instances).
 - Run the seeded day forecast → orders → approved → trips → loaded → started → delivered through the API once a database exists (TESTING.md).
-- M8: MQTT → Kafka → InfluxDB pipeline, threshold alerts, escalation, notifications (needs Docker: Kafka, Redis, Mosquitto, InfluxDB).
-- Run the deferred M1 checks when Docker is available (listed in TESTING.md).
+- Re-run `server/test/pipeline/run.ts` to verify SRV-02 (sensor → Influx p95 ≤ 500 ms) with the new ms-accurate measurement (TESTING.md, M8).
+- The dev stack now runs in Docker: the deferred M1–M4/M7 database checks can be run against it.
+- M9: incident engine, backup buyers, diversion and rescue (consumes the M8 `alerts` topic).

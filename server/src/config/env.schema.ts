@@ -33,7 +33,24 @@ export const envSchema = z
     HTTPSMS_WEBHOOK_SECRET: z.string().optional(),
     SMTP_HOST: z.string().optional(),
     SMTP_PORT: z.coerce.number().int().optional(),
+    SMTP_USER: z.string().optional(),
+    SMTP_PASS: z.string().optional(),
     SMTP_FROM: z.string().optional(),
+    // M8 pipeline. Optional in the schema; each client checks its own variable when it starts.
+    REDIS_URL: z.string().startsWith('redis').optional(),
+    KAFKA_BROKERS: z.string().optional(), // comma-separated host:port
+    INFLUX_URL: z.string().url().optional(),
+    INFLUX_TOKEN: z.string().optional(),
+    INFLUX_ORG: z.string().default('iccms'),
+    INFLUX_BUCKET: z.string().default('telemetry'),
+    MQTT_URL: z.string().optional(), // mqtt://host:1883 (dev) | mqtts://host:8883
+    MQTT_BRIDGE_USERNAME: z.string().optional(),
+    MQTT_BRIDGE_PASSWORD: z.string().optional(),
+    FIREBASE_CREDENTIALS_JSON: z.string().optional(), // service-account JSON, raw or base64
+    // Pipeline tests only: 60 = one config minute lasts one second. Refused in production.
+    TELEMETRY_TIME_SCALE: z.coerce.number().positive().max(3600).default(1),
+    // Dev: where the tiering job writes archives when S3_BUCKET is not set.
+    TIERING_LOCAL_DIR: z.string().optional(),
   })
   .superRefine((env, ctx) => {
     if (
@@ -45,6 +62,9 @@ export const envSchema = z
         path: ['SMS_PROVIDER'],
         message: 'httpsms needs HTTPSMS_API_URL, HTTPSMS_API_KEY and HTTPSMS_FROM_NUMBER',
       });
+    }
+    if (env.NODE_ENV === 'production' && env.TELEMETRY_TIME_SCALE !== 1) {
+      ctx.addIssue({ code: 'custom', path: ['TELEMETRY_TIME_SCALE'], message: 'time scaling is for pipeline tests only' });
     }
     if (env.NODE_ENV === 'production' && env.SMS_PROVIDER === 'console') {
       ctx.addIssue({

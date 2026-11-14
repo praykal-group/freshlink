@@ -1,0 +1,9 @@
+# The worker's bridge reads every device topic and the broker stats used by the healthcheck.
+user iccms-bridge
+topic read iccms/telemetry/#
+topic read iccms/beacons/#
+topic read $SYS/#
+
+# Any other user is a device: it may only publish to the topic named after its own username.
+pattern write iccms/telemetry/%u
+pattern write iccms/beacons/%u

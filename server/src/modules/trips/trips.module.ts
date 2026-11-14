@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { EventBus } from '../../infra/events/event-bus.service';
 import { FilesModule } from '../files/files.module';
 import { PodService } from '../pod/pod.service';
 import { SmsModule } from '../sms/sms.module';
@@ -11,7 +10,7 @@ import { TripsService } from './trips.service';
 @Module({
   imports: [FilesModule, StorageModule, SmsModule],
   controllers: [TripsController],
-  providers: [TripsService, PodService, EventBus],
+  providers: [TripsService, PodService],
   exports: [TripsService, PodService],
 })
 export class TripsModule {}

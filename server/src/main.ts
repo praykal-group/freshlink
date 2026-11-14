@@ -5,6 +5,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Logger } from 'nestjs-pino';
 import { AppModule } from './app.module';
 import { loadEnv } from './config/env.schema';
+import { RedisIoAdapter } from './modules/realtime/redis-io.adapter';
 
 async function bootstrap() {
   const env = loadEnv();
@@ -35,6 +36,9 @@ async function bootstrap() {
       .build();
     SwaggerModule.setup('api/docs', app, SwaggerModule.createDocument(app, doc));
   }
+
+  // Socket.IO over Redis: events from the worker (Redis emitter) and from other API instances reach every client.
+  if (env.REDIS_URL) app.useWebSocketAdapter(await RedisIoAdapter.create(app, env.REDIS_URL));
 
   app.enableShutdownHooks();
   await app.listen(env.PORT);

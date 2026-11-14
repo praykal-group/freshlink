@@ -8,7 +8,9 @@ import { PrismaService } from '../../infra/prisma/prisma.service';
 import { BatchesService } from '../batches/batches.service';
 import { AttachImageDto, AttachTagDto, CreateBatchDto, EditableBatchFieldsDto, ReceiveDto } from '../batches/dto/batch.dto';
 import { PodService } from '../pod/pod.service';
-import { LoadTripDto, PodDto, TripEventDto } from '../trips/dto/trip.dto';
+import { GpsBatchDto, LoadTripDto, PodDto, TripEventDto } from '../trips/dto/trip.dto';
+import { AlertsService } from '../alerts/alerts.service';
+import { TelemetryService } from '../telemetry/telemetry.service';
 import { TripsService } from '../trips/trips.service';
 import type { SyncOpDto, SyncResult, SyncType } from './sync.dto';
 
@@ -30,6 +32,8 @@ const OP_ROLES: Partial<Record<SyncType, UserRole[]>> = {
   TRIP_EVENT: ['DRIVER'],
   POD: ['DRIVER'],
   ROUTE_ACCEPT: ['DRIVER'],
+  GPS_POINTS: ['DRIVER'],
+  ALERT_ACK: ['DRIVER', 'MANAGER', 'ADMIN'],
 };
 
 /** Splits `{<key>: uuid, ...rest}`. */
@@ -86,6 +90,8 @@ export class SyncService {
     batches: BatchesService,
     trips: TripsService,
     pod: PodService,
+    alerts: AlertsService,
+    telemetry: TelemetryService,
   ) {
     this.handlers = {
       BATCH_CREATE: async (user, p, _op, deviceId) => batches.create(user, await parse(CreateBatchDto, p), deviceId),
@@ -118,6 +124,16 @@ export class SyncService {
         const version = rest.version;
         if (!Number.isInteger(version) || (version as number) < 1) throw new InvalidPayload('VALIDATION_FAILED', 'payload.version must be a positive integer', 400);
         return trips.respondRoute(user, id, version as number, true);
+      },
+      GPS_POINTS: async (user, p) => {
+        const { id, rest } = idOf(p, 'tripId');
+        const trip = await trips.loadForUser(user, id);
+        if (trip.status !== 'IN_PROGRESS') throw new AppError('INVALID_TRIP_STATUS', 'GPS is recorded only while the trip is in progress', 409);
+        return telemetry.writeGps(id, user.id, (await parse(GpsBatchDto, rest)).points);
+      },
+      ALERT_ACK: async (user, p) => {
+        const { id } = idOf(p, 'alertId');
+        return alerts.ack(user, id);
       },
       POD: async (user, p) => {
         const { id: tripId, rest } = idOf(p, 'tripId');

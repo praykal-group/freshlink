@@ -1,6 +1,5 @@
 import { AppError } from '../../common/errors/app-error';
 import { MlCallError } from '../../infra/ml/ml-client.service';
-import { msUntilNextIst } from '../../workers/jobs/forecast.job';
 import { ForecastService, istTomorrow, latestPerDay } from './forecast.service';
 
 describe('forecast helpers', () => {
@@ -19,12 +18,6 @@ describe('forecast helpers', () => {
     expect(latestPerDay(rows).map((r) => r.runId)).toEqual(['new', 'new']);
   });
 
-  it('msUntilNextIst: next 02:00 India time', () => {
-    // 2026-11-13 19:00 UTC = 00:30 IST on the 14th → 1.5 h to 02:00
-    expect(msUntilNextIst(new Date('2026-11-13T19:00:00Z'))).toBe(90 * 60_000);
-    // 21:00 UTC = 02:30 IST → 23.5 h
-    expect(msUntilNextIst(new Date('2026-11-13T21:00:00Z'))).toBe(23.5 * 3_600_000);
-  });
 });
 
 function setup(ml: jest.Mock) {

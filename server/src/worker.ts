@@ -9,7 +9,7 @@ async function bootstrap() {
   const logger = app.get(Logger);
   app.useLogger(logger);
   app.enableShutdownHooks();
-  logger.log('worker started (no consumers or jobs registered yet)');
+  logger.log('worker started (mqtt bridge, kafka consumers and maintenance jobs running)');
 }
 
 void bootstrap();

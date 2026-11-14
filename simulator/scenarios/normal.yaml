@@ -1,0 +1,8 @@
+name: normal
+# Healthy fish trip: reefer holds 2 °C.
+start: {lat: 19.4769, lng: 75.3859}   # Paithan landing
+end: {lat: 19.8762, lng: 75.3433}     # Chh. Sambhajinagar DC
+setpoint_c: 2.0
+initial_temp_c: 2.0
+phases:
+  - {from_min: 0, reefer_on: true}

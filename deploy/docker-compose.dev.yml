@@ -1,4 +1,6 @@
-# Dev stack (M1). Kafka, Redis, Mosquitto and InfluxDB are deferred (see docs/DECISIONS.md D-25).
+# Dev stack. All credentials here are local dev placeholders, never production values.
+# Up:     docker compose -f deploy/docker-compose.dev.yml up -d
+# Check:  docker compose -f deploy/docker-compose.dev.yml ps   (every service "healthy")
 name: iccms-dev
 services:
   postgres:
@@ -7,12 +9,92 @@ services:
       POSTGRES_USER: iccms
       POSTGRES_PASSWORD: iccms_dev
       POSTGRES_DB: iccms
-    ports: ["5432:5432"]
+    # 5433 on the host: a local PostgreSQL often already uses 5432.
+    ports: ["5433:5432"]
     volumes: [pgdata:/var/lib/postgresql/data]
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U iccms"]
       interval: 5s
       retries: 10
+
+  redis:
+    image: redis:7.4-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports: ["6379:6379"]
+    volumes: [redisdata:/data]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 10
+
+  # Kafka KRaft, single broker, 512 MB heap (D-05). Containers use kafka:9092, the host 127.0.0.1:29092 (IPv4: on Windows, "localhost" resolves to ::1 first and Docker Desktop's IPv6 forwarding stalls under load).
+  kafka:
+    image: apache/kafka:3.8.1
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: INTERNAL://:9092,EXTERNAL://:29092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:9092,EXTERNAL://127.0.0.1:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false" # the worker creates topics (3 partitions, 72 h)
+      KAFKA_NUM_PARTITIONS: 3
+      KAFKA_LOG_RETENTION_HOURS: 72
+      KAFKA_HEAP_OPTS: -Xmx512m -Xms512m
+    ports: ["29092:29092"]
+    volumes: [kafkadata:/var/lib/kafka/data]
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 > /dev/null 2>&1"]
+      interval: 10s
+      retries: 12
+      start_period: 20s
+
+  mosquitto:
+    image: eclipse-mosquitto:2.0.20
+    entrypoint: ["/bin/sh", "/mosquitto/config/entrypoint.sh"]
+    environment:
+      # user:password pairs written to the password file at start (dev only).
+      # Device password = "<DEVICE CODE>:<SEED_DEVICE_SECRET>" (seed default secret: dev-device-secret).
+      MOSQ_USERS: >-
+        iccms-bridge:dev-bridge-pass
+        dev-001:DEV-001:dev-device-secret
+        dev-002:DEV-002:dev-device-secret
+        dev-003:DEV-003:dev-device-secret
+      # Load test (M8: 500 devices): MOSQ_DEVICE_COUNT=500 docker compose ... up -d mosquitto
+      MOSQ_DEVICE_COUNT: ${MOSQ_DEVICE_COUNT:-0}
+      MOSQ_DEVICE_SECRET: dev-device-secret
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./mosquitto/acl:/mosquitto/config/acl:ro
+      - ./mosquitto/entrypoint.sh:/mosquitto/config/entrypoint.sh:ro
+    ports: ["1883:1883"]
+    healthcheck:
+      test: ["CMD-SHELL", "mosquitto_sub -h localhost -u iccms-bridge -P dev-bridge-pass -t '$$SYS/broker/uptime' -C 1 -W 3 > /dev/null"]
+      interval: 10s
+      retries: 6
+
+  influxdb:
+    image: influxdb:2.7-alpine
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: admin
+      DOCKER_INFLUXDB_INIT_PASSWORD: iccms_dev_influx
+      DOCKER_INFLUXDB_INIT_ORG: iccms
+      DOCKER_INFLUXDB_INIT_BUCKET: telemetry
+      DOCKER_INFLUXDB_INIT_RETENTION: 30d # SYN-12
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: dev-influx-token
+    ports: ["8086:8086"]
+    volumes: [influxdata:/var/lib/influxdb2]
+    healthcheck:
+      test: ["CMD", "influx", "ping"]
+      interval: 10s
+      retries: 6
 
   ml:
     build: ../ml/service
@@ -26,3 +108,6 @@ services:
 
 volumes:
   pgdata:
+  redisdata:
+  kafkadata:
+  influxdata:
