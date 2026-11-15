@@ -10,7 +10,13 @@
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" tools:node="remove" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="remove" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" tools:node="remove" />
+    <!-- Driver-only plugins (flutter_foreground_task, geolocator): one pubspec, D-139 / D-145. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" tools:node="remove" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" tools:node="remove" />
     <application>
+        <receiver android:name="com.pravera.flutter_foreground_task.service.RebootReceiver" tools:node="remove" />
+        <receiver android:name="com.pravera.flutter_foreground_task.service.RestartReceiver" tools:node="remove" />
+        <service android:name="com.baseflow.geolocator.GeolocatorLocationService" tools:node="remove" />
         <activity android:name=".MainActivity" android:exported="true">
             <!-- Supabase redirect after a password-reset / OAuth link (Section 6.2 redirect URLs). -->
             <intent-filter>

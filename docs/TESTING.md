@@ -283,9 +283,48 @@ No ERROR lines in the API or worker logs during the run.
 - Operator endpoints against the live dev stack (needs a Supabase JWT).
 - Hindi and Marathi strings need a native-speaker review.
 
+### M12 — 2026-11-15
+`cd client && flutter analyze` → **no issues**. `flutter test` → **197 tests, all pass** (55 new). `cd server && npx jest` → **290 pass** (5 new); `tsc --noEmit` and eslint on the changed modules clean. `scripts/check_flavor_isolation.sh` OK.
+
+| File | M12 test item covered |
+|------|----------------------|
+| `test/driver/driver_units_test.dart` (18) | GPS journal: drained once oldest first; a fix appended during a drain goes to the next drain; a failed store keeps the points; a line cut by a killed process is skipped; JSON = the server's point with its clamps. **Speed lock with mocked speed**: locks > 10 km/h, junction stops keep it, unlocks after 8 s slow, inaccurate / speedless fixes never unlock. Corridor tiles: coarse zooms first, every stop covered, band ≪ bounding box. Tile cache: hit without network, offline miss fails, eviction above the cap, prefetch stops at the byte budget. **Alarm: loops 2 min, then ring + voice every 30 s, silent after the ack** (fake clock). PoD rules = server `checkOutcome`. Trip / proposal / cargo models |
+| `test/driver/driver_flow_test.dart` (4) | Real screens + outbox + sync engine + API client against a scripted backend. **Full trip**: pre-check refused with the allowed range, then passes → Start (tracking, then device binding) → Navigate opens Google Maps for the next stop → GPS fixes → **network off** → Arrive → crate scans (a crate not on the truck refused) → partial line 60 / 80 kg + reason → receiver, signature, photo → done on the phone → **reconnect: STOP_ARRIVE before POD, GPS_POINTS, 2 uploads, each applied once, a second pass sends nothing**. **Critical alert** through the realtime event (1 s, not the 60 s poll) → full screen, alarm + voice → Acknowledge stops it and ALERT_ACK reaches the server. **Diversion reroute**: old vs new stop, +11.2 km, no Decline → **accepted offline**, navigation switches to the new stop, ROUTE_ACCEPT synced later. **Speed lock** at 42 km/h: incident button blocked, Navigate and SOS work (SOS synced at once), unlocks after stopping |
+| `test/driver/driver_text_scale_test.dart` (33) | **Every driver screen at text scale 2.0 on 360×640 dp in EN, HI and MR**: today, pre-check, active trip, active trip under the speed lock, cargo, alert, reroute, incident, stop (arrive), PoD with a partial line, history — no overflow |
+| `server/src/modules/sync/sync.service.spec.ts` (+2) | STOP_ARRIVE: driver only, replayed before the POD of the same stop; GPS_POINTS after completion: in-trip points written, later ones dropped |
+| `server/src/modules/trips/trips.spec.ts` (+3) | Route proposal: old / new stops with names, extra km, `canDecline` false for a diversion, true for a delay; trip detail: per-stop `batchIds` (null for open drops), batch `tagUids` |
+
+**Builds (measured):**
+
+| Check | Result |
+|-------|--------|
+| `scripts/build_apk.sh <flavor> dev` (release, obfuscated, one APK per ABI, D-146) | **driver arm64-v8a 32.1 MB, armeabi-v7a 27.0 MB**; operator 32.1 / 27.0 MB; manager 31.8 / 26.8 MB. **DA-NFR APK < 40 MB: met** for both driver APKs (the M11 universal APK was 53.8 MB). Debug-key signed (no upload keystore) |
+| `scripts/verify_apk_isolation.sh` | **OK for all 6 APKs** |
+| Permissions + components (`aapt2 dump badging` / `xmltree`) | driver: ACCESS_FINE + COARSE_LOCATION, FOREGROUND_SERVICE(_LOCATION), POST_NOTIFICATIONS, RECORD_AUDIO, CAMERA; the trip service with `foregroundServiceType=location`; no boot receiver, no geolocator service. operator: as M11. manager: POST_NOTIFICATIONS only. Operator + manager: no foreground service, receivers or geolocator service. All: + INTERNET, REQUEST_INSTALL_PACKAGES, network state, wake lock, vibrate, FCM. Each APK packages only its own ABI; versionCode 1 on both ABIs |
+
+**Found and fixed during the milestone:**
+- **Sync role check failed open**: an op type missing from the role map was accepted from any role (STOP_ARRIVE from an operator) → complete map, fail closed (D-148). Found by a negative test.
+- **Valid GPS rejected after the last PoD**: points synced after the trip completed came back REJECTED → kept inside the trip span (D-149).
+- The PoD line card overflowed by 40 px once the partial fields appeared (AppCard's IntrinsicHeight under-measures text fields with counters) → no intrinsic sizing there.
+- The incident grid clipped labels at text scale 2.0 (5.5 / 50 px) → tiles sized to their text.
+- The alert / proposal poll and the GPS drain kept running after the trip screen closed → auto-dispose.
+- Plugin manifests (flutter_foreground_task, geolocator) added a foreground service, a boot receiver and RECEIVE_BOOT_COMPLETED to every flavor → removed per flavor (D-145).
+- `--split-per-abi` would add 1000 / 2000 to the versionCode (breaks the update API and the 426 check) → one build per ABI (D-146).
+- **`build_apk.sh` wrote unopenable file names since M10**: Windows Python prints CRLF, so the versionCode read from `release/versions.json` carried a carriage return into `dist/iccms-<flavor>-<ver>-<code>….apk`; the shell showed the name, Windows tools could not open it (the isolation script read the version the same way, so it still matched). → CR stripped in both scripts, the files renamed, then checked with `aapt2` (both ABIs have versionCode 1). Earlier milestones blamed this on the sandbox.
+
+**Deferred M12 checks (NOT RUN — no phone, no emulator boot, no Supabase login, no live sensors):**
+- Simulator `reefer_failure` → alert on the phone ≤ 10 s, ack stops escalation, the reroute appears and navigation switches: covered against a scripted backend only (flow test); the M9 live engine run produced the proposals, but not on a phone.
+- Offline trip with airplane mode for 20 min on a device; real GPS in the foreground service with the app swiped away.
+- Cold start < 3 s on a 2–3 GB device, 60 fps (performance overlay), battery drain over 1 h (< 5 %/h).
+- Real TTS voices in hi-IN / mr-IN, the alarm on the ALARM stream with the screen off, microphone, camera, NFC crate scans, Google Maps hand-off.
+- Tile corridor prefetch (needs a tile provider that allows bulk download; off with the OSM default, D-143); the ~15 KB per tile estimate is not measured.
+- "A full simulated trip with one incident and diversion completed from the driver phone" (M12 done-when): needs the phone + Supabase login.
+- Hindi and Marathi strings need a native-speaker review.
+
 ## Measured metrics
 - M8 pipeline (dev stack on one Windows PC, time scale 60): breach → shelf life 110–152 ms; 500 devices × 10 packets → 5,000 / 5,000 stored; warm publish → Kafka p95 222 ms. Sensor → Influx p95 **not verified** (see M8).
 - M9 incident engine (dev stack, time scale 60): diversion route proposed 217–509 ms after a buyer accepts; 26 / 26 live checks.
+- M12 release APK sizes (one per ABI, obfuscated): driver arm64-v8a 32.1 MB / armeabi-v7a 27.0 MB, operator 32.1 / 27.0 MB, manager 31.8 / 26.8 MB — driver target < 40 MB met.
 - M11 release APK sizes (arm + arm64, obfuscated): operator 53.8 MB, driver 53.8 MB, manager 53.3 MB. The driver target (< 40 MB, M12) is further away: ML Kit barcode (7.8 MB) + CameraX are now in every flavor. Options for M12: per-ABI splits, or the unbundled (Play services) barcode model.
 - M10 release APK sizes (arm + arm64, obfuscated, M10 screens only): driver 44.2 MB, operator 44.2 MB, manager 43.7 MB. The M12 target (driver < 40 MB) is not met yet; per-ABI splits would roughly halve each file.
 

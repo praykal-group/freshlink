@@ -4,7 +4,7 @@ import { ArrayMaxSize, ArrayMinSize, IsArray, IsDateString, IsIn, IsObject, IsUU
 
 export const SYNC_TYPES = [
   'BATCH_CREATE', 'BATCH_UPDATE', 'TAG_ATTACH', 'IMAGE_ATTACH', 'RECEIVE',
-  'LOAD', 'TRIP_EVENT', 'GPS_POINTS', 'POD', 'ALERT_ACK', 'ROUTE_ACCEPT',
+  'LOAD', 'TRIP_EVENT', 'GPS_POINTS', 'POD', 'ALERT_ACK', 'ROUTE_ACCEPT', 'STOP_ARRIVE',
 ] as const;
 export type SyncType = (typeof SYNC_TYPES)[number];
 

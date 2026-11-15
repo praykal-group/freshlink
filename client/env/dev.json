@@ -10,5 +10,7 @@
   "FIREBASE_MESSAGING_SENDER_ID": "",
   "FIREBASE_APP_ID_DRIVER": "",
   "FIREBASE_APP_ID_OPERATOR": "",
-  "FIREBASE_APP_ID_MANAGER": ""
+  "FIREBASE_APP_ID_MANAGER": "",
+  "MAP_TILE_URL": "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+  "MAP_TILE_PREFETCH": "false"
 }

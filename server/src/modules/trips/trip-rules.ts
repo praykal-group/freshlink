@@ -62,3 +62,6 @@ export function co2Kg(distanceKm: number, factorKgPerKm: number): number {
 }
 
 export const mapsLink = (lat: number, lng: number) => `https://maps.google.com/?q=${lat.toFixed(6)},${lng.toFixed(6)}`;
+
+/** Drops that accept any batch on board (no order to match): diversion, cold storage, rescue handover. */
+export const OPEN_DROPS: readonly string[] = ['DIVERSION_DROP', 'COLD_STORAGE_DROP', 'RESCUE_DROP'];

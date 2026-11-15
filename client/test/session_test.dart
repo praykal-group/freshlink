@@ -166,9 +166,10 @@ void main() {
         final backend = FakeAuthBackend()
           ..session = true
           ..id = const AuthIdentity(email: 'x@iccms.in', emailConfirmed: true, provider: 'google');
-        final adapter = FakeAdapter((m, p, o) => p == '/me' ? (200, meJson(v.$2, name: 'Asha')) : (200, {}));
-        // The operator app works on its local database (outbox, cached masters).
-        final db = flavor == AppFlavor.operator ? AppDatabase(NativeDatabase.memory()) : null;
+        // The driver's server answers null when there is no trip today.
+        final adapter = FakeAdapter((m, p, o) => p == '/me' ? (200, meJson(v.$2, name: 'Asha')) : p == '/driver/trips/current' ? (200, null) : (200, {}));
+        // The operator and driver apps work on their local database (outbox, cached masters / trip).
+        final db = flavor != AppFlavor.manager ? AppDatabase(NativeDatabase.memory()) : null;
         if (db != null) addTearDown(db.close);
         final c = ProviderContainer(overrides: [
           ...overridesFor(flavor, backend: backend, adapter: adapter, router: v.$1),
@@ -177,14 +178,21 @@ void main() {
         ].cast());
         addTearDown(c.dispose);
         await tester.pumpWidget(UncontrolledProviderScope(container: c, child: const IccmsApp()));
-        await tester.pumpAndSettle();
+        // bounded pumps: the empty state (driver: no trip today) animates on a loop, so it never settles
+        Future<void> settle() async {
+          for (var i = 0; i < 20; i++) {
+            await tester.pump(const Duration(milliseconds: 100));
+          }
+        }
+
+        await settle();
         // The operator home lists its actions first; the module tag is at the end of the list.
-        await tester.scrollUntilVisible(find.text('iccms-module-${flavor.name}'), 300);
+        await tester.scrollUntilVisible(find.text('iccms-module-${flavor.name}'), 300, scrollable: find.byType(Scrollable).first);
         expect(find.text('iccms-module-${flavor.name}'), findsOneWidget);
         expect(find.text('Hello, Asha'), findsOneWidget);
         expect(c.read(routerProvider).routerDelegate.currentConfiguration.uri.path, '/home');
         unawaited(c.read(routerProvider).push('/settings'));
-        await tester.pumpAndSettle();
+        await settle();
         expect(find.byKey(const Key('sign-out')), findsOneWidget);
       });
     });

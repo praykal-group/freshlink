@@ -182,8 +182,8 @@ ADMIN: `GET /admin/integration-clients`, `POST /admin/integration-clients {name,
 | GET | `/driver/trips/current` | DRIVER | ASSIGNED / PRE_CHECK_DONE / IN_PROGRESS trip (IN_PROGRESS first) with stops, batches, vehicle; `null` if none |
 | GET | `/driver/trips?cursor` | DRIVER | History |
 | GET | `/trips?status&date` | MANAGER | |
-| GET | `/trips/:id` | driver (own), operator, manager | Current-version stops, batches on the trip |
-| GET | `/trips/:id/route` | driver (own), manager | `{currentVersion, accepted, pending}` |
+| GET | `/trips/:id` | driver (own), operator, manager | Current-version stops (`site{code,name}`, `buyer{name}`, M12: `batchIds` = batches this drop expects, `null` = any batch on board for DIVERSION_DROP / COLD_STORAGE_DROP / RESCUE_DROP or stops without an order), batches on the trip (M12: `product{code,name,nameHi,nameMr}`, `tagUids[]`) |
+| GET | `/trips/:id/route` | driver (own), manager | `{currentVersion, accepted, pending}`. M12: each plan has `distanceKm` and `stopRows` (its non-cancelled stops with site / buyer names, position, ETA); `pending` also `extraKm` (pending − accepted distance) and `canDecline` (false for INCIDENT / DIVERSION / RESCUE) |
 | GET | `/trips/:id/cargo-status` | driver (own), manager | Batches on board with grade + remaining shelf life (`telemetry: null` until M8) |
 | POST | `/trips/:id/assign` | MANAGER | `{driverId, vehicleId}` → ASSIGNED. 409 `DRIVER_BUSY` / `VEHICLE_BUSY` |
 | POST | `/trips/:id/load` | OPERATOR (at the depot) | `{batchIds}`. Each batch must be allocated to an order dropped by this trip (409 `BATCH_NOT_ON_TRIP`, `details.batchIds`) and be at the depot. Batch → LOADED (storage released) + trace `LOADED`. Re-scans are ignored. Loading after a passed pre-check sets the trip back to ASSIGNED |
@@ -201,7 +201,7 @@ ADMIN: `GET /admin/integration-clients`, `POST /admin/integration-clients {name,
 | GET | `/operator/trips?date=YYYY-MM-DD` | Loadable trips (PLANNED / ASSIGNED / PRE_CHECK_DONE) leaving the operator's site that day: `{date, items[{id, code, status, plannedStart, vehicle{regNo, capacityKg}, driverName, allocated[{id, code, weightKg}], loadedBatchIds[]}]}`. `allocated` = the batches on the current route version's stops. Loading itself is the `LOAD` sync op (or `POST /trips/:id/load`) |
 
 ### Sync additions
-`LOAD {tripId, batchIds}` (OPERATOR), `TRIP_EVENT {tripId, ...event}`, `POD {tripId, stopId, ...pod}`, `ROUTE_ACCEPT {tripId, version}` (DRIVER). M8: `GPS_POINTS {tripId, points[1..500]{at, lat, lng, speedKmh?, accuracyM?}}` (DRIVER, trip IN_PROGRESS, written to InfluxDB `driver_gps`), `ALERT_ACK {alertId}` (same rules as `POST /alerts/:id/ack`; replay is idempotent).
+`LOAD {tripId, batchIds}` (OPERATOR), `TRIP_EVENT {tripId, ...event}`, `POD {tripId, stopId, ...pod}`, `ROUTE_ACCEPT {tripId, version}` (DRIVER). M12: `STOP_ARRIVE {tripId, stopId, arrivedAt?, lat?, lng?}` (DRIVER; same rules as `POST /trips/:id/stops/:stopId/arrive`, a replay is a no-op). Every op type has a role list and anything else is refused (`FORBIDDEN_ROLE`, D-148). M8: `GPS_POINTS {tripId, points[1..500]{at, lat, lng, speedKmh?, accuracyM?}}` (DRIVER, trip IN_PROGRESS, written to InfluxDB `driver_gps`; M12: for a COMPLETED trip the points inside startedAt..completedAt are written and the rest dropped, `{written, dropped}`, D-149), `ALERT_ACK {alertId}` (same rules as `POST /alerts/:id/ack`; replay is idempotent).
 
 ### Alerts (M8)
 | Method | Path | Roles | Notes |

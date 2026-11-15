@@ -821,4 +821,481 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get bluetoothOff => 'ब्लूटूथ बंद है। प्रिंट के लिए चालू करें।';
+
+  @override
+  String get acceptReroute => 'नया रास्ता स्वीकार करें';
+
+  @override
+  String get declineReroute => 'मौजूदा रास्ता रखें';
+
+  @override
+  String get acknowledge => 'स्वीकार करें';
+
+  @override
+  String get alertTemp => 'तापमान सीमा से बाहर';
+
+  @override
+  String get alertTempDo =>
+      'रीफर चालू है और सेटपॉइंट सही है, जाँचें। दरवाज़े बंद रखें।';
+
+  @override
+  String get alertDriverFix => 'तापमान धीरे-धीरे बढ़ रहा है';
+
+  @override
+  String get alertDriverFixDo =>
+      'दरवाज़े की सील, रीफर सेटपॉइंट और हवा का रास्ता जाँचें। 15 मिनट में फिर जाँच होगी।';
+
+  @override
+  String get alertSpoilage => 'माल खराब होने का खतरा';
+
+  @override
+  String get alertSpoilageDo =>
+      'कंट्रोल टावर से नए रास्ते का इंतज़ार करें और उसे स्वीकार करें।';
+
+  @override
+  String get alertHumidity => 'नमी सीमा से बाहर';
+
+  @override
+  String get alertHumidityDo => 'दरवाज़े और रीफर जाँचें।';
+
+  @override
+  String get alertEthylene => 'एथिलीन ज़्यादा';
+
+  @override
+  String get alertEthyleneDo =>
+      'सुरक्षित हो तो हवा आने दें और कंट्रोल टावर को बताएँ।';
+
+  @override
+  String get alertShock => 'तेज़ झटका दर्ज हुआ';
+
+  @override
+  String get alertShockDo => 'सुरक्षित जगह रुककर माल जाँचें।';
+
+  @override
+  String get alertDevice => 'सेंसर बंद';
+
+  @override
+  String get alertDeviceDo => 'सेंसर पॉड की बिजली और केबल जाँचें।';
+
+  @override
+  String get alertGeneric => 'माल चेतावनी';
+
+  @override
+  String get alertGenericDo => 'संदेश पढ़ें और कंट्रोल टावर के निर्देश मानें।';
+
+  @override
+  String get allStopsDone => 'सभी स्टॉप पूरे। डिपो लौटें।';
+
+  @override
+  String get allUploaded => 'सब अपलोड हो गया';
+
+  @override
+  String pendingUploads(int count) {
+    return '$count चीज़ें अपलोड होने को बाकी';
+  }
+
+  @override
+  String get arrived => 'मैं पहुँच गया';
+
+  @override
+  String get deliverHere => 'यहाँ डिलीवरी करें';
+
+  @override
+  String get cargoStatus => 'माल';
+
+  @override
+  String get cargoTemp => 'तापमान';
+
+  @override
+  String get cargoHumidity => 'नमी';
+
+  @override
+  String cargoLowestShelfLife(String value) {
+    return 'सबसे कम शेल्फ लाइफ: $value';
+  }
+
+  @override
+  String cargoAsOf(String time) {
+    return 'आखिरी अपडेट $time (ऑफ़लाइन)';
+  }
+
+  @override
+  String get cargoEmpty => 'गाड़ी में माल नहीं';
+
+  @override
+  String cargoSafeRange(String min, String max) {
+    return 'सुरक्षित $min से $max °C';
+  }
+
+  @override
+  String get clear => 'मिटाएँ';
+
+  @override
+  String get gpsOff => 'लोकेशन बंद है। ट्रिप शुरू करने के लिए चालू करें।';
+
+  @override
+  String get gpsDenied => 'ट्रिप ट्रैक करने के लिए लोकेशन की अनुमति चाहिए।';
+
+  @override
+  String get gpsDeniedForever =>
+      'लोकेशन की अनुमति बंद है। सेटिंग्स में चालू करें।';
+
+  @override
+  String get gpsFailed => 'ट्रिप ट्रैकिंग शुरू नहीं हुई। फिर कोशिश करें।';
+
+  @override
+  String get notificationsDenied =>
+      'सूचनाएँ चालू करें ताकि दिखे कि ट्रिप ट्रैक हो रही है।';
+
+  @override
+  String get openSettings => 'सेटिंग्स खोलें';
+
+  @override
+  String historyPods(int count) {
+    return 'दर्ज डिलीवरी: $count';
+  }
+
+  @override
+  String get noHistory => 'अभी कोई ट्रिप नहीं';
+
+  @override
+  String get tripHistory => 'ट्रिप इतिहास';
+
+  @override
+  String get incDelay => 'देरी';
+
+  @override
+  String get incBreakdown => 'गाड़ी खराब';
+
+  @override
+  String get incAccident => 'दुर्घटना';
+
+  @override
+  String get incRoadblock => 'रास्ता बंद';
+
+  @override
+  String get incReeferFault => 'रीफर खराब';
+
+  @override
+  String get incPhoto => 'फ़ोटो जोड़ें';
+
+  @override
+  String get incPhotoDone => 'फ़ोटो जुड़ गई';
+
+  @override
+  String get incPhotoHint => 'समस्या दिखाएँ';
+
+  @override
+  String get incVoice => 'आवाज़ संदेश';
+
+  @override
+  String incVoiceDone(int seconds) {
+    return 'आवाज़ संदेश $seconds सेकंड';
+  }
+
+  @override
+  String incVoiceStop(int seconds) {
+    return 'रोकें ($seconds सेकंड बाकी)';
+  }
+
+  @override
+  String get incSend => 'रिपोर्ट भेजें';
+
+  @override
+  String get incSent => 'रिपोर्ट सेव हुई। नेटवर्क मिलते ही भेजी जाएगी।';
+
+  @override
+  String get incQueuedHint => 'बिना नेटवर्क भी चलता है: बाद में भेजा जाता है।';
+
+  @override
+  String get reportIncident => 'घटना बताएँ';
+
+  @override
+  String get micDenied => 'आवाज़ संदेश के लिए माइक की अनुमति चाहिए।';
+
+  @override
+  String get navigate => 'रास्ता दिखाएँ';
+
+  @override
+  String get nextStop => 'अगला स्टॉप';
+
+  @override
+  String get noTripToday => 'आज कोई ट्रिप नहीं';
+
+  @override
+  String get noTripTodayHint => 'फिर जाँचने के लिए नीचे खींचें।';
+
+  @override
+  String openAlerts(int count) {
+    return '$count खुली चेतावनियाँ: देखने के लिए दबाएँ';
+  }
+
+  @override
+  String get openTrip => 'ट्रिप खोलें';
+
+  @override
+  String get preCheck => 'ट्रिप से पहले जाँच';
+
+  @override
+  String get preCheckAgain => 'फिर से जाँचें';
+
+  @override
+  String get pcReeferOn => 'रीफर चालू है';
+
+  @override
+  String get pcSetpointChecked => 'सेट तापमान जाँचा';
+
+  @override
+  String get pcDoorsClosed => 'दरवाज़े बंद हैं';
+
+  @override
+  String get pcSetpoint => 'रीफर सेट तापमान';
+
+  @override
+  String get pcSubmit => 'जाँच सेव करें';
+
+  @override
+  String get pcAllNeeded => 'आगे बढ़ने के लिए तीनों जाँच चालू करें।';
+
+  @override
+  String get pcFailed => 'जाँच असफल';
+
+  @override
+  String get pcReeferOff => 'रीफर बंद है';
+
+  @override
+  String get pcDoorsOpen => 'दरवाज़ा खुला है';
+
+  @override
+  String get pcSetpointOut => 'यह सेट तापमान इस माल के लिए गलत है';
+
+  @override
+  String get pcIncompatible =>
+      'ये उत्पाद साथ नहीं जा सकते। कंट्रोल टावर को कॉल करें।';
+
+  @override
+  String pcAllowedRange(String min, String max) {
+    return 'मान्य: $min से $max °C';
+  }
+
+  @override
+  String get podAccepted => 'स्वीकार';
+
+  @override
+  String get podPartial => 'आंशिक';
+
+  @override
+  String get podRejected => 'अस्वीकार';
+
+  @override
+  String get podAcceptedKg => 'स्वीकृत वज़न';
+
+  @override
+  String podBatchWeight(String kg) {
+    return 'वज़न $kg किलो';
+  }
+
+  @override
+  String get podReason => 'कारण';
+
+  @override
+  String get podReceiver => 'प्राप्तकर्ता का नाम';
+
+  @override
+  String get podSignature => 'प्राप्तकर्ता के हस्ताक्षर';
+
+  @override
+  String get podPhoto => 'डिलीवरी की फ़ोटो';
+
+  @override
+  String get podPhotoDone => 'फ़ोटो ली गई';
+
+  @override
+  String get podPhotoHint => 'प्राप्तकर्ता के पास क्रेट दिखाएँ';
+
+  @override
+  String get podSubmit => 'डिलीवरी जमा करें';
+
+  @override
+  String get podSaved => 'डिलीवरी सेव हुई। नेटवर्क मिलते ही भेजी जाएगी।';
+
+  @override
+  String get podDone => 'इस स्टॉप की डिलीवरी दर्ज है।';
+
+  @override
+  String podScanTitle(int done, int total) {
+    return 'हर क्रेट स्कैन करें: $total में से $done';
+  }
+
+  @override
+  String podOtherStop(String code) {
+    return 'क्रेट $code दूसरे स्टॉप का है। गाड़ी में रखें।';
+  }
+
+  @override
+  String podUnknownCrate(String code) {
+    return '$code इस गाड़ी में नहीं है।';
+  }
+
+  @override
+  String get podNeedScan => 'क्रेट स्कैन करें';
+
+  @override
+  String get podWrongTag => 'गलत क्रेट';
+
+  @override
+  String get podNeedKg => 'स्वीकृत वज़न डालें (पूरे वज़न से कम)';
+
+  @override
+  String get podNeedReason => 'कारण लिखें';
+
+  @override
+  String get podNeedReceiver => 'प्राप्तकर्ता का नाम डालें';
+
+  @override
+  String get podNeedSignature => 'प्राप्तकर्ता से हस्ताक्षर करवाएँ';
+
+  @override
+  String get podNeedPhoto => 'डिलीवरी की फ़ोटो लें';
+
+  @override
+  String get reasonDelay => 'रास्ते में देरी: स्टॉप का तेज़ क्रम';
+
+  @override
+  String get reasonIncident => 'घटना: माल बचाने के लिए रास्ता बदला';
+
+  @override
+  String get reasonDiversion =>
+      'मोड़: माल खराब होने से पहले पास के खरीदार को दें';
+
+  @override
+  String get reasonRescue => 'बचाव: माल दूसरी गाड़ी को दें';
+
+  @override
+  String get reasonManual => 'कंट्रोल टावर ने रास्ता बदला';
+
+  @override
+  String get rerouteTitle => 'नया रास्ता';
+
+  @override
+  String get rerouteOld => 'पहले जा रहे थे';
+
+  @override
+  String get rerouteNew => 'अब जाएँ';
+
+  @override
+  String rerouteExtraKm(String km) {
+    return '$km किमी ज़्यादा';
+  }
+
+  @override
+  String rerouteShorterKm(String km) {
+    return '$km किमी कम';
+  }
+
+  @override
+  String get rerouteMustAccept =>
+      'यह रास्ता माल को बचाता है और स्वीकार करना ज़रूरी है।';
+
+  @override
+  String get rerouteWaiting => 'नया रास्ता इंतज़ार में: देखने के लिए दबाएँ';
+
+  @override
+  String shelfLifeDays(int days, int hours) {
+    return '$days दिन $hours घंटे बाकी';
+  }
+
+  @override
+  String shelfLifeHm(int hours, int minutes) {
+    return '$hours घंटे $minutes मिनट बाकी';
+  }
+
+  @override
+  String get shelfLifeExpired => 'शेल्फ लाइफ खत्म';
+
+  @override
+  String get shelfLifeUnknown => 'शेल्फ लाइफ अभी पता नहीं';
+
+  @override
+  String get sos => 'SOS';
+
+  @override
+  String get sosSent => 'SOS भेजा गया';
+
+  @override
+  String get sosSentBody =>
+      'आपकी लोकेशन कंट्रोल टावर और आपातकालीन संपर्क को जाती है। सुरक्षित रहें; मदद आ रही है।';
+
+  @override
+  String get speedLockTitle => 'गाड़ी चल रही है';
+
+  @override
+  String get speedLockBody =>
+      'यह स्क्रीन इस्तेमाल करने के लिए गाड़ी रोकें। रास्ता और SOS चलते रहेंगे।';
+
+  @override
+  String get startTrip => 'ट्रिप शुरू करें';
+
+  @override
+  String get startNeedsPreCheck => 'पहले ट्रिप से पहले की जाँच करें।';
+
+  @override
+  String get stopArriveHint => 'गाड़ी इस स्टॉप पर पहुँचे तब दबाएँ।';
+
+  @override
+  String get stopPickupHint => 'पिकअप स्टॉप: यहाँ कुछ देना नहीं है।';
+
+  @override
+  String get stopNotFound => 'यह स्टॉप अब रास्ते में नहीं है।';
+
+  @override
+  String get stopPickup => 'पिकअप';
+
+  @override
+  String get stopDrop => 'डिलीवरी';
+
+  @override
+  String get stopDiversion => 'मोड़ खरीदार';
+
+  @override
+  String get stopRescuePickup => 'बचाव पिकअप';
+
+  @override
+  String get stopRescueDrop => 'बचाव गाड़ी को सौंपें';
+
+  @override
+  String get stopColdStorage => 'कोल्ड स्टोरेज';
+
+  @override
+  String stopEta(String time) {
+    return 'पहुँच $time';
+  }
+
+  @override
+  String stopWindow(String window) {
+    return 'समय $window';
+  }
+
+  @override
+  String tripBatches(int count) {
+    return 'बैच: $count';
+  }
+
+  @override
+  String tripInProgress(String code) {
+    return 'ट्रिप $code चल रही है';
+  }
+
+  @override
+  String get tripInProgressText => 'लोकेशन कंट्रोल टावर से साझा है';
+
+  @override
+  String tripStarts(String time) {
+    return 'शुरू $time';
+  }
+
+  @override
+  String tripVehicle(String regNo) {
+    return 'गाड़ी $regNo';
+  }
 }

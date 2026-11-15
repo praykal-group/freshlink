@@ -56,6 +56,16 @@ dependencies:
   esc_pos_utils_plus: 2.0.4
   share_plus: 13.3.1
   qr: 4.0.0 # 4.0.1 needs Dart 3.13
+  # driver app (M12). Every Android part compiles against SDK <= 36 (checked, D-141). Map tiles
+  # come from a configurable URL through our own caching TileProvider (no tile-cache package).
+  flutter_map: 8.3.2
+  latlong2: 0.10.1
+  geolocator: 14.0.1
+  flutter_foreground_task: 11.0.3
+  signature: 6.4.0
+  record: 7.2.0
+  flutter_tts: 4.2.5
+  url_launcher: 6.3.3
 
 dev_dependencies:
   flutter_test:

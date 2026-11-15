@@ -24,6 +24,12 @@ class Env {
   static const _firebaseAppIdOperator = String.fromEnvironment('FIREBASE_APP_ID_OPERATOR');
   static const _firebaseAppIdManager = String.fromEnvironment('FIREBASE_APP_ID_MANAGER');
 
+  /// Map tiles for the driver app (DA-NFR-01). The default is the public OpenStreetMap server,
+  /// whose usage policy allows viewing (and caching what was viewed) but forbids bulk download,
+  /// so corridor prefetch is on only for a provider that allows it (MAP_TILE_PREFETCH, D-143).
+  static const mapTileUrl = String.fromEnvironment('MAP_TILE_URL', defaultValue: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png');
+  static const mapTilePrefetch = bool.fromEnvironment('MAP_TILE_PREFETCH');
+
   static bool get supabaseConfigured => supabaseUrl.isNotEmpty && supabasePublishableKey.isNotEmpty;
 
   static String firebaseAppId(AppFlavor f) => switch (f) {

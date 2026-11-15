@@ -229,3 +229,48 @@ describe('PodService.submit', () => {
     expect(s.prisma.$transaction).not.toHaveBeenCalled();
   });
 });
+
+describe('TripsService.route (DA-FR-08 reroute proposal)', () => {
+  it('returns old and new stops with names, the extra km and whether the driver may decline', async () => {
+    const s = setup(trip({ status: 'IN_PROGRESS', currentRouteVersion: 1 }));
+    const plans: Record<string, unknown> = { accepted: { version: 1, fitness: 120.04, reason: 'INITIAL', status: 'ACCEPTED' }, pending: { version: 2, fitness: 131.26, reason: 'DIVERSION', status: 'PROPOSED' } };
+    (s.prisma as Record<string, unknown>).routePlan = { findFirst: jest.fn(async ({ where }) => (where.status === 'PROPOSED' ? plans.pending : plans.accepted)) };
+    s.prisma.tripStop.findMany = jest.fn(async ({ where }) =>
+      where.routeVersion === 1 ? [{ id: 's1', seq: 1, site: { code: 'DC-CSN', name: 'Sambhajinagar DC' }, buyer: null }] : [{ id: 's9', seq: 1, site: null, buyer: { name: 'Jalna Fresh' } }],
+    ) as never;
+    const r = await s.service.route(driver, TRIP);
+    expect(r.pending).toMatchObject({ version: 2, distanceKm: 131.3, extraKm: 11.2, canDecline: false, stopRows: [{ buyer: { name: 'Jalna Fresh' } }] });
+    expect(r.accepted).toMatchObject({ distanceKm: 120, stopRows: [{ site: { name: 'Sambhajinagar DC' } }] });
+    expect(s.prisma.tripStop.findMany).toHaveBeenCalledWith(expect.objectContaining({ where: expect.objectContaining({ status: { not: 'CANCELLED' } }) }));
+  });
+
+  it('a DELAY replan can be declined; no proposal → pending null', async () => {
+    const s = setup(trip({ status: 'IN_PROGRESS' }));
+    (s.prisma as Record<string, unknown>).routePlan = { findFirst: jest.fn(async ({ where }) => (where.status === 'PROPOSED' ? { version: 2, fitness: 100, reason: 'DELAY' } : { version: 1, fitness: 100 })) };
+    expect((await s.service.route(driver, TRIP)).pending).toMatchObject({ canDecline: true, extraKm: 0 });
+    (s.prisma as Record<string, unknown>).routePlan = { findFirst: jest.fn(async ({ where }) => (where.status === 'PROPOSED' ? null : { version: 1, fitness: 100 })) };
+    expect((await s.service.route(driver, TRIP)).pending).toBeNull();
+  });
+});
+
+describe('TripsService.detail (driver app, M12)', () => {
+  it('each drop lists the batches it expects (null for open drops) and each batch its tag UIDs', async () => {
+    const s = setup(trip({ status: 'IN_PROGRESS' }));
+    s.prisma.tripStop.findMany = jest.fn().mockResolvedValue([
+      { id: 'p', seq: 1, type: 'PICKUP', orderId: null, site: { code: 'DEP', name: 'Depot' }, buyer: null },
+      { id: 'd1', seq: 2, type: 'DROP', orderId: 'o1', site: { code: 'DC', name: 'DC' }, buyer: null },
+      { id: 'dv', seq: 3, type: 'DIVERSION_DROP', orderId: 'o2', site: null, buyer: { name: 'Jalna Fresh' } },
+    ]) as never;
+    s.prisma.tripBatch.findMany = jest.fn().mockResolvedValue([
+      { batchId: B1, loadedAt: null, unloadedAt: null, batch: { code: 'FSH-1', productId: 'p1', weightKg: '120.5', status: 'IN_TRANSIT', currentGrade: 'A', product: { code: 'ROHU', name: 'Rohu' }, tags: [{ tagUid: '04A1' }, { tagUid: 'E200' }] } },
+    ]) as never;
+    s.prisma.orderBatch.findMany = jest.fn().mockResolvedValue([{ orderId: 'o1', batchId: B1 }]) as never;
+    (s.prisma.vehicle as Record<string, unknown>).findUnique = jest.fn().mockResolvedValue({ id: 'veh-1', regNo: 'MH20', capacityKg: '3000' });
+    (s.prisma.user as Record<string, unknown>).findUnique = jest.fn().mockResolvedValue({ id: 'drv-1', name: 'Ravi', phone: '+91' });
+    const d = await s.service.detail(driver, TRIP);
+    expect(d.stops.map((x) => x.batchIds)).toEqual([null, [B1], null]);
+    expect(d.batches[0]).toMatchObject({ batchId: B1, code: 'FSH-1', weightKg: 120.5, tagUids: ['04A1', 'E200'], product: { code: 'ROHU' } });
+    expect(d.batches[0]).not.toHaveProperty('tags');
+    expect(d.stops[2]).toMatchObject({ buyer: { name: 'Jalna Fresh' } });
+  });
+});

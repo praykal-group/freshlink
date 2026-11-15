@@ -1,18 +1,15 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/printing/label_printer.dart';
 import '../../core/providers.dart';
-import '../../core/tags/nfc_tag_reader.dart';
-import '../../core/tags/qr_tag_reader.dart';
-import '../../core/tags/tag_reader.dart';
-import '../../core/tags/wedge_tag_reader.dart';
 import '../../core/voice/voice_number.dart';
+export '../../shared/screens/camera_screen.dart' show CapturedPhoto, PhotoCapture, photoCaptureProvider;
+export '../../shared/widgets/tag_picker.dart' show TagPicker, tagReadersProvider;
+
 import 'data/models.dart';
 import 'data/operator_repository.dart';
-import 'screens/camera_screen.dart';
 
 final operatorRepositoryProvider = Provider<OperatorRepository>((ref) {
   final db = ref.watch(databaseProvider);
@@ -26,19 +23,6 @@ final mastersProvider = FutureProvider<Masters>((ref) => ref.watch(operatorRepos
 final summaryProvider = FutureProvider.autoDispose<OperatorSummary>((ref) => ref.watch(operatorRepositoryProvider).summary());
 
 final operatorTripsProvider = FutureProvider.autoDispose<List<OperatorTrip>>((ref) => ref.watch(operatorRepositoryProvider).trips());
-
-/// Readers in the order offered (FO-FR-05). Overridden in tests.
-final tagReadersProvider = Provider<Map<TagKind, TagReader>>((_) => const {
-      TagKind.nfc: NfcTagReader(),
-      TagKind.qr: QrTagReader(),
-      TagKind.uhf: WedgeTagReader(),
-    });
-
-/// Guided photo capture (FO-FR-06): opens the camera screen. Tests replace it with stored photos.
-typedef PhotoCapture = Future<CapturedPhoto?> Function(BuildContext context, {required String title, required String instruction, required String fileStem});
-
-final photoCaptureProvider = Provider<PhotoCapture>((_) => (context, {required title, required instruction, required fileStem}) =>
-    Navigator.of(context).push<CapturedPhoto>(MaterialPageRoute(builder: (_) => CameraCaptureScreen(title: title, instruction: instruction, fileStem: fileStem))));
 
 final voiceInputProvider = Provider<VoiceNumberInput>((_) => VoiceNumberInput());
 

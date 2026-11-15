@@ -2,11 +2,12 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 
-import '../../../core/l10n/l10n.dart';
-import '../../../core/media/photo_compress.dart';
-import '../../../core/theme/app_spacing.dart';
+import '../../core/l10n/l10n.dart';
+import '../../core/media/photo_compress.dart';
+import '../../core/theme/app_spacing.dart';
 
 /// One captured photo: the compressed copy that is uploaded and the full-resolution original kept
 /// on the phone until the batch is graded (FO-NFR-04).
@@ -141,3 +142,9 @@ class _CameraCaptureScreenState extends State<CameraCaptureScreen> {
     );
   }
 }
+
+/// Guided photo capture (FO-FR-06, DA-FR-09/11): opens the camera screen. Tests replace it with stored photos.
+typedef PhotoCapture = Future<CapturedPhoto?> Function(BuildContext context, {required String title, required String instruction, required String fileStem});
+
+final photoCaptureProvider = Provider<PhotoCapture>((_) => (context, {required title, required instruction, required fileStem}) =>
+    Navigator.of(context).push<CapturedPhoto>(MaterialPageRoute(builder: (_) => CameraCaptureScreen(title: title, instruction: instruction, fileStem: fileStem))));

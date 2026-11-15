@@ -17,15 +17,20 @@ import { StorageService } from '../storage/storage.service';
 import { TelemetryService } from '../telemetry/telemetry.service';
 import { TraceService } from '../trace/trace.service';
 import type { ArriveDto, ListTripsQuery, PreCheckDto, TripEventDto } from './dto/trip.dto';
-import { allowedSetpoint, canDo, co2Kg, mapsLink, preCheckProblems, type TripAction } from './trip-rules';
+import { allowedSetpoint, canDo, co2Kg, mapsLink, OPEN_DROPS, preCheckProblems, type TripAction } from './trip-rules';
 
 type Tx = Prisma.TransactionClient;
 const ACTIVE_FOR_DRIVER = ['ASSIGNED', 'PRE_CHECK_DONE', 'IN_PROGRESS'] as const;
 const STOP_DONE = ['COMPLETED', 'SKIPPED', 'CANCELLED'];
+/** Replans that protect the cargo: the driver must accept them (DA-FR-08). */
+const MUST_ACCEPT: readonly string[] = ['INCIDENT', 'DIVERSION', 'RESCUE'];
 
 function fail(code: string, message: string, status: HttpStatus, details?: Record<string, unknown>): never {
   throw new AppError(code, message, status, details);
 }
+
+/** Stop rows as the driver app shows them: site or buyer name (diversion stops are buyers). */
+const STOP_INCLUDE = { site: { select: { code: true, name: true } }, buyer: { select: { name: true } } } as const;
 
 export const tripView = (t: Trip) => ({ ...t, distanceKm: t.distanceKm === null ? null : Number(t.distanceKm), co2Kg: t.co2Kg === null ? null : Number(t.co2Kg) });
 
@@ -92,19 +97,29 @@ export class TripsService {
     const [stops, batches, vehicle, driver] = await Promise.all([
       this.prisma.tripStop.findMany({
         where: { tripId: id, routeVersion: trip.currentRouteVersion },
-        include: { site: { select: { code: true, name: true } } },
+        include: STOP_INCLUDE,
         orderBy: { seq: 'asc' },
       }),
-      this.prisma.tripBatch.findMany({ where: { tripId: id }, include: { batch: { select: { code: true, productId: true, weightKg: true, status: true, currentGrade: true } } } }),
+      this.prisma.tripBatch.findMany({
+        where: { tripId: id },
+        include: { batch: { select: { code: true, productId: true, weightKg: true, status: true, currentGrade: true, product: { select: { code: true, name: true, nameHi: true, nameMr: true } }, tags: { select: { tagUid: true } } } } },
+      }),
       this.prisma.vehicle.findUnique({ where: { id: trip.vehicleId }, select: { id: true, regNo: true, capacityKg: true } }),
       trip.driverId ? this.prisma.user.findUnique({ where: { id: trip.driverId }, select: { id: true, name: true, phone: true } }) : null,
     ]);
+    // DA-FR-11/12 offline: which batches each drop expects (its order's batches; null = any batch on
+    // board, as PodService accepts for diversion / cold-storage / rescue drops) and each batch's tag
+    // UIDs, so the phone checks a crate scan with the server's rule before it has a network.
+    const orderIds = [...new Set(stops.map((s) => s.orderId).filter((o): o is string => !!o))];
+    const orderBatches = orderIds.length ? await this.prisma.orderBatch.findMany({ where: { orderId: { in: orderIds } }, select: { orderId: true, batchId: true } }) : [];
+    const byOrder = new Map<string, string[]>();
+    for (const ob of orderBatches) byOrder.set(ob.orderId, [...(byOrder.get(ob.orderId) ?? []), ob.batchId]);
     return {
       ...tripView(trip),
       vehicle: vehicle && { ...vehicle, capacityKg: Number(vehicle.capacityKg) },
       driver,
-      stops,
-      batches: batches.map((b) => ({ batchId: b.batchId, loadedAt: b.loadedAt, unloadedAt: b.unloadedAt, ...b.batch, weightKg: Number(b.batch.weightKg) })),
+      stops: stops.map((s) => ({ ...s, batchIds: OPEN_DROPS.includes(s.type) || !s.orderId ? null : (byOrder.get(s.orderId) ?? []) })),
+      batches: batches.map(({ batch: { tags, ...b }, ...tb }) => ({ batchId: tb.batchId, loadedAt: tb.loadedAt, unloadedAt: tb.unloadedAt, ...b, weightKg: Number(b.weightKg), tagUids: tags.map((t) => t.tagUid) })),
     };
   }
 
@@ -135,7 +150,23 @@ export class TripsService {
       this.prisma.routePlan.findFirst({ where: { tripId: id, version: trip.currentRouteVersion } }),
       this.prisma.routePlan.findFirst({ where: { tripId: id, status: 'PROPOSED' }, orderBy: { version: 'desc' } }),
     ]);
-    return { currentVersion: trip.currentRouteVersion, accepted, pending };
+    // DA-FR-08: the driver compares old and new stops, so both versions come with their stop rows
+    // (name, position, ETA) and distance; `extraKm` = pending − accepted plan distance (fitness = km).
+    const stopsOf = (version: number) =>
+      this.prisma.tripStop.findMany({ where: { tripId: id, routeVersion: version, status: { not: 'CANCELLED' } }, include: STOP_INCLUDE, orderBy: { seq: 'asc' } });
+    const [acceptedStops, pendingStops] = await Promise.all([stopsOf(trip.currentRouteVersion), pending ? stopsOf(pending.version) : Promise.resolve([])]);
+    const km = (p: { fitness: number } | null) => (p ? Math.round(p.fitness * 10) / 10 : null);
+    return {
+      currentVersion: trip.currentRouteVersion,
+      accepted: accepted && { ...accepted, distanceKm: km(accepted), stopRows: acceptedStops },
+      pending: pending && {
+        ...pending,
+        distanceKm: km(pending),
+        extraKm: accepted ? Math.round((pending.fitness - accepted.fitness) * 10) / 10 : null,
+        canDecline: !MUST_ACCEPT.includes(pending.reason),
+        stopRows: pendingStops,
+      },
+    };
   }
 
   async cargoStatus(user: AuthUser, id: string) {
@@ -352,7 +383,7 @@ export class TripsService {
       if ((accept && plan.status === 'ACCEPTED') || (!accept && plan.status === 'DECLINED')) return plan; // idempotent replay
       fail('ROUTE_NOT_PROPOSED', `Route v${version} is ${plan.status}`, HttpStatus.CONFLICT);
     }
-    if (!accept && ['INCIDENT', 'DIVERSION', 'RESCUE'].includes(plan.reason)) {
+    if (!accept && MUST_ACCEPT.includes(plan.reason)) {
       fail('DECLINE_NOT_ALLOWED', 'This reroute protects the cargo and must be accepted', HttpStatus.CONFLICT);
     }
     const now = new Date();

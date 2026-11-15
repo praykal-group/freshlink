@@ -8,7 +8,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:iccms/apps/operator/data/operator_repository.dart';
 import 'package:iccms/apps/operator/providers.dart';
 import 'package:iccms/apps/operator/router.dart';
-import 'package:iccms/apps/operator/screens/camera_screen.dart';
 import 'package:iccms/bootstrap.dart';
 import 'package:iccms/core/config/app_flavor.dart';
 import 'package:iccms/core/providers.dart';

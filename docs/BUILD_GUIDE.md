@@ -57,7 +57,7 @@ flutter run -d chrome         -t lib/main_manager.dart  --dart-define-from-file=
 ## 5. Release APKs
 
 ```bash
-scripts/build_apk.sh driver   prod
+scripts/build_apk.sh driver   prod   # → dist/iccms-driver-<ver>-<code>-arm64-v8a.apk + ...-armeabi-v7a.apk (D-146)
 scripts/build_apk.sh operator prod
 scripts/build_apk.sh manager  prod
 ```
@@ -126,7 +126,7 @@ Google Cloud console → APIs & Services → Credentials:
 ```bash
 cd client && flutter analyze && flutter test        # unit + widget tests (incl. text scale 2.0, EN/HI/MR)
 scripts/check_flavor_isolation.sh                   # no cross-flavor imports
-scripts/verify_apk_isolation.sh driver              # after a release build: libapp.so holds only its own module tag
+scripts/verify_apk_isolation.sh driver              # after a release build: each ABI's libapp.so holds only its own module tag
 scripts/verify_apk_isolation.sh operator
 scripts/verify_apk_isolation.sh manager
 ```

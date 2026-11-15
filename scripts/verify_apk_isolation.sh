@@ -2,16 +2,29 @@
 # Binary isolation check (Section 11): the compiled Dart code (lib/<abi>/libapp.so) of a flavor's
 # APK must contain only its own module tag 'iccms-module-<flavor>', never another dashboard's.
 #
-#   scripts/verify_apk_isolation.sh <flavor> [path/to.apk]
+#   scripts/verify_apk_isolation.sh <flavor> [path/to.apk ...]
+# Without paths: every dist/iccms-<flavor>-*.apk of the current version (one per ABI, D-146).
 set -euo pipefail
 
 flavor="${1:-}"
 case "$flavor" in driver|operator|manager) ;; *) echo "usage: $0 <driver|operator|manager> [apk]" >&2; exit 2;; esac
 root="$(git rev-parse --show-toplevel)"
-apk="${2:-$root/client/build/app/outputs/flutter-apk/app-${flavor}-release.apk}"
-[[ -f "$apk" ]] || { echo "APK not found: $apk" >&2; exit 2; }
+shift
+apks=("$@")
+if [[ ${#apks[@]} -eq 0 ]]; then
+  read -r vn vc < <(python - "$root/release/versions.json" "$flavor" <<'PY' | tr -d '\r'
+import json, sys
+v = json.load(open(sys.argv[1]))[sys.argv[2]]
+print(v["versionName"], v["versionCode"])
+PY
+)
+  apks=("$root"/dist/iccms-"$flavor"-"$vn"-"$vc"-*.apk)
+fi
+for apk in "${apks[@]}"; do [[ -f "$apk" ]] || { echo "APK not found: $apk" >&2; exit 2; }; done
 
-tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' EXIT
+check_one() {
+apk="$1"
+tmp="$(mktemp -d)"
 python - "$apk" "$tmp" <<'PY'
 import sys, zipfile
 z = zipfile.ZipFile(sys.argv[1])
@@ -36,5 +49,11 @@ while IFS= read -r so; do
   if [[ "${found[*]:-}" != "$flavor" ]]; then fail=1; fi
 done < <(find "$tmp" -name libapp.so)
 
-if [[ $fail -ne 0 ]]; then echo "verify_apk_isolation: FAIL ($flavor APK must contain only iccms-module-$flavor)"; exit 1; fi
-echo "verify_apk_isolation: OK ($flavor)"
+rm -rf "$tmp"
+if [[ $fail -ne 0 ]]; then echo "verify_apk_isolation: FAIL ($(basename "$apk") must contain only iccms-module-$flavor)"; return 1; fi
+echo "verify_apk_isolation: OK ($(basename "$apk"))"
+}
+
+status=0
+for apk in "${apks[@]}"; do check_one "$apk" || status=1; done
+exit $status

@@ -2,6 +2,17 @@
 
 All notable changes, per milestone (Keep a Changelog style).
 
+## [m12] - 2026-11-15
+### Added
+- Driver app (Section 10.5): today's trip card, pre-trip check, Start Trip (tracking + device binding), active trip with map (route, stops, truck), next stop + Google Maps hand-off, cargo strip and cargo screen (60 s refresh), critical alert screen (alarm + voice until Acknowledge), reroute proposal (old vs new stop, extra km, Accept; Decline only for non-critical replans), 2-tap incident report with optional photo and 60 s voice note, SOS, stop / PoD (arrive, crate scan checked on the phone, accepted / partial / rejected with kg + reason, receiver, signature, photo), history + pending uploads.
+- Offline: arrival, PoD, reroute acceptance, incidents, SOS, alert acks and GPS go through the outbox; the cached trip shows them before the server has them.
+- Core: trip GPS in a foreground service with a journal file, speed lock, disk-caching tile provider + corridor prefetch, alarm via the alarm audio stream + TTS, voice recorder.
+- Backend: `STOP_ARRIVE` sync op; stop `batchIds`, batch `tagUids`, buyer names in the trip detail; route proposals with stops, distance, extra km and `canDecline`.
+- 140 strings in EN / HI / MR; per-ABI release APKs (`scripts/build_apk.sh`).
+### Changed
+- Sync role checks fail closed (D-148); GPS points synced after a trip completed are kept if inside the trip (D-149).
+- `TagPicker`, the tag readers provider and the camera screen moved to `shared/` (used by operator and driver).
+
 ## [m11] - 2026-11-15
 ### Added
 - Operator app (Section 10.4): home with today's counts and draft resume; 7-step batch wizard for fish and produce (details with on-device ranges and voice number input, tag via NFC / QR / UHF wedge, guided 3-photo capture compressed to ≤ 500 KB, AI grade with dispute, storage path + unit, label with QR, done with elapsed time); batch list (search, status filter, infinite scroll) and detail (30-min edit, edit request, label reprint, timeline); receive at cold storage; load truck with wrong-batch warning; Bluetooth printer setup.

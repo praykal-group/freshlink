@@ -22,7 +22,6 @@ import '../data/models.dart';
 import '../data/operator_repository.dart';
 import '../providers.dart';
 import '../widgets/operator_widgets.dart';
-import 'camera_screen.dart';
 
 // ───────────────────────── Receive (FO-FR-10) ─────────────────────────
 

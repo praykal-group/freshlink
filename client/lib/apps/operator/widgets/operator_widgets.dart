@@ -11,15 +11,12 @@ import 'package:share_plus/share_plus.dart';
 import '../../../core/l10n/l10n.dart';
 import '../../../core/printing/label_printer.dart';
 import '../../../core/providers.dart';
-import '../../../core/tags/tag_reader.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
-import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/validators.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/qr_view.dart';
-import '../../../shared/widgets/status.dart';
 import '../providers.dart';
 
 String batchStatusText(AppLocalizations l, String s) => switch (s) {
@@ -51,41 +48,6 @@ String storagePathText(AppLocalizations l, String path) => switch (path) {
       _ => path,
     };
 
-/// FO-FR-05: one big button per reader (gloves: 56 dp+). Returns the tag read, or null.
-class TagPicker extends ConsumerWidget {
-  const TagPicker({super.key, required this.onRead, this.current});
-  final ValueChanged<TagRead> onRead;
-  final TagRead? current;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l = context.l10n;
-    final readers = ref.watch(tagReadersProvider);
-    Future<void> use(TagKind k) async {
-      final r = await readers[k]?.read(context);
-      if (r != null) {
-        HapticFeedback.mediumImpact();
-        onRead(r);
-      }
-    }
-
-    return Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-      AppButton(key: const Key('tag-nfc'), label: l.tagNfc, icon: Icons.nfc_rounded, kind: AppButtonKind.tonal, onPressed: () => use(TagKind.nfc)),
-      const SizedBox(height: AppSpacing.md),
-      AppButton(key: const Key('tag-qr'), label: l.tagQr, icon: Icons.qr_code_scanner_rounded, kind: AppButtonKind.tonal, onPressed: () => use(TagKind.qr)),
-      const SizedBox(height: AppSpacing.md),
-      AppButton(key: const Key('tag-uhf'), label: l.tagWedge, icon: Icons.sensors_rounded, kind: AppButtonKind.outlined, onPressed: () => use(TagKind.uhf)),
-      if (current != null) ...[
-        const SizedBox(height: AppSpacing.lg),
-        AppCard(status: StatusLevel.safe, child: Row(children: [
-          Icon(Icons.check_circle_rounded, color: context.palette.safe),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(child: Text('${current!.kind.api} · ${l.tagRead(current!.uid)}', key: const Key('tag-current'))),
-        ])),
-      ],
-    ]);
-  }
-}
 
 /// Numeric field with a range check and the mic button (FO-NFR voice input on numeric fields).
 class NumberField extends ConsumerWidget {

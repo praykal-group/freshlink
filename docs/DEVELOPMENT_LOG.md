@@ -248,3 +248,25 @@ cd server && npx jest src/modules/operator
 cd client && flutter analyze && flutter test
 scripts/build_apk.sh operator dev && scripts/verify_apk_isolation.sh operator
 ```
+
+## M12 — Driver APK (2026-11-15)
+
+**Implemented**
+- `server/`: `STOP_ARRIVE` sync op; complete, fail-closed sync role table (D-148); late GPS kept inside the trip span (D-149); trip detail with per-stop `batchIds`, batch `tagUids`, buyer names; route proposals with stop rows, distance, extra km, `canDecline` (D-147).
+- `client/lib/core/`: `location` (GPS fix, journal, speed lock, foreground-service tracker), `map` (corridor tiles, tile store, caching TileProvider, prefetch), `alarm/alert_alarm.dart`, `media/voice_recorder.dart`; Env `MAP_TILE_URL`, `MAP_TILE_PREFETCH`.
+- `client/lib/apps/driver/`: `data` (models, repository: trip cache + offline overlay, outbox writes, online pre-check / start), `providers.dart` (trip, cargo poll, tracker, last fix, speed lock, GPS drain, alarm, attention = alerts + proposals), `widgets`, `screens` (today, pre-check, active trip, cargo + history, alert + reroute, incident, stop / PoD), `router.dart`.
+- `shared/`: tag picker + camera screen moved from the operator app.
+- Manifests per flavor (D-145); per-ABI builds (D-146); 140 strings EN / HI / MR.
+
+**Bugs found and fixed during the milestone:** see TESTING.md (M12).
+
+**Tests:** see TESTING.md (M12).
+
+**Limitations / pending:** no phone here: alert ≤ 10 s on a device, 20-minute airplane-mode trip, cold start, 60 fps, 1-hour battery drain, real GPS / camera / microphone / TTS / NFC are not measured; tile prefetch is off with the default OSM tiles (D-143); M15 must add `abi` to the update API (D-146); HI/MR strings need review.
+
+**Repro**
+```bash
+cd server && npx jest
+cd client && flutter analyze && flutter test
+scripts/build_apk.sh driver dev && scripts/verify_apk_isolation.sh driver
+```

@@ -11,9 +11,17 @@
     <!-- Pulled in by camerax / plugins; photos stay in app storage, so no shared-storage access (D-140). -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="remove" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" tools:node="remove" />
+    <!-- Driver-only plugins (flutter_foreground_task, geolocator): one pubspec, D-139 / D-145. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" tools:node="remove" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" tools:node="remove" />
     <!-- NFC is recommended, not required (FO-NFR): QR and the RFID reader cover phones without it. -->
     <uses-feature android:name="android.hardware.nfc" android:required="false" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <application>
+        <receiver android:name="com.pravera.flutter_foreground_task.service.RebootReceiver" tools:node="remove" />
+        <receiver android:name="com.pravera.flutter_foreground_task.service.RestartReceiver" tools:node="remove" />
+        <service android:name="com.baseflow.geolocator.GeolocatorLocationService" tools:node="remove" />
+    </application>
     <queries>
         <!-- speech_to_text: voice input for numeric fields (Android 11+ package visibility) -->
         <intent>

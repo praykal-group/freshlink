@@ -827,4 +827,483 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bluetoothOff => 'Bluetooth is off. Turn it on to print.';
+
+  @override
+  String get acceptReroute => 'Accept new route';
+
+  @override
+  String get declineReroute => 'Keep current route';
+
+  @override
+  String get acknowledge => 'Acknowledge';
+
+  @override
+  String get alertTemp => 'Temperature out of range';
+
+  @override
+  String get alertTempDo =>
+      'Check the reefer is running and the setpoint is right. Keep the doors closed.';
+
+  @override
+  String get alertDriverFix => 'Temperature drifting';
+
+  @override
+  String get alertDriverFixDo =>
+      'Check the door seals, the reefer setpoint and that the airflow is not blocked. Re-checked in 15 minutes.';
+
+  @override
+  String get alertSpoilage => 'Cargo at risk of spoiling';
+
+  @override
+  String get alertSpoilageDo =>
+      'Wait for the new route from the control tower and accept it.';
+
+  @override
+  String get alertHumidity => 'Humidity out of range';
+
+  @override
+  String get alertHumidityDo => 'Check the doors and the reefer.';
+
+  @override
+  String get alertEthylene => 'Ethylene high';
+
+  @override
+  String get alertEthyleneDo => 'Ventilate if safe and tell the control tower.';
+
+  @override
+  String get alertShock => 'Hard shock detected';
+
+  @override
+  String get alertShockDo => 'Stop when safe and check the cargo.';
+
+  @override
+  String get alertDevice => 'Sensor offline';
+
+  @override
+  String get alertDeviceDo => 'Check the sensor pod power and cable.';
+
+  @override
+  String get alertGeneric => 'Cargo alert';
+
+  @override
+  String get alertGenericDo => 'Read the message and follow the control tower.';
+
+  @override
+  String get allStopsDone => 'All stops done. Drive back to the depot.';
+
+  @override
+  String get allUploaded => 'Everything is uploaded';
+
+  @override
+  String pendingUploads(int count) {
+    return '$count items waiting to upload';
+  }
+
+  @override
+  String get arrived => 'I have arrived';
+
+  @override
+  String get deliverHere => 'Deliver here';
+
+  @override
+  String get cargoStatus => 'Cargo';
+
+  @override
+  String get cargoTemp => 'Temperature';
+
+  @override
+  String get cargoHumidity => 'Humidity';
+
+  @override
+  String cargoLowestShelfLife(String value) {
+    return 'Lowest shelf life: $value';
+  }
+
+  @override
+  String cargoAsOf(String time) {
+    return 'Last update $time (offline)';
+  }
+
+  @override
+  String get cargoEmpty => 'No cargo on board';
+
+  @override
+  String cargoSafeRange(String min, String max) {
+    return 'Safe $min to $max °C';
+  }
+
+  @override
+  String get clear => 'Clear';
+
+  @override
+  String get gpsOff => 'Location is off. Turn it on to start the trip.';
+
+  @override
+  String get gpsDenied => 'Location permission is needed to track the trip.';
+
+  @override
+  String get gpsDeniedForever =>
+      'Location permission is blocked. Allow it in settings.';
+
+  @override
+  String get gpsFailed => 'Trip tracking could not start. Try again.';
+
+  @override
+  String get notificationsDenied =>
+      'Allow notifications so you can see that the trip is tracked.';
+
+  @override
+  String get openSettings => 'Open settings';
+
+  @override
+  String historyPods(int count) {
+    return 'Deliveries recorded: $count';
+  }
+
+  @override
+  String get noHistory => 'No trips yet';
+
+  @override
+  String get tripHistory => 'Trip history';
+
+  @override
+  String get incDelay => 'Delay';
+
+  @override
+  String get incBreakdown => 'Breakdown';
+
+  @override
+  String get incAccident => 'Accident';
+
+  @override
+  String get incRoadblock => 'Road block';
+
+  @override
+  String get incReeferFault => 'Reefer fault';
+
+  @override
+  String get incPhoto => 'Add photo';
+
+  @override
+  String get incPhotoDone => 'Photo added';
+
+  @override
+  String get incPhotoHint => 'Show the problem';
+
+  @override
+  String get incVoice => 'Voice note';
+
+  @override
+  String incVoiceDone(int seconds) {
+    return 'Voice note $seconds s';
+  }
+
+  @override
+  String incVoiceStop(int seconds) {
+    return 'Stop ($seconds s left)';
+  }
+
+  @override
+  String get incSend => 'Send report';
+
+  @override
+  String get incSent => 'Report saved. It is sent as soon as there is network.';
+
+  @override
+  String get incQueuedHint => 'Works without network: it is sent later.';
+
+  @override
+  String get reportIncident => 'Report incident';
+
+  @override
+  String get micDenied => 'Microphone permission is needed for a voice note.';
+
+  @override
+  String get navigate => 'Navigate';
+
+  @override
+  String get nextStop => 'Next stop';
+
+  @override
+  String get noTripToday => 'No trip today';
+
+  @override
+  String get noTripTodayHint => 'Pull down to check again.';
+
+  @override
+  String openAlerts(int count) {
+    return '$count open alerts: tap to see';
+  }
+
+  @override
+  String get openTrip => 'Open trip';
+
+  @override
+  String get preCheck => 'Pre-trip check';
+
+  @override
+  String get preCheckAgain => 'Check again';
+
+  @override
+  String get pcReeferOn => 'Reefer is ON';
+
+  @override
+  String get pcSetpointChecked => 'Set temperature checked';
+
+  @override
+  String get pcDoorsClosed => 'Doors are closed';
+
+  @override
+  String get pcSetpoint => 'Reefer set temperature';
+
+  @override
+  String get pcSubmit => 'Save check';
+
+  @override
+  String get pcAllNeeded => 'Turn on all three checks to continue.';
+
+  @override
+  String get pcFailed => 'Check failed';
+
+  @override
+  String get pcReeferOff => 'The reefer is off';
+
+  @override
+  String get pcDoorsOpen => 'A door is open';
+
+  @override
+  String get pcSetpointOut => 'The set temperature is wrong for this cargo';
+
+  @override
+  String get pcIncompatible =>
+      'These products cannot travel together. Call the control tower.';
+
+  @override
+  String pcAllowedRange(String min, String max) {
+    return 'Allowed: $min to $max °C';
+  }
+
+  @override
+  String get podAccepted => 'Accepted';
+
+  @override
+  String get podPartial => 'Partial';
+
+  @override
+  String get podRejected => 'Rejected';
+
+  @override
+  String get podAcceptedKg => 'Accepted weight';
+
+  @override
+  String podBatchWeight(String kg) {
+    return 'Weight $kg kg';
+  }
+
+  @override
+  String get podReason => 'Reason';
+
+  @override
+  String get podReceiver => 'Receiver name';
+
+  @override
+  String get podSignature => 'Receiver signature';
+
+  @override
+  String get podPhoto => 'Photo of the delivery';
+
+  @override
+  String get podPhotoDone => 'Photo taken';
+
+  @override
+  String get podPhotoHint => 'Show the crates at the receiver';
+
+  @override
+  String get podSubmit => 'Submit delivery';
+
+  @override
+  String get podSaved =>
+      'Delivery saved. It is sent as soon as there is network.';
+
+  @override
+  String get podDone => 'Delivery recorded for this stop.';
+
+  @override
+  String podScanTitle(int done, int total) {
+    return 'Scan each crate: $done of $total';
+  }
+
+  @override
+  String podOtherStop(String code) {
+    return 'Crate $code is for another stop. Keep it on the truck.';
+  }
+
+  @override
+  String podUnknownCrate(String code) {
+    return '$code is not on this truck.';
+  }
+
+  @override
+  String get podNeedScan => 'scan the crate';
+
+  @override
+  String get podWrongTag => 'wrong crate';
+
+  @override
+  String get podNeedKg =>
+      'enter the accepted weight (less than the full weight)';
+
+  @override
+  String get podNeedReason => 'enter a reason';
+
+  @override
+  String get podNeedReceiver => 'Enter the receiver name';
+
+  @override
+  String get podNeedSignature => 'Ask the receiver to sign';
+
+  @override
+  String get podNeedPhoto => 'Take the delivery photo';
+
+  @override
+  String get reasonDelay => 'Delay on the road: a faster order of stops';
+
+  @override
+  String get reasonIncident =>
+      'Incident: the route changed to protect the cargo';
+
+  @override
+  String get reasonDiversion =>
+      'Diversion: deliver to a nearer buyer before the cargo spoils';
+
+  @override
+  String get reasonRescue => 'Rescue: hand the cargo to another truck';
+
+  @override
+  String get reasonManual => 'The control tower changed the route';
+
+  @override
+  String get rerouteTitle => 'New route';
+
+  @override
+  String get rerouteOld => 'Was going to';
+
+  @override
+  String get rerouteNew => 'Now go to';
+
+  @override
+  String rerouteExtraKm(String km) {
+    return '$km km longer';
+  }
+
+  @override
+  String rerouteShorterKm(String km) {
+    return '$km km shorter';
+  }
+
+  @override
+  String get rerouteMustAccept =>
+      'This route protects the cargo and must be accepted.';
+
+  @override
+  String get rerouteWaiting => 'A new route is waiting: tap to see';
+
+  @override
+  String shelfLifeDays(int days, int hours) {
+    return '$days d $hours h left';
+  }
+
+  @override
+  String shelfLifeHm(int hours, int minutes) {
+    return '$hours h $minutes min left';
+  }
+
+  @override
+  String get shelfLifeExpired => 'Shelf life over';
+
+  @override
+  String get shelfLifeUnknown => 'Shelf life not known yet';
+
+  @override
+  String get sos => 'SOS';
+
+  @override
+  String get sosSent => 'SOS sent';
+
+  @override
+  String get sosSentBody =>
+      'Your location goes to the control tower and your emergency contact. Stay safe; help is coming.';
+
+  @override
+  String get speedLockTitle => 'Driving';
+
+  @override
+  String get speedLockBody =>
+      'Stop the truck to use this screen. Navigate and SOS still work.';
+
+  @override
+  String get startTrip => 'Start trip';
+
+  @override
+  String get startNeedsPreCheck => 'Do the pre-trip check first.';
+
+  @override
+  String get stopArriveHint => 'Tap when the truck is at this stop.';
+
+  @override
+  String get stopPickupHint => 'Pickup stop: nothing to deliver here.';
+
+  @override
+  String get stopNotFound => 'This stop is no longer on the route.';
+
+  @override
+  String get stopPickup => 'Pickup';
+
+  @override
+  String get stopDrop => 'Delivery';
+
+  @override
+  String get stopDiversion => 'Diversion buyer';
+
+  @override
+  String get stopRescuePickup => 'Rescue pickup';
+
+  @override
+  String get stopRescueDrop => 'Hand over to rescue truck';
+
+  @override
+  String get stopColdStorage => 'Cold storage';
+
+  @override
+  String stopEta(String time) {
+    return 'ETA $time';
+  }
+
+  @override
+  String stopWindow(String window) {
+    return 'Window $window';
+  }
+
+  @override
+  String tripBatches(int count) {
+    return 'Batches: $count';
+  }
+
+  @override
+  String tripInProgress(String code) {
+    return 'Trip $code in progress';
+  }
+
+  @override
+  String get tripInProgressText => 'Location is shared with the control tower';
+
+  @override
+  String tripStarts(String time) {
+    return 'Starts $time';
+  }
+
+  @override
+  String tripVehicle(String regNo) {
+    return 'Vehicle $regNo';
+  }
 }

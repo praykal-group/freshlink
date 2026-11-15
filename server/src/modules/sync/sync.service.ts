@@ -8,7 +8,7 @@ import { PrismaService } from '../../infra/prisma/prisma.service';
 import { BatchesService } from '../batches/batches.service';
 import { AttachImageDto, AttachTagDto, CreateBatchDto, EditableBatchFieldsDto, ReceiveDto } from '../batches/dto/batch.dto';
 import { PodService } from '../pod/pod.service';
-import { GpsBatchDto, LoadTripDto, PodDto, TripEventDto } from '../trips/dto/trip.dto';
+import { ArriveDto, GpsBatchDto, LoadTripDto, PodDto, TripEventDto } from '../trips/dto/trip.dto';
 import { AlertsService } from '../alerts/alerts.service';
 import { TelemetryService } from '../telemetry/telemetry.service';
 import { TripsService } from '../trips/trips.service';
@@ -22,7 +22,9 @@ class InvalidPayload extends AppError {}
  * Same role rules as the REST routes. Controller @Roles do not apply here because /sync calls
  * the services directly, so each op type is checked explicitly.
  */
-const OP_ROLES: Partial<Record<SyncType, UserRole[]>> = {
+// A full Record (not Partial): a new op type without roles does not compile, and an unknown
+// type is refused (fail closed). M12 found STOP_ARRIVE accepted from any role with the Partial map.
+const OP_ROLES: Record<SyncType, UserRole[]> = {
   BATCH_CREATE: ['OPERATOR', 'ADMIN'],
   BATCH_UPDATE: ['OPERATOR', 'ADMIN'],
   TAG_ATTACH: ['OPERATOR', 'ADMIN'],
@@ -33,6 +35,7 @@ const OP_ROLES: Partial<Record<SyncType, UserRole[]>> = {
   POD: ['DRIVER'],
   ROUTE_ACCEPT: ['DRIVER'],
   GPS_POINTS: ['DRIVER'],
+  STOP_ARRIVE: ['DRIVER'],
   ALERT_ACK: ['DRIVER', 'MANAGER', 'ADMIN'],
 };
 
@@ -128,12 +131,26 @@ export class SyncService {
       GPS_POINTS: async (user, p) => {
         const { id, rest } = idOf(p, 'tripId');
         const trip = await trips.loadForUser(user, id);
-        if (trip.status !== 'IN_PROGRESS') throw new AppError('INVALID_TRIP_STATUS', 'GPS is recorded only while the trip is in progress', 409);
-        return telemetry.writeGps(id, user.id, (await parse(GpsBatchDto, rest)).points);
+        const { points } = await parse(GpsBatchDto, rest);
+        if (trip.status === 'IN_PROGRESS') return telemetry.writeGps(id, user.id, points);
+        // Fixes recorded during the trip but synced after its last PoD completed it (offline phone,
+        // M12): keep those inside the trip's time span, drop the rest, never reject valid data.
+        if (trip.status === 'COMPLETED' && trip.startedAt && trip.completedAt) {
+          const from = trip.startedAt.getTime(), to = trip.completedAt.getTime();
+          const inTrip = points.filter((pt) => Date.parse(pt.at) >= from && Date.parse(pt.at) <= to);
+          return inTrip.length ? telemetry.writeGps(id, user.id, inTrip) : { written: 0, dropped: points.length };
+        }
+        throw new AppError('INVALID_TRIP_STATUS', 'GPS is recorded only while the trip is in progress', 409);
       },
       ALERT_ACK: async (user, p) => {
         const { id } = idOf(p, 'alertId');
         return alerts.ack(user, id);
+      },
+      // M12: arrival recorded offline at a drop point (DA-NFR-01); replayed before that stop's POD (capture order).
+      STOP_ARRIVE: async (user, p) => {
+        const { id: tripId, rest } = idOf(p, 'tripId');
+        const { id: stopId, rest: body } = idOf(rest, 'stopId');
+        return trips.arrive(user, tripId, stopId, await parse(ArriveDto, body));
       },
       POD: async (user, p) => {
         const { id: tripId, rest } = idOf(p, 'tripId');
@@ -171,7 +188,7 @@ export class SyncService {
     let result: SyncResult;
     try {
       const allowed = OP_ROLES[op.type];
-      if (allowed && !allowed.includes(user.role)) {
+      if (!allowed?.includes(user.role)) {
         throw new AppError('FORBIDDEN_ROLE', `${user.role} cannot send ${op.type}`, 403);
       }
       result ={ clientOpId: op.clientOpId, type: op.type, status: 'APPLIED', data: await handler(user, op.payload, op, deviceId) };

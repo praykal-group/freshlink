@@ -8,6 +8,7 @@ import { FilesService } from '../files/files.service';
 import { IncidentsService } from '../incidents/incidents.service';
 import { TraceService } from '../trace/trace.service';
 import type { PodDto, PodItemDto } from '../trips/dto/trip.dto';
+import { OPEN_DROPS } from '../trips/trip-rules';
 import { TripsService } from '../trips/trips.service';
 
 function fail(code: string, message: string, status: HttpStatus, details?: Record<string, unknown>): never {
@@ -15,7 +16,6 @@ function fail(code: string, message: string, status: HttpStatus, details?: Recor
 }
 
 /** Stop types where any batch on board may be handed over (no single order behind the stop). */
-const OPEN_DROPS = ['DIVERSION_DROP', 'COLD_STORAGE_DROP', 'RESCUE_DROP'];
 
 export function checkOutcome(item: Pick<PodItemDto, 'outcome' | 'acceptedKg' | 'reason'>, weightKg: number): string | null {
   if (item.outcome === 'ACCEPTED' && Math.abs(item.acceptedKg - weightKg) > 1e-6) return `ACCEPTED must accept the full ${weightKg} kg`;

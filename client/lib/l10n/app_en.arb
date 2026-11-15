@@ -432,5 +432,321 @@
   "noPairedPrinters": "No paired printer. Pair the printer in the phone’s Bluetooth settings first.",
   "testPrint": "Test print",
   "selectedPrinter": "Selected",
-  "bluetoothOff": "Bluetooth is off. Turn it on to print."
+  "bluetoothOff": "Bluetooth is off. Turn it on to print.",
+  "acceptReroute": "Accept new route",
+  "declineReroute": "Keep current route",
+  "acknowledge": "Acknowledge",
+  "alertTemp": "Temperature out of range",
+  "alertTempDo": "Check the reefer is running and the setpoint is right. Keep the doors closed.",
+  "alertDriverFix": "Temperature drifting",
+  "alertDriverFixDo": "Check the door seals, the reefer setpoint and that the airflow is not blocked. Re-checked in 15 minutes.",
+  "alertSpoilage": "Cargo at risk of spoiling",
+  "alertSpoilageDo": "Wait for the new route from the control tower and accept it.",
+  "alertHumidity": "Humidity out of range",
+  "alertHumidityDo": "Check the doors and the reefer.",
+  "alertEthylene": "Ethylene high",
+  "alertEthyleneDo": "Ventilate if safe and tell the control tower.",
+  "alertShock": "Hard shock detected",
+  "alertShockDo": "Stop when safe and check the cargo.",
+  "alertDevice": "Sensor offline",
+  "alertDeviceDo": "Check the sensor pod power and cable.",
+  "alertGeneric": "Cargo alert",
+  "alertGenericDo": "Read the message and follow the control tower.",
+  "allStopsDone": "All stops done. Drive back to the depot.",
+  "allUploaded": "Everything is uploaded",
+  "pendingUploads": "{count} items waiting to upload",
+  "@pendingUploads": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "arrived": "I have arrived",
+  "deliverHere": "Deliver here",
+  "cargoStatus": "Cargo",
+  "cargoTemp": "Temperature",
+  "cargoHumidity": "Humidity",
+  "cargoLowestShelfLife": "Lowest shelf life: {value}",
+  "@cargoLowestShelfLife": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "cargoAsOf": "Last update {time} (offline)",
+  "@cargoAsOf": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "cargoEmpty": "No cargo on board",
+  "cargoSafeRange": "Safe {min} to {max} °C",
+  "@cargoSafeRange": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "clear": "Clear",
+  "gpsOff": "Location is off. Turn it on to start the trip.",
+  "gpsDenied": "Location permission is needed to track the trip.",
+  "gpsDeniedForever": "Location permission is blocked. Allow it in settings.",
+  "gpsFailed": "Trip tracking could not start. Try again.",
+  "notificationsDenied": "Allow notifications so you can see that the trip is tracked.",
+  "openSettings": "Open settings",
+  "historyPods": "Deliveries recorded: {count}",
+  "@historyPods": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noHistory": "No trips yet",
+  "tripHistory": "Trip history",
+  "incDelay": "Delay",
+  "incBreakdown": "Breakdown",
+  "incAccident": "Accident",
+  "incRoadblock": "Road block",
+  "incReeferFault": "Reefer fault",
+  "incPhoto": "Add photo",
+  "incPhotoDone": "Photo added",
+  "incPhotoHint": "Show the problem",
+  "incVoice": "Voice note",
+  "incVoiceDone": "Voice note {seconds} s",
+  "@incVoiceDone": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "incVoiceStop": "Stop ({seconds} s left)",
+  "@incVoiceStop": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "incSend": "Send report",
+  "incSent": "Report saved. It is sent as soon as there is network.",
+  "incQueuedHint": "Works without network: it is sent later.",
+  "reportIncident": "Report incident",
+  "micDenied": "Microphone permission is needed for a voice note.",
+  "navigate": "Navigate",
+  "nextStop": "Next stop",
+  "noTripToday": "No trip today",
+  "noTripTodayHint": "Pull down to check again.",
+  "openAlerts": "{count} open alerts: tap to see",
+  "@openAlerts": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "openTrip": "Open trip",
+  "preCheck": "Pre-trip check",
+  "preCheckAgain": "Check again",
+  "pcReeferOn": "Reefer is ON",
+  "pcSetpointChecked": "Set temperature checked",
+  "pcDoorsClosed": "Doors are closed",
+  "pcSetpoint": "Reefer set temperature",
+  "pcSubmit": "Save check",
+  "pcAllNeeded": "Turn on all three checks to continue.",
+  "pcFailed": "Check failed",
+  "pcReeferOff": "The reefer is off",
+  "pcDoorsOpen": "A door is open",
+  "pcSetpointOut": "The set temperature is wrong for this cargo",
+  "pcIncompatible": "These products cannot travel together. Call the control tower.",
+  "pcAllowedRange": "Allowed: {min} to {max} °C",
+  "@pcAllowedRange": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "podAccepted": "Accepted",
+  "podPartial": "Partial",
+  "podRejected": "Rejected",
+  "podAcceptedKg": "Accepted weight",
+  "podBatchWeight": "Weight {kg} kg",
+  "@podBatchWeight": {
+    "placeholders": {
+      "kg": {
+        "type": "String"
+      }
+    }
+  },
+  "podReason": "Reason",
+  "podReceiver": "Receiver name",
+  "podSignature": "Receiver signature",
+  "podPhoto": "Photo of the delivery",
+  "podPhotoDone": "Photo taken",
+  "podPhotoHint": "Show the crates at the receiver",
+  "podSubmit": "Submit delivery",
+  "podSaved": "Delivery saved. It is sent as soon as there is network.",
+  "podDone": "Delivery recorded for this stop.",
+  "podScanTitle": "Scan each crate: {done} of {total}",
+  "@podScanTitle": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "podOtherStop": "Crate {code} is for another stop. Keep it on the truck.",
+  "@podOtherStop": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "podUnknownCrate": "{code} is not on this truck.",
+  "@podUnknownCrate": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "podNeedScan": "scan the crate",
+  "podWrongTag": "wrong crate",
+  "podNeedKg": "enter the accepted weight (less than the full weight)",
+  "podNeedReason": "enter a reason",
+  "podNeedReceiver": "Enter the receiver name",
+  "podNeedSignature": "Ask the receiver to sign",
+  "podNeedPhoto": "Take the delivery photo",
+  "reasonDelay": "Delay on the road: a faster order of stops",
+  "reasonIncident": "Incident: the route changed to protect the cargo",
+  "reasonDiversion": "Diversion: deliver to a nearer buyer before the cargo spoils",
+  "reasonRescue": "Rescue: hand the cargo to another truck",
+  "reasonManual": "The control tower changed the route",
+  "rerouteTitle": "New route",
+  "rerouteOld": "Was going to",
+  "rerouteNew": "Now go to",
+  "rerouteExtraKm": "{km} km longer",
+  "@rerouteExtraKm": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "rerouteShorterKm": "{km} km shorter",
+  "@rerouteShorterKm": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "rerouteMustAccept": "This route protects the cargo and must be accepted.",
+  "rerouteWaiting": "A new route is waiting: tap to see",
+  "shelfLifeDays": "{days} d {hours} h left",
+  "@shelfLifeDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "shelfLifeHm": "{hours} h {minutes} min left",
+  "@shelfLifeHm": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "shelfLifeExpired": "Shelf life over",
+  "shelfLifeUnknown": "Shelf life not known yet",
+  "sos": "SOS",
+  "sosSent": "SOS sent",
+  "sosSentBody": "Your location goes to the control tower and your emergency contact. Stay safe; help is coming.",
+  "speedLockTitle": "Driving",
+  "speedLockBody": "Stop the truck to use this screen. Navigate and SOS still work.",
+  "startTrip": "Start trip",
+  "startNeedsPreCheck": "Do the pre-trip check first.",
+  "stopArriveHint": "Tap when the truck is at this stop.",
+  "stopPickupHint": "Pickup stop: nothing to deliver here.",
+  "stopNotFound": "This stop is no longer on the route.",
+  "stopPickup": "Pickup",
+  "stopDrop": "Delivery",
+  "stopDiversion": "Diversion buyer",
+  "stopRescuePickup": "Rescue pickup",
+  "stopRescueDrop": "Hand over to rescue truck",
+  "stopColdStorage": "Cold storage",
+  "stopEta": "ETA {time}",
+  "@stopEta": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "stopWindow": "Window {window}",
+  "@stopWindow": {
+    "placeholders": {
+      "window": {
+        "type": "String"
+      }
+    }
+  },
+  "tripBatches": "Batches: {count}",
+  "@tripBatches": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tripInProgress": "Trip {code} in progress",
+  "@tripInProgress": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "tripInProgressText": "Location is shared with the control tower",
+  "tripStarts": "Starts {time}",
+  "@tripStarts": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "tripVehicle": "Vehicle {regNo}",
+  "@tripVehicle": {
+    "placeholders": {
+      "regNo": {
+        "type": "String"
+      }
+    }
+  }
 }

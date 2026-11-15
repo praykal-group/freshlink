@@ -1,6 +1,6 @@
 # Project Status
 
-**Current milestone:** M12 — Driver APK (next)
+**Current milestone:** M13 — Control Tower (Manager) APK + Web Console (next)
 
 | # | Milestone | Status | Date | Commit |
 |---|-----------|--------|------|--------|
@@ -15,7 +15,7 @@
 | M9 | Incident Engine, Backup Buyers, Diversion and Rescue | Done on the dev stack: all three incident paths (cold storage / rescue / buyer → MANUAL) and drift recovery end to end with simulated MQTT packets, 26/26 live checks; 282 unit tests. Driver route acceptance + PoD via API not run (no Supabase login) | 2026-11-14 | see `git log --grep m09` |
 | M10 | Mobile Foundation: Core, Design System, Auth, Offline Sync | Code + 92 tests pass (sync engine, token refresh, SQLCipher, contrast, text scale 2.0 in EN/HI/MR, wrong-role login); 3 release APKs built and isolation-verified; web console builds and renders. Not run: install on a device, real Supabase/Google/FCM logins (no projects/keys yet) | 2026-11-15 | see `git log --grep m10` |
 | M11 | Operator APK | Code + tests done: 142 Flutter tests (wizard online / offline-then-reconnect exactly once / grade 503 queued / resume; every operator screen at text scale 2.0 in EN/HI/MR), backend 285; 3 release APKs built (53–54 MB), isolation and per-flavor permissions verified. Not run: on a phone (NFC, camera, printer, voice, < 60 s per batch), real grading (no model) | 2026-11-15 | see `git log --grep m11` |
-| M12 | Driver APK | Not started | | |
+| M12 | Driver APK | Code + tests done: 197 Flutter tests (full trip with an offline delivery synced exactly once, alert → ack, diversion accepted offline, speed lock; every driver screen at text scale 2.0 in EN/HI/MR), backend 290; per-ABI release APKs, **driver 32.1 / 27.0 MB (< 40 MB met)**, isolation verified. Not run: on a phone (alert ≤ 10 s, 20-min airplane trip, cold start, 60 fps, battery), real logins | 2026-11-15 | see `git log --grep m12` |
 | M13 | Control Tower (Manager) APK + Web Console | Not started | | |
 | M14 | AWS Infrastructure and Production Deployment | Not started | | |
 | M15 | In-App Updates, GitHub Releases, Final QA and README | Not started | | |
@@ -37,5 +37,7 @@
 - The dev stack now runs in Docker: the deferred M1–M4/M7 database checks can be run against it.
 - Create the Supabase dev project, the Google OAuth clients (debug + release SHA-1), the Firebase project and the upload keystore; then run the deferred M10 device checks (TESTING.md).
 - Run the deferred M11 phone checks (TESTING.md): NFC / QR / UHF reads, photo size, Bluetooth label, voice in HI/MR, < 60 s per batch.
-- M12: driver APK; bring the driver APK size towards < 40 MB (per-ABI splits or the unbundled barcode model).
+- Run the deferred M12 phone checks (TESTING.md): alert ≤ 10 s, 20-min airplane-mode trip, cold start, 60 fps, 1-h battery, the full simulated trip with an incident and diversion.
+- M15: add `abi` to the release metadata and `GET /app/updates` (two APKs per release, D-146).
+- M13: manager APK + web console.
 - Run the M9 driver-side steps (accept reroute, PoD at the diversion / handover stop) once a Supabase dev project exists.

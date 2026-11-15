@@ -1533,6 +1533,846 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Bluetooth is off. Turn it on to print.'**
   String get bluetoothOff;
+
+  /// No description provided for @acceptReroute.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept new route'**
+  String get acceptReroute;
+
+  /// No description provided for @declineReroute.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep current route'**
+  String get declineReroute;
+
+  /// No description provided for @acknowledge.
+  ///
+  /// In en, this message translates to:
+  /// **'Acknowledge'**
+  String get acknowledge;
+
+  /// No description provided for @alertTemp.
+  ///
+  /// In en, this message translates to:
+  /// **'Temperature out of range'**
+  String get alertTemp;
+
+  /// No description provided for @alertTempDo.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the reefer is running and the setpoint is right. Keep the doors closed.'**
+  String get alertTempDo;
+
+  /// No description provided for @alertDriverFix.
+  ///
+  /// In en, this message translates to:
+  /// **'Temperature drifting'**
+  String get alertDriverFix;
+
+  /// No description provided for @alertDriverFixDo.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the door seals, the reefer setpoint and that the airflow is not blocked. Re-checked in 15 minutes.'**
+  String get alertDriverFixDo;
+
+  /// No description provided for @alertSpoilage.
+  ///
+  /// In en, this message translates to:
+  /// **'Cargo at risk of spoiling'**
+  String get alertSpoilage;
+
+  /// No description provided for @alertSpoilageDo.
+  ///
+  /// In en, this message translates to:
+  /// **'Wait for the new route from the control tower and accept it.'**
+  String get alertSpoilageDo;
+
+  /// No description provided for @alertHumidity.
+  ///
+  /// In en, this message translates to:
+  /// **'Humidity out of range'**
+  String get alertHumidity;
+
+  /// No description provided for @alertHumidityDo.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the doors and the reefer.'**
+  String get alertHumidityDo;
+
+  /// No description provided for @alertEthylene.
+  ///
+  /// In en, this message translates to:
+  /// **'Ethylene high'**
+  String get alertEthylene;
+
+  /// No description provided for @alertEthyleneDo.
+  ///
+  /// In en, this message translates to:
+  /// **'Ventilate if safe and tell the control tower.'**
+  String get alertEthyleneDo;
+
+  /// No description provided for @alertShock.
+  ///
+  /// In en, this message translates to:
+  /// **'Hard shock detected'**
+  String get alertShock;
+
+  /// No description provided for @alertShockDo.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop when safe and check the cargo.'**
+  String get alertShockDo;
+
+  /// No description provided for @alertDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Sensor offline'**
+  String get alertDevice;
+
+  /// No description provided for @alertDeviceDo.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the sensor pod power and cable.'**
+  String get alertDeviceDo;
+
+  /// No description provided for @alertGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Cargo alert'**
+  String get alertGeneric;
+
+  /// No description provided for @alertGenericDo.
+  ///
+  /// In en, this message translates to:
+  /// **'Read the message and follow the control tower.'**
+  String get alertGenericDo;
+
+  /// No description provided for @allStopsDone.
+  ///
+  /// In en, this message translates to:
+  /// **'All stops done. Drive back to the depot.'**
+  String get allStopsDone;
+
+  /// No description provided for @allUploaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Everything is uploaded'**
+  String get allUploaded;
+
+  /// No description provided for @pendingUploads.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} items waiting to upload'**
+  String pendingUploads(int count);
+
+  /// No description provided for @arrived.
+  ///
+  /// In en, this message translates to:
+  /// **'I have arrived'**
+  String get arrived;
+
+  /// No description provided for @deliverHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Deliver here'**
+  String get deliverHere;
+
+  /// No description provided for @cargoStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Cargo'**
+  String get cargoStatus;
+
+  /// No description provided for @cargoTemp.
+  ///
+  /// In en, this message translates to:
+  /// **'Temperature'**
+  String get cargoTemp;
+
+  /// No description provided for @cargoHumidity.
+  ///
+  /// In en, this message translates to:
+  /// **'Humidity'**
+  String get cargoHumidity;
+
+  /// No description provided for @cargoLowestShelfLife.
+  ///
+  /// In en, this message translates to:
+  /// **'Lowest shelf life: {value}'**
+  String cargoLowestShelfLife(String value);
+
+  /// No description provided for @cargoAsOf.
+  ///
+  /// In en, this message translates to:
+  /// **'Last update {time} (offline)'**
+  String cargoAsOf(String time);
+
+  /// No description provided for @cargoEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No cargo on board'**
+  String get cargoEmpty;
+
+  /// No description provided for @cargoSafeRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Safe {min} to {max} °C'**
+  String cargoSafeRange(String min, String max);
+
+  /// No description provided for @clear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get clear;
+
+  /// No description provided for @gpsOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Location is off. Turn it on to start the trip.'**
+  String get gpsOff;
+
+  /// No description provided for @gpsDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permission is needed to track the trip.'**
+  String get gpsDenied;
+
+  /// No description provided for @gpsDeniedForever.
+  ///
+  /// In en, this message translates to:
+  /// **'Location permission is blocked. Allow it in settings.'**
+  String get gpsDeniedForever;
+
+  /// No description provided for @gpsFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip tracking could not start. Try again.'**
+  String get gpsFailed;
+
+  /// No description provided for @notificationsDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow notifications so you can see that the trip is tracked.'**
+  String get notificationsDenied;
+
+  /// No description provided for @openSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get openSettings;
+
+  /// No description provided for @historyPods.
+  ///
+  /// In en, this message translates to:
+  /// **'Deliveries recorded: {count}'**
+  String historyPods(int count);
+
+  /// No description provided for @noHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'No trips yet'**
+  String get noHistory;
+
+  /// No description provided for @tripHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip history'**
+  String get tripHistory;
+
+  /// No description provided for @incDelay.
+  ///
+  /// In en, this message translates to:
+  /// **'Delay'**
+  String get incDelay;
+
+  /// No description provided for @incBreakdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Breakdown'**
+  String get incBreakdown;
+
+  /// No description provided for @incAccident.
+  ///
+  /// In en, this message translates to:
+  /// **'Accident'**
+  String get incAccident;
+
+  /// No description provided for @incRoadblock.
+  ///
+  /// In en, this message translates to:
+  /// **'Road block'**
+  String get incRoadblock;
+
+  /// No description provided for @incReeferFault.
+  ///
+  /// In en, this message translates to:
+  /// **'Reefer fault'**
+  String get incReeferFault;
+
+  /// No description provided for @incPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Add photo'**
+  String get incPhoto;
+
+  /// No description provided for @incPhotoDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo added'**
+  String get incPhotoDone;
+
+  /// No description provided for @incPhotoHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Show the problem'**
+  String get incPhotoHint;
+
+  /// No description provided for @incVoice.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice note'**
+  String get incVoice;
+
+  /// No description provided for @incVoiceDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Voice note {seconds} s'**
+  String incVoiceDone(int seconds);
+
+  /// No description provided for @incVoiceStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop ({seconds} s left)'**
+  String incVoiceStop(int seconds);
+
+  /// No description provided for @incSend.
+  ///
+  /// In en, this message translates to:
+  /// **'Send report'**
+  String get incSend;
+
+  /// No description provided for @incSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Report saved. It is sent as soon as there is network.'**
+  String get incSent;
+
+  /// No description provided for @incQueuedHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Works without network: it is sent later.'**
+  String get incQueuedHint;
+
+  /// No description provided for @reportIncident.
+  ///
+  /// In en, this message translates to:
+  /// **'Report incident'**
+  String get reportIncident;
+
+  /// No description provided for @micDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'Microphone permission is needed for a voice note.'**
+  String get micDenied;
+
+  /// No description provided for @navigate.
+  ///
+  /// In en, this message translates to:
+  /// **'Navigate'**
+  String get navigate;
+
+  /// No description provided for @nextStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Next stop'**
+  String get nextStop;
+
+  /// No description provided for @noTripToday.
+  ///
+  /// In en, this message translates to:
+  /// **'No trip today'**
+  String get noTripToday;
+
+  /// No description provided for @noTripTodayHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Pull down to check again.'**
+  String get noTripTodayHint;
+
+  /// No description provided for @openAlerts.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} open alerts: tap to see'**
+  String openAlerts(int count);
+
+  /// No description provided for @openTrip.
+  ///
+  /// In en, this message translates to:
+  /// **'Open trip'**
+  String get openTrip;
+
+  /// No description provided for @preCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Pre-trip check'**
+  String get preCheck;
+
+  /// No description provided for @preCheckAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Check again'**
+  String get preCheckAgain;
+
+  /// No description provided for @pcReeferOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Reefer is ON'**
+  String get pcReeferOn;
+
+  /// No description provided for @pcSetpointChecked.
+  ///
+  /// In en, this message translates to:
+  /// **'Set temperature checked'**
+  String get pcSetpointChecked;
+
+  /// No description provided for @pcDoorsClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Doors are closed'**
+  String get pcDoorsClosed;
+
+  /// No description provided for @pcSetpoint.
+  ///
+  /// In en, this message translates to:
+  /// **'Reefer set temperature'**
+  String get pcSetpoint;
+
+  /// No description provided for @pcSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Save check'**
+  String get pcSubmit;
+
+  /// No description provided for @pcAllNeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn on all three checks to continue.'**
+  String get pcAllNeeded;
+
+  /// No description provided for @pcFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Check failed'**
+  String get pcFailed;
+
+  /// No description provided for @pcReeferOff.
+  ///
+  /// In en, this message translates to:
+  /// **'The reefer is off'**
+  String get pcReeferOff;
+
+  /// No description provided for @pcDoorsOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'A door is open'**
+  String get pcDoorsOpen;
+
+  /// No description provided for @pcSetpointOut.
+  ///
+  /// In en, this message translates to:
+  /// **'The set temperature is wrong for this cargo'**
+  String get pcSetpointOut;
+
+  /// No description provided for @pcIncompatible.
+  ///
+  /// In en, this message translates to:
+  /// **'These products cannot travel together. Call the control tower.'**
+  String get pcIncompatible;
+
+  /// No description provided for @pcAllowedRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Allowed: {min} to {max} °C'**
+  String pcAllowedRange(String min, String max);
+
+  /// No description provided for @podAccepted.
+  ///
+  /// In en, this message translates to:
+  /// **'Accepted'**
+  String get podAccepted;
+
+  /// No description provided for @podPartial.
+  ///
+  /// In en, this message translates to:
+  /// **'Partial'**
+  String get podPartial;
+
+  /// No description provided for @podRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get podRejected;
+
+  /// No description provided for @podAcceptedKg.
+  ///
+  /// In en, this message translates to:
+  /// **'Accepted weight'**
+  String get podAcceptedKg;
+
+  /// No description provided for @podBatchWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight {kg} kg'**
+  String podBatchWeight(String kg);
+
+  /// No description provided for @podReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason'**
+  String get podReason;
+
+  /// No description provided for @podReceiver.
+  ///
+  /// In en, this message translates to:
+  /// **'Receiver name'**
+  String get podReceiver;
+
+  /// No description provided for @podSignature.
+  ///
+  /// In en, this message translates to:
+  /// **'Receiver signature'**
+  String get podSignature;
+
+  /// No description provided for @podPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo of the delivery'**
+  String get podPhoto;
+
+  /// No description provided for @podPhotoDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Photo taken'**
+  String get podPhotoDone;
+
+  /// No description provided for @podPhotoHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Show the crates at the receiver'**
+  String get podPhotoHint;
+
+  /// No description provided for @podSubmit.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit delivery'**
+  String get podSubmit;
+
+  /// No description provided for @podSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivery saved. It is sent as soon as there is network.'**
+  String get podSaved;
+
+  /// No description provided for @podDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivery recorded for this stop.'**
+  String get podDone;
+
+  /// No description provided for @podScanTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan each crate: {done} of {total}'**
+  String podScanTitle(int done, int total);
+
+  /// No description provided for @podOtherStop.
+  ///
+  /// In en, this message translates to:
+  /// **'Crate {code} is for another stop. Keep it on the truck.'**
+  String podOtherStop(String code);
+
+  /// No description provided for @podUnknownCrate.
+  ///
+  /// In en, this message translates to:
+  /// **'{code} is not on this truck.'**
+  String podUnknownCrate(String code);
+
+  /// No description provided for @podNeedScan.
+  ///
+  /// In en, this message translates to:
+  /// **'scan the crate'**
+  String get podNeedScan;
+
+  /// No description provided for @podWrongTag.
+  ///
+  /// In en, this message translates to:
+  /// **'wrong crate'**
+  String get podWrongTag;
+
+  /// No description provided for @podNeedKg.
+  ///
+  /// In en, this message translates to:
+  /// **'enter the accepted weight (less than the full weight)'**
+  String get podNeedKg;
+
+  /// No description provided for @podNeedReason.
+  ///
+  /// In en, this message translates to:
+  /// **'enter a reason'**
+  String get podNeedReason;
+
+  /// No description provided for @podNeedReceiver.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the receiver name'**
+  String get podNeedReceiver;
+
+  /// No description provided for @podNeedSignature.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask the receiver to sign'**
+  String get podNeedSignature;
+
+  /// No description provided for @podNeedPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Take the delivery photo'**
+  String get podNeedPhoto;
+
+  /// No description provided for @reasonDelay.
+  ///
+  /// In en, this message translates to:
+  /// **'Delay on the road: a faster order of stops'**
+  String get reasonDelay;
+
+  /// No description provided for @reasonIncident.
+  ///
+  /// In en, this message translates to:
+  /// **'Incident: the route changed to protect the cargo'**
+  String get reasonIncident;
+
+  /// No description provided for @reasonDiversion.
+  ///
+  /// In en, this message translates to:
+  /// **'Diversion: deliver to a nearer buyer before the cargo spoils'**
+  String get reasonDiversion;
+
+  /// No description provided for @reasonRescue.
+  ///
+  /// In en, this message translates to:
+  /// **'Rescue: hand the cargo to another truck'**
+  String get reasonRescue;
+
+  /// No description provided for @reasonManual.
+  ///
+  /// In en, this message translates to:
+  /// **'The control tower changed the route'**
+  String get reasonManual;
+
+  /// No description provided for @rerouteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New route'**
+  String get rerouteTitle;
+
+  /// No description provided for @rerouteOld.
+  ///
+  /// In en, this message translates to:
+  /// **'Was going to'**
+  String get rerouteOld;
+
+  /// No description provided for @rerouteNew.
+  ///
+  /// In en, this message translates to:
+  /// **'Now go to'**
+  String get rerouteNew;
+
+  /// No description provided for @rerouteExtraKm.
+  ///
+  /// In en, this message translates to:
+  /// **'{km} km longer'**
+  String rerouteExtraKm(String km);
+
+  /// No description provided for @rerouteShorterKm.
+  ///
+  /// In en, this message translates to:
+  /// **'{km} km shorter'**
+  String rerouteShorterKm(String km);
+
+  /// No description provided for @rerouteMustAccept.
+  ///
+  /// In en, this message translates to:
+  /// **'This route protects the cargo and must be accepted.'**
+  String get rerouteMustAccept;
+
+  /// No description provided for @rerouteWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'A new route is waiting: tap to see'**
+  String get rerouteWaiting;
+
+  /// No description provided for @shelfLifeDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} d {hours} h left'**
+  String shelfLifeDays(int days, int hours);
+
+  /// No description provided for @shelfLifeHm.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} h {minutes} min left'**
+  String shelfLifeHm(int hours, int minutes);
+
+  /// No description provided for @shelfLifeExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Shelf life over'**
+  String get shelfLifeExpired;
+
+  /// No description provided for @shelfLifeUnknown.
+  ///
+  /// In en, this message translates to:
+  /// **'Shelf life not known yet'**
+  String get shelfLifeUnknown;
+
+  /// No description provided for @sos.
+  ///
+  /// In en, this message translates to:
+  /// **'SOS'**
+  String get sos;
+
+  /// No description provided for @sosSent.
+  ///
+  /// In en, this message translates to:
+  /// **'SOS sent'**
+  String get sosSent;
+
+  /// No description provided for @sosSentBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your location goes to the control tower and your emergency contact. Stay safe; help is coming.'**
+  String get sosSentBody;
+
+  /// No description provided for @speedLockTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Driving'**
+  String get speedLockTitle;
+
+  /// No description provided for @speedLockBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop the truck to use this screen. Navigate and SOS still work.'**
+  String get speedLockBody;
+
+  /// No description provided for @startTrip.
+  ///
+  /// In en, this message translates to:
+  /// **'Start trip'**
+  String get startTrip;
+
+  /// No description provided for @startNeedsPreCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Do the pre-trip check first.'**
+  String get startNeedsPreCheck;
+
+  /// No description provided for @stopArriveHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap when the truck is at this stop.'**
+  String get stopArriveHint;
+
+  /// No description provided for @stopPickupHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Pickup stop: nothing to deliver here.'**
+  String get stopPickupHint;
+
+  /// No description provided for @stopNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'This stop is no longer on the route.'**
+  String get stopNotFound;
+
+  /// No description provided for @stopPickup.
+  ///
+  /// In en, this message translates to:
+  /// **'Pickup'**
+  String get stopPickup;
+
+  /// No description provided for @stopDrop.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivery'**
+  String get stopDrop;
+
+  /// No description provided for @stopDiversion.
+  ///
+  /// In en, this message translates to:
+  /// **'Diversion buyer'**
+  String get stopDiversion;
+
+  /// No description provided for @stopRescuePickup.
+  ///
+  /// In en, this message translates to:
+  /// **'Rescue pickup'**
+  String get stopRescuePickup;
+
+  /// No description provided for @stopRescueDrop.
+  ///
+  /// In en, this message translates to:
+  /// **'Hand over to rescue truck'**
+  String get stopRescueDrop;
+
+  /// No description provided for @stopColdStorage.
+  ///
+  /// In en, this message translates to:
+  /// **'Cold storage'**
+  String get stopColdStorage;
+
+  /// No description provided for @stopEta.
+  ///
+  /// In en, this message translates to:
+  /// **'ETA {time}'**
+  String stopEta(String time);
+
+  /// No description provided for @stopWindow.
+  ///
+  /// In en, this message translates to:
+  /// **'Window {window}'**
+  String stopWindow(String window);
+
+  /// No description provided for @tripBatches.
+  ///
+  /// In en, this message translates to:
+  /// **'Batches: {count}'**
+  String tripBatches(int count);
+
+  /// No description provided for @tripInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip {code} in progress'**
+  String tripInProgress(String code);
+
+  /// No description provided for @tripInProgressText.
+  ///
+  /// In en, this message translates to:
+  /// **'Location is shared with the control tower'**
+  String get tripInProgressText;
+
+  /// No description provided for @tripStarts.
+  ///
+  /// In en, this message translates to:
+  /// **'Starts {time}'**
+  String tripStarts(String time);
+
+  /// No description provided for @tripVehicle.
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicle {regNo}'**
+  String tripVehicle(String regNo);
 }
 
 class _AppLocalizationsDelegate

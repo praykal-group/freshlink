@@ -44,7 +44,7 @@ describe('orderOps', () => {
 describe('SyncService', () => {
   let prisma: ReturnType<typeof fakePrisma>;
   let batches: { attachTag: jest.Mock; create: jest.Mock };
-  let trips: { load: jest.Mock; recordEvent: jest.Mock; respondRoute: jest.Mock; loadForUser?: jest.Mock };
+  let trips: { load: jest.Mock; recordEvent: jest.Mock; respondRoute: jest.Mock; arrive: jest.Mock; loadForUser?: jest.Mock };
   let pod: { submit: jest.Mock };
   let alerts: { ack: jest.Mock };
   let telemetry: { writeGps: jest.Mock };
@@ -53,7 +53,7 @@ describe('SyncService', () => {
   beforeEach(() => {
     prisma = fakePrisma();
     batches = { attachTag: jest.fn().mockResolvedValue({ id: 'tag-1' }), create: jest.fn() };
-    trips = { load: jest.fn().mockResolvedValue({ loaded: [] }), recordEvent: jest.fn().mockResolvedValue({ id: 'e' }), respondRoute: jest.fn().mockResolvedValue({ status: 'ACCEPTED' }) };
+    trips = { load: jest.fn().mockResolvedValue({ loaded: [] }), recordEvent: jest.fn().mockResolvedValue({ id: 'e' }), respondRoute: jest.fn().mockResolvedValue({ status: 'ACCEPTED' }), arrive: jest.fn().mockResolvedValue({ status: 'ARRIVED' }) };
     pod = { submit: jest.fn().mockResolvedValue({ stored: ['p1'] }) };
     alerts = { ack: jest.fn().mockResolvedValue({ status: 'ACKNOWLEDGED' }) };
     telemetry = { writeGps: jest.fn().mockResolvedValue({ written: 2 }) };
@@ -84,6 +84,21 @@ describe('SyncService', () => {
     const r5 = await sync.process(driver, [op('a5555555-5555-4555-8555-555555555555', 'POD', { tripId: TRIP, stopId: STOP, ...podBody })]);
     expect(r5.results[0].status).toBe('APPLIED');
     expect(pod.submit).toHaveBeenCalledWith(driver, TRIP, STOP, expect.objectContaining({ receiverName: 'Anil', items: [expect.objectContaining({ outcome: 'ACCEPTED' })] }));
+  });
+
+  it('STOP_ARRIVE (M12, offline arrival): driver only, replayed before the POD of that stop', async () => {
+    const TRIP = '9a8e6a1c-4b2d-4c3e-9a1b-2c3d4e5f6a7b';
+    const STOP = '1b8e6a1c-4b2d-4c3e-9a1b-2c3d4e5f6a7b';
+    const arrive = { tripId: TRIP, stopId: STOP, arrivedAt: '2026-11-13T09:59:00Z', lat: 19.8, lng: 75.3 };
+    const r = await sync.process(driver, [
+      op('c2222222-2222-4222-8222-222222222222', 'POD', { tripId: TRIP, stopId: STOP, receiverName: 'x' }, '2026-11-13T10:01:00Z'),
+      op('c1111111-1111-4111-8111-111111111111', 'STOP_ARRIVE', arrive, '2026-11-13T10:00:00Z'),
+    ]);
+    expect(r.results.map((x) => x.type)).toEqual(['STOP_ARRIVE', 'POD']);
+    expect(r.results[0].status).toBe('APPLIED');
+    expect(trips.arrive).toHaveBeenCalledWith(driver, TRIP, STOP, expect.objectContaining({ arrivedAt: '2026-11-13T09:59:00Z', lat: 19.8 }));
+    const bad = await sync.process(operator, [op('c3333333-3333-4333-8333-333333333333', 'STOP_ARRIVE', arrive)]);
+    expect(bad.results[0].error?.code).toBe('FORBIDDEN_ROLE');
   });
 
   it('applies an op once; the duplicate replays the stored result without a second write', async () => {
@@ -141,8 +156,20 @@ describe('SyncService', () => {
     expect(alerts.ack).toHaveBeenCalledWith(driver, ALERT);
   });
 
-  it('GPS_POINTS for a trip that is not in progress is rejected', async () => {
-    trips.loadForUser = jest.fn().mockResolvedValue({ id: 'x', status: 'COMPLETED' });
+  it('GPS_POINTS synced after the trip completed: points inside the trip are written, others dropped (M12)', async () => {
+    trips.loadForUser = jest.fn().mockResolvedValue({ id: 'x', status: 'COMPLETED', startedAt: new Date('2026-11-14T04:00:00Z'), completedAt: new Date('2026-11-14T08:00:00Z') });
+    const pts = [{ lat: 1, lng: 1, at: '2026-11-14T07:59:30Z' }, { lat: 1, lng: 1, at: '2026-11-14T08:05:00Z' }];
+    const r = await sync.process(driver, [op('79888888-8888-4888-8888-888888888888', 'GPS_POINTS', { tripId: '9a8e6a1c-4b2d-4c3e-9a1b-2c3d4e5f6a7b', points: pts })]);
+    expect(r.results[0].status).toBe('APPLIED');
+    expect(telemetry.writeGps).toHaveBeenCalledWith('9a8e6a1c-4b2d-4c3e-9a1b-2c3d4e5f6a7b', 'dr-1', [pts[0]]);
+    telemetry.writeGps.mockClear();
+    const late = await sync.process(driver, [op('79999999-9999-4999-8999-999999999999', 'GPS_POINTS', { tripId: '9a8e6a1c-4b2d-4c3e-9a1b-2c3d4e5f6a7b', points: [pts[1]] })]);
+    expect(late.results[0].status).toBe('APPLIED');
+    expect(telemetry.writeGps).not.toHaveBeenCalled();
+  });
+
+  it('GPS_POINTS for a trip that has not started is rejected', async () => {
+    trips.loadForUser = jest.fn().mockResolvedValue({ id: 'x', status: 'ASSIGNED' });
     const r = await sync.process(driver, [op('79777777-7777-4777-8777-777777777777', 'GPS_POINTS', { tripId: '9a8e6a1c-4b2d-4c3e-9a1b-2c3d4e5f6a7b', points: [{ lat: 1, lng: 1, at: '2026-11-14T05:00:00Z' }] })]);
     expect(r.results[0]).toMatchObject({ status: 'REJECTED', error: { code: 'INVALID_TRIP_STATUS' } });
   });
