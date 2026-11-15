@@ -1,10 +1,11 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import type { User, UserRole } from '@prisma/client';
+import type { Prisma, User, UserRole } from '@prisma/client';
+import { afterCursor, toPage } from '../../common/pagination';
 import { AppError } from '../../common/errors/app-error';
 import { PrismaService } from '../../infra/prisma/prisma.service';
 import { SupabaseAdmin } from '../../infra/supabase/supabase-admin.service';
 import { UserDirectory } from '../auth/user-directory.service';
-import type { CreateUserDto, UpdateUserDto } from './dto/user.dto';
+import type { CreateUserDto, ListUsersQuery, UpdateUserDto } from './dto/user.dto';
 
 const FIELD_ROLES: UserRole[] = ['DRIVER', 'OPERATOR'];
 
@@ -20,6 +21,26 @@ export class UsersService {
    * AUTH-06: write the RDS row first (INVITED), then create/invite the Supabase user and link it.
    * If Supabase fails the row stays INVITED and POST /admin/users/:id/resend-invite retries.
    */
+  /** ADMIN list (M13): newest first, cursor paged; never returns Supabase ids or device rows. */
+  async list(q: ListUsersQuery) {
+    const limit = q.limit ?? 20;
+    const text = q.q?.trim();
+    const rows = await this.prisma.user.findMany({
+      where: {
+        AND: [
+          q.role ? { role: q.role } : {},
+          q.status ? { status: q.status } : {},
+          text ? { OR: [{ name: { contains: text, mode: 'insensitive' } }, { phone: { contains: text } }, { email: { contains: text, mode: 'insensitive' } }] } : {},
+          afterCursor(q.cursor) as Prisma.UserWhereInput,
+        ],
+      },
+      select: { id: true, name: true, role: true, status: true, phone: true, email: true, siteId: true, language: true, emergencyContactPhone: true, createdAt: true },
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+      take: limit + 1,
+    });
+    return toPage(rows, limit);
+  }
+
   async create(dto: CreateUserDto) {
     if (!dto.phone && !dto.email) throw new AppError('CONTACT_REQUIRED', 'phone or email is required');
     if (FIELD_ROLES.includes(dto.role) && !dto.phone) {

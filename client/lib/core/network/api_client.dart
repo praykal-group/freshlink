@@ -178,6 +178,7 @@ class ApiClient {
   Future<dynamic> get(String path, {Map<String, dynamic>? query}) => _call(() => dio.get(path, queryParameters: query));
   Future<dynamic> post(String path, {Object? body}) => _call(() => dio.post(path, data: body));
   Future<dynamic> patch(String path, {Object? body}) => _call(() => dio.patch(path, data: body));
+  Future<dynamic> put(String path, {Object? body}) => _call(() => dio.put(path, data: body));
   Future<dynamic> delete(String path) => _call(() => dio.delete(path));
 
   /// Presigned S3 PUT: absolute URL, exactly the signed headers, no bearer token (Section 6.4 Files).

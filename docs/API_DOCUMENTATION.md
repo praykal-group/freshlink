@@ -59,6 +59,7 @@ Manager/admin writes are recorded in `audit_logs` (route, target id, redacted bo
 ### Admin users (ADMIN)
 | Method | Path | Body / notes |
 |--------|------|------|
+| GET | `/admin/users?role&status&q&cursor&limit` | M13. Newest first, cursor paged; `q` matches name / phone / email (case-insensitive). Profile fields only (`id, name, role, status, phone, email, siteId, language, emergencyContactPhone, createdAt`) |
 | POST | `/admin/users` | `{name, role, phone?, email?, siteId?, language?, emergencyContactPhone?}`. DRIVER/OPERATOR need `phone` + `siteId`. Creates the RDS row (`INVITED`), then the Supabase user: phone → pre-confirmed (OTP login); email (manager/admin) → invite mail. Linked → `ACTIVE` |
 | PATCH | `/admin/users/:id` | `{name?, role?, siteId?, language?, emergencyContactPhone?}`. Phone/email are identity fields and change through Supabase |
 | POST | `/admin/users/:id/disable` | `DISABLED` + Supabase ban + all devices inactive |
@@ -199,6 +200,13 @@ ADMIN: `GET /admin/integration-clients`, `POST /admin/integration-clients {name,
 |--------|------|-------|
 | GET | `/operator/summary?date=YYYY-MM-DD` | Today's counts at the operator's site (IST day, default today): `{date, site{id, code, name, type}, registered, graded, stored, dispatched}`. A user without a site → 422 `NO_SITE` |
 | GET | `/operator/trips?date=YYYY-MM-DD` | Loadable trips (PLANNED / ASSIGNED / PRE_CHECK_DONE) leaving the operator's site that day: `{date, items[{id, code, status, plannedStart, vehicle{regNo, capacityKg}, driverName, allocated[{id, code, weightKg}], loadedBatchIds[]}]}`. `allocated` = the batches on the current route version's stops. Loading itself is the `LOAD` sync op (or `POST /trips/:id/load`) |
+
+### Control tower (MANAGER, ADMIN; M13)
+| Method | Path | Notes |
+|--------|------|-------|
+| GET | `/control/summary` | `{date, kpis{activeTrips, openCriticalAlerts, atRiskBatches, deliveriesToday, spoilageAvoidedKg}, vehicles[{vehicleId, regNo, tripId, tripCode, driverName, lat, lng, tempC, at}]}`. Definitions in D-151 (IST day; at risk < 12 h; spoilage avoided = kg accepted at diversion / cold-storage / rescue drops, last 30 days). Positions are the last pod reading (null without Redis or before the first packet); live moves come as `vehicle.position` |
+| GET | `/control/drivers` | `{items[{id, name, phone, siteId, busyTripCode}]}`: ACTIVE drivers, with the code of the trip they already have (assignment picker) |
+| GET | `/control/releases?flavor` | `{items[{id, flavor, channel, versionName, versionCode, minSupportedCode, mandatory, publishedAt, sizeBytes, features, improvements, fixes}]}`: active releases, newest first (filled by the release sync, M15) |
 
 ### Sync additions
 `LOAD {tripId, batchIds}` (OPERATOR), `TRIP_EVENT {tripId, ...event}`, `POD {tripId, stopId, ...pod}`, `ROUTE_ACCEPT {tripId, version}` (DRIVER). M12: `STOP_ARRIVE {tripId, stopId, arrivedAt?, lat?, lng?}` (DRIVER; same rules as `POST /trips/:id/stops/:stopId/arrive`, a replay is a no-op). Every op type has a role list and anything else is refused (`FORBIDDEN_ROLE`, D-148). M8: `GPS_POINTS {tripId, points[1..500]{at, lat, lng, speedKmh?, accuracyM?}}` (DRIVER, trip IN_PROGRESS, written to InfluxDB `driver_gps`; M12: for a COMPLETED trip the points inside startedAt..completedAt are written and the rest dropped, `{written, dropped}`, D-149), `ALERT_ACK {alertId}` (same rules as `POST /alerts/:id/ack`; replay is idempotent).

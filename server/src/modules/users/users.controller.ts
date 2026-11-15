@@ -1,7 +1,7 @@
-import { Body, Controller, HttpCode, Param, ParseUUIDPipe, Patch, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Param, ParseUUIDPipe, Patch, Post, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Roles } from '../../common/auth/decorators';
-import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
+import { CreateUserDto, ListUsersQuery, UpdateUserDto } from './dto/user.dto';
 import { UsersService } from './users.service';
 
 @ApiTags('admin/users')
@@ -10,6 +10,11 @@ import { UsersService } from './users.service';
 @Controller('admin/users')
 export class UsersController {
   constructor(private readonly users: UsersService) {}
+
+  @Get()
+  list(@Query() q: ListUsersQuery) {
+    return this.users.list(q);
+  }
 
   @Post()
   create(@Body() dto: CreateUserDto) {

@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Language, UserRole } from '@prisma/client';
+import { Language, UserRole, UserStatus } from '@prisma/client';
 import { Transform } from 'class-transformer';
+import { PageQuery } from '../../../common/pagination';
 import { IsEmail, IsEnum, IsOptional, IsString, IsUUID, Length, Matches } from 'class-validator';
 
 const E164 = /^\+[1-9]\d{7,14}$/;
@@ -41,4 +42,11 @@ export class UpdateUserDto {
   @IsOptional()
   @Matches(E164, { message: 'emergencyContactPhone must be E.164' })
   emergencyContactPhone?: string;
+}
+
+/** GET /admin/users (M13 user admin screen). `q` matches name, phone or email (case-insensitive). */
+export class ListUsersQuery extends PageQuery {
+  @ApiPropertyOptional({ enum: UserRole }) @IsOptional() @IsEnum(UserRole) role?: UserRole;
+  @ApiPropertyOptional({ enum: UserStatus }) @IsOptional() @IsEnum(UserStatus) status?: UserStatus;
+  @ApiPropertyOptional() @IsOptional() @IsString() @Length(1, 80) q?: string;
 }

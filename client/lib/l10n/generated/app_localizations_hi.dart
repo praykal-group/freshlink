@@ -1298,4 +1298,573 @@ class AppLocalizationsHi extends AppLocalizations {
   String tripVehicle(String regNo) {
     return 'गाड़ी $regNo';
   }
+
+  @override
+  String get mgrDashboard => 'डैशबोर्ड';
+
+  @override
+  String get mgrTrips => 'ट्रिप';
+
+  @override
+  String get mgrAlerts => 'चेतावनियाँ';
+
+  @override
+  String get mgrPlanning => 'योजना';
+
+  @override
+  String get mgrForecast => 'पूर्वानुमान';
+
+  @override
+  String get mgrApprovals => 'मंज़ूरियाँ';
+
+  @override
+  String get mgrBuyers => 'खरीदार व कोल्ड स्टोरेज';
+
+  @override
+  String get mgrReports => 'रिपोर्ट';
+
+  @override
+  String get mgrReleases => 'ऐप रिलीज़';
+
+  @override
+  String get mgrMasters => 'मास्टर डेटा';
+
+  @override
+  String get mgrUsers => 'उपयोगकर्ता';
+
+  @override
+  String get mgrConfig => 'रिमोट कॉन्फ़िग';
+
+  @override
+  String get mgrMore => 'और';
+
+  @override
+  String get kpiActiveTrips => 'चालू ट्रिप';
+
+  @override
+  String get kpiCriticalAlerts => 'खुली गंभीर चेतावनियाँ';
+
+  @override
+  String get kpiAtRisk => 'जोखिम वाले बैच (< 12 घं)';
+
+  @override
+  String get kpiDeliveries => 'आज की डिलीवरी';
+
+  @override
+  String get kpiAvoided => 'बचाया गया नुकसान (30 दिन)';
+
+  @override
+  String liveVehicles(int count) {
+    return 'सड़क पर गाड़ियाँ: $count';
+  }
+
+  @override
+  String vehiclesNoPosition(int count) {
+    return '$count की लोकेशन अभी नहीं';
+  }
+
+  @override
+  String get latestAlerts => 'नई चेतावनियाँ';
+
+  @override
+  String get seeAll => 'सब देखें';
+
+  @override
+  String get noAlerts => 'कोई चेतावनी नहीं';
+
+  @override
+  String get refresh => 'ताज़ा करें';
+
+  @override
+  String get noDriver => 'ड्राइवर नहीं';
+
+  @override
+  String get tripStatus => 'स्थिति';
+
+  @override
+  String get tripVehicleLabel => 'गाड़ी';
+
+  @override
+  String get tripDriver => 'ड्राइवर';
+
+  @override
+  String get tripDistance => 'दूरी';
+
+  @override
+  String get tripCo2 => 'उत्सर्जन';
+
+  @override
+  String get tripRouteVersion => 'रास्ता';
+
+  @override
+  String get proposed => 'प्रस्तावित';
+
+  @override
+  String get assignDriver => 'ड्राइवर और गाड़ी सौंपें';
+
+  @override
+  String get telemetryTitle => 'रीफर तापमान';
+
+  @override
+  String get noTelemetry => 'इस ट्रिप की सेंसर रीडिंग अभी नहीं';
+
+  @override
+  String chartAllInBand(int count) {
+    return '$count रीडिंग, सभी सुरक्षित सीमा में';
+  }
+
+  @override
+  String chartExcursions(int bad, int count) {
+    return '$count में से $bad रीडिंग सुरक्षित सीमा से बाहर';
+  }
+
+  @override
+  String get stopsTitle => 'स्टॉप';
+
+  @override
+  String batchesOnTrip(int count) {
+    return 'ट्रिप में बैच: $count';
+  }
+
+  @override
+  String get alertsTab => 'चेतावनियाँ';
+
+  @override
+  String get incidentsTab => 'घटनाएँ';
+
+  @override
+  String get resolve => 'हल करें';
+
+  @override
+  String get noIncidents => 'कोई घटना नहीं';
+
+  @override
+  String incidentSteps(int count) {
+    return '$count कदम';
+  }
+
+  @override
+  String get incidentTitle => 'घटना';
+
+  @override
+  String rescueBy(String code) {
+    return 'बचाव: $code';
+  }
+
+  @override
+  String get manualActions => 'खुद कार्रवाई करें';
+
+  @override
+  String offersTitle(int count) {
+    return 'भेजे गए ऑफ़र: $count';
+  }
+
+  @override
+  String decisionLog(int count) {
+    return 'निर्णय लॉग ($count)';
+  }
+
+  @override
+  String get resolveIncident => 'यह घटना हल मानें?';
+
+  @override
+  String get markFailed => 'माल खराब हो गया';
+
+  @override
+  String get markFailedConfirm => 'घटना असफल (माल खराब) के रूप में बंद करें?';
+
+  @override
+  String get pickBuyer => 'खरीदार चुनें';
+
+  @override
+  String get pickRescueTrip => 'बचाव गाड़ी चुनें';
+
+  @override
+  String get nothingToPick => 'चुनने को कुछ नहीं';
+
+  @override
+  String confirmAction(String action) {
+    return '$action भेजें?';
+  }
+
+  @override
+  String get actionSent => 'कार्रवाई भेजी गई';
+
+  @override
+  String get siteLabel => 'साइट';
+
+  @override
+  String get productLabel => 'उत्पाद';
+
+  @override
+  String get pickSiteProduct => 'केंद्र और उत्पाद चुनें';
+
+  @override
+  String get noForecast => 'इन दिनों का पूर्वानुमान अभी नहीं';
+
+  @override
+  String modelVersion(String version) {
+    return 'मॉडल $version';
+  }
+
+  @override
+  String get runForecast => 'अभी पूर्वानुमान चलाएँ';
+
+  @override
+  String get forecastRunning => 'पूर्वानुमान चल रहा है…';
+
+  @override
+  String get forecastBusy => 'एक पूर्वानुमान पहले से चल रहा है';
+
+  @override
+  String jobStatus(String status) {
+    return 'आखिरी रन: $status';
+  }
+
+  @override
+  String planFor(String day) {
+    return '$day की योजना';
+  }
+
+  @override
+  String get changeDate => 'तारीख बदलें';
+
+  @override
+  String get runPlanner => 'योजना बनाएँ';
+
+  @override
+  String get loadExistingOrders => 'इस दिन के मौजूदा ऑर्डर दिखाएँ';
+
+  @override
+  String get plannerDone => 'ड्राफ़्ट ऑर्डर तैयार';
+
+  @override
+  String get needsTitle => 'केंद्र-वार ज़रूरत';
+
+  @override
+  String get forecastKg => 'पूर्वानुमान';
+
+  @override
+  String get onHandKg => 'मौजूद';
+
+  @override
+  String get needKg => 'ज़रूरत';
+
+  @override
+  String get shortfallKg => 'कमी';
+
+  @override
+  String ordersTitle(int count) {
+    return 'ऑर्डर: $count';
+  }
+
+  @override
+  String approveAll(int count) {
+    return 'सभी मंज़ूर करें ($count)';
+  }
+
+  @override
+  String get noOrders => 'इस दिन कोई ऑर्डर नहीं';
+
+  @override
+  String get approve => 'मंज़ूर करें';
+
+  @override
+  String buildRoutes(int count) {
+    return '$count मंज़ूर ऑर्डर के रास्ते बनाएँ';
+  }
+
+  @override
+  String get noApprovedOrders => 'पहले कम से कम एक ऑर्डर मंज़ूर करें';
+
+  @override
+  String get pickDepot => 'किस डिपो से रास्ते?';
+
+  @override
+  String get routesBuilt => 'रास्ते बन गए';
+
+  @override
+  String tripsBuilt(int count) {
+    return 'योजनाबद्ध ट्रिप: $count';
+  }
+
+  @override
+  String editOrder(String code) {
+    return '$code बदलें';
+  }
+
+  @override
+  String get quantityKg => 'मात्रा';
+
+  @override
+  String get destination => 'गंतव्य';
+
+  @override
+  String get invalidQuantity => '0 से ज़्यादा मात्रा डालें';
+
+  @override
+  String get loadFailed => 'सूची लोड नहीं हुई। फिर कोशिश करें।';
+
+  @override
+  String get editRequestsTab => 'बदलाव अनुरोध';
+
+  @override
+  String get disputesTab => 'ग्रेड विवाद';
+
+  @override
+  String get nothingPending => 'कुछ भी बाकी नहीं';
+
+  @override
+  String requestedBy(String name, String time) {
+    return '$name · $time';
+  }
+
+  @override
+  String reasonIs(String reason) {
+    return 'कारण: $reason';
+  }
+
+  @override
+  String get rejected => 'अस्वीकार किया';
+
+  @override
+  String get approved => 'मंज़ूर किया';
+
+  @override
+  String aiConfidence(int percent) {
+    return 'AI भरोसा $percent %';
+  }
+
+  @override
+  String get setGrade => 'ग्रेड तय करें';
+
+  @override
+  String gradeSet(String grade) {
+    return 'ग्रेड $grade तय हुआ';
+  }
+
+  @override
+  String get addBuyer => 'खरीदार जोड़ें';
+
+  @override
+  String get editBuyer => 'खरीदार बदलें';
+
+  @override
+  String get noBuyers => 'अभी कोई खरीदार नहीं';
+
+  @override
+  String minGradeIs(String grade) {
+    return 'न्यूनतम ग्रेड $grade';
+  }
+
+  @override
+  String acceptsProducts(int count) {
+    return '$count उत्पाद लेता है';
+  }
+
+  @override
+  String get deactivate => 'निष्क्रिय करें';
+
+  @override
+  String get deactivateBuyer => 'यह खरीदार निष्क्रिय करें? पुराने ऑफ़र रहेंगे।';
+
+  @override
+  String get fieldRequired => 'ज़रूरी';
+
+  @override
+  String numberBetween(String min, String max) {
+    return '$min से $max तक की संख्या';
+  }
+
+  @override
+  String hoursInvalid(String day) {
+    return '$day का समय जाँचें (HH:MM, अधिकतम 4)';
+  }
+
+  @override
+  String get pickOneProduct => 'कम से कम एक उत्पाद चुनें';
+
+  @override
+  String hoursFor(String day) {
+    return '$day का समय';
+  }
+
+  @override
+  String get opens => 'खुलता है';
+
+  @override
+  String get closes => 'बंद होता है';
+
+  @override
+  String get closedDay => 'बंद';
+
+  @override
+  String get name => 'नाम';
+
+  @override
+  String get typeLabel => 'प्रकार';
+
+  @override
+  String get phoneE164 => 'फ़ोन (+91…)';
+
+  @override
+  String get phoneInvalidE164 =>
+      'देश कोड के साथ नंबर डालें, जैसे +919812345678';
+
+  @override
+  String get emailOptional => 'ईमेल (वैकल्पिक)';
+
+  @override
+  String get latitude => 'अक्षांश';
+
+  @override
+  String get longitude => 'देशांतर';
+
+  @override
+  String get discountPct => 'छूट';
+
+  @override
+  String get minGrade => 'न्यूनतम ग्रेड';
+
+  @override
+  String get capacityOptional => 'क्षमता (वैकल्पिक)';
+
+  @override
+  String get acceptedProducts => 'लिए जाने वाले उत्पाद';
+
+  @override
+  String get openingHours => 'खुलने का समय (IST)';
+
+  @override
+  String get save => 'सेव करें';
+
+  @override
+  String get complianceReport => 'बैच-वार अनुपालन रिपोर्ट';
+
+  @override
+  String get batchCodeOrTag => 'बैच कोड या टैग';
+
+  @override
+  String get search => 'खोजें';
+
+  @override
+  String periodIs(String from, String to) {
+    return '$from से $to';
+  }
+
+  @override
+  String get traceabilityCsv => 'ट्रेसबिलिटी निर्यात (CSV)';
+
+  @override
+  String get emissionsReport => 'उत्सर्जन';
+
+  @override
+  String emissionsTotals(int trips, String km, String co2) {
+    return '$trips ट्रिप · $km किमी · $co2 किलो CO₂';
+  }
+
+  @override
+  String emissionFactor(String value, String source) {
+    return 'फ़ैक्टर $value किलो/किमी ($source)';
+  }
+
+  @override
+  String get downloadCsv => 'CSV डाउनलोड करें';
+
+  @override
+  String get reeferHealth => 'रीफर की हालत';
+
+  @override
+  String get noData => 'यहाँ अभी कुछ नहीं';
+
+  @override
+  String get noWeeks => 'अभी कोई साप्ताहिक जाँच नहीं';
+
+  @override
+  String degradation(String pct) {
+    return 'ठंडा होना $pct % धीमा';
+  }
+
+  @override
+  String get flagged => 'सर्विस ज़रूरी';
+
+  @override
+  String get noReleases => 'अभी कोई रिलीज़ नहीं';
+
+  @override
+  String get noReleasesHint =>
+      'GitHub रिलीज़ सिंक चलने पर रिलीज़ यहाँ दिखेंगे।';
+
+  @override
+  String get mandatory => 'ज़रूरी';
+
+  @override
+  String get add => 'जोड़ें';
+
+  @override
+  String get inactive => 'निष्क्रिय';
+
+  @override
+  String get notANumber => 'संख्या डालें';
+
+  @override
+  String get secretHelp =>
+      '16–128 अक्षर; यह हैश होकर सेव होता है और फिर नहीं दिखता';
+
+  @override
+  String get secretKeep => 'मौजूदा सीक्रेट रखने के लिए खाली छोड़ें';
+
+  @override
+  String get secretLength => '16 से 128 अक्षर';
+
+  @override
+  String get immutable => 'बदला नहीं जा सकता';
+
+  @override
+  String get addUser => 'उपयोगकर्ता जोड़ें';
+
+  @override
+  String get disabled => 'बंद';
+
+  @override
+  String get roleLabel => 'भूमिका';
+
+  @override
+  String get emailInvalid => 'सही ईमेल डालें';
+
+  @override
+  String get siteRequired => 'ड्राइवर और ऑपरेटर को साइट चाहिए';
+
+  @override
+  String get emergencyContact => 'आपातकालीन संपर्क (+91…)';
+
+  @override
+  String get enableUser => 'उपयोगकर्ता चालू करें';
+
+  @override
+  String get disableUser => 'उपयोगकर्ता बंद करें';
+
+  @override
+  String get disableUserConfirm =>
+      'यह उपयोगकर्ता बंद करें? हर डिवाइस से साइन आउट होगा।';
+
+  @override
+  String get configHint => 'मान सर्वर जाँचता है; गलत रूप अस्वीकार होता है।';
+
+  @override
+  String get notSet => 'सेट नहीं (डिफ़ॉल्ट)';
+
+  @override
+  String get jsonValue => 'JSON मान';
+
+  @override
+  String get invalidJson => 'यह सही JSON नहीं है';
+
+  @override
+  String operatorSays(String reason) {
+    return 'ऑपरेटर का कहना: $reason';
+  }
+
+  @override
+  String get tripAssigned => 'ड्राइवर और गाड़ी सौंप दी';
 }

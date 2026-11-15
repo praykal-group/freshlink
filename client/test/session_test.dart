@@ -176,7 +176,10 @@ void main() {
           if (db != null) databaseProvider.overrideWithValue(db),
           if (db != null) syncSchedulerProvider.overrideWithValue(null),
         ].cast());
-        addTearDown(c.dispose);
+        var disposed = false;
+        addTearDown(() {
+          if (!disposed) c.dispose();
+        });
         await tester.pumpWidget(UncontrolledProviderScope(container: c, child: const IccmsApp()));
         // bounded pumps: the empty state (driver: no trip today) animates on a loop, so it never settles
         Future<void> settle() async {
@@ -187,13 +190,24 @@ void main() {
 
         await settle();
         // The operator home lists its actions first; the module tag is at the end of the list.
-        await tester.scrollUntilVisible(find.text('iccms-module-${flavor.name}'), 300, scrollable: find.byType(Scrollable).first);
+        // Scroll the home's list to its end in code: a drag from the middle of the manager
+        // dashboard lands on the vehicle map, which takes the gesture.
+        final pos = tester.state<ScrollableState>(find.byType(Scrollable).first).position;
+        pos.jumpTo(pos.maxScrollExtent);
+        await settle();
         expect(find.text('iccms-module-${flavor.name}'), findsOneWidget);
-        expect(find.text('Hello, Asha'), findsOneWidget);
+        // driver / operator homes greet the user; the control tower opens on its dashboard (M13)
+        expect(find.text(flavor == AppFlavor.manager ? 'Dashboard' : 'Hello, Asha'), findsWidgets);
         expect(c.read(routerProvider).routerDelegate.currentConfiguration.uri.path, '/home');
         unawaited(c.read(routerProvider).push('/settings'));
         await settle();
         expect(find.byKey(const Key('sign-out')), findsOneWidget);
+        // dispose while the test clock runs: the dashboard's 60 s poll is cancelled before the
+        // binding checks for pending timers
+        await tester.pumpWidget(const SizedBox());
+        disposed = true;
+        c.dispose();
+        await tester.pump(const Duration(milliseconds: 100));
       });
     });
   });

@@ -1,6 +1,6 @@
 # Project Status
 
-**Current milestone:** M13 — Control Tower (Manager) APK + Web Console (next)
+**Current milestone:** M14 — AWS Infrastructure and Production Deployment (next)
 
 | # | Milestone | Status | Date | Commit |
 |---|-----------|--------|------|--------|
@@ -16,7 +16,7 @@
 | M10 | Mobile Foundation: Core, Design System, Auth, Offline Sync | Code + 92 tests pass (sync engine, token refresh, SQLCipher, contrast, text scale 2.0 in EN/HI/MR, wrong-role login); 3 release APKs built and isolation-verified; web console builds and renders. Not run: install on a device, real Supabase/Google/FCM logins (no projects/keys yet) | 2026-11-15 | see `git log --grep m10` |
 | M11 | Operator APK | Code + tests done: 142 Flutter tests (wizard online / offline-then-reconnect exactly once / grade 503 queued / resume; every operator screen at text scale 2.0 in EN/HI/MR), backend 285; 3 release APKs built (53–54 MB), isolation and per-flavor permissions verified. Not run: on a phone (NFC, camera, printer, voice, < 60 s per batch), real grading (no model) | 2026-11-15 | see `git log --grep m11` |
 | M12 | Driver APK | Code + tests done: 197 Flutter tests (full trip with an offline delivery synced exactly once, alert → ack, diversion accepted offline, speed lock; every driver screen at text scale 2.0 in EN/HI/MR), backend 290; per-ABI release APKs, **driver 32.1 / 27.0 MB (< 40 MB met)**, isolation verified. Not run: on a phone (alert ≤ 10 s, 20-min airplane trip, cold start, 60 fps, battery), real logins | 2026-11-15 | see `git log --grep m12` |
-| M13 | Control Tower (Manager) APK + Web Console | Not started | | |
+| M13 | Control Tower (Manager) APK + Web Console | Code + tests done: 253 Flutter tests (planning flow, admin screens hidden + redirected, live alert on the dashboard, charts equal the API data, every screen at text scale 2.0 in EN/HI/MR), backend 314 (incl. 403 for MANAGER on all 17 admin routes); web console built and opened in a browser at 1280 px and phone width (sign-in screen); manager APKs built. Not run: a signed-in manager day on the live stack (no Supabase project) | 2026-11-15 | see `git log --grep m13` |
 | M14 | AWS Infrastructure and Production Deployment | Not started | | |
 | M15 | In-App Updates, GitHub Releases, Final QA and README | Not started | | |
 
@@ -39,5 +39,7 @@
 - Run the deferred M11 phone checks (TESTING.md): NFC / QR / UHF reads, photo size, Bluetooth label, voice in HI/MR, < 60 s per batch.
 - Run the deferred M12 phone checks (TESTING.md): alert ≤ 10 s, 20-min airplane-mode trip, cold start, 60 fps, 1-h battery, the full simulated trip with an incident and diversion.
 - M15: add `abi` to the release metadata and `GET /app/updates` (two APKs per release, D-146).
-- M13: manager APK + web console.
+- Run the deferred M13 check (TESTING.md): a manager runs a whole day from the APK and the console once Supabase exists.
+- M15: `abi` column on `app_releases` (D-159).
+- M14: AWS infrastructure; then the console deploy step of `release-console.yml`.
 - Run the M9 driver-side steps (accept reroute, PoD at the diversion / handover stop) once a Supabase dev project exists.

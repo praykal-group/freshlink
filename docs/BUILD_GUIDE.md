@@ -71,6 +71,8 @@ Web console:
 
 ```bash
 cd client && flutter build web --release -t lib/main_manager.dart --dart-define-from-file=env/prod.json --base-href /console/
+# Git Bash on Windows rewrites /console/ into a Windows path: prefix MSYS_NO_PATHCONV=1
+# Release: tag console-v<x.y.z> → .github/workflows/release-console.yml (secret CONSOLE_ENV_JSON; deploy when DEPLOY_HOST is set)
 ```
 
 ## 6. Signing

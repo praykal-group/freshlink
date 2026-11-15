@@ -748,5 +748,417 @@
         "type": "String"
       }
     }
-  }
+  },
+  "mgrDashboard": "Dashboard",
+  "mgrTrips": "Trips",
+  "mgrAlerts": "Alerts",
+  "mgrPlanning": "Planning",
+  "mgrForecast": "Forecast",
+  "mgrApprovals": "Approvals",
+  "mgrBuyers": "Buyers & cold storage",
+  "mgrReports": "Reports",
+  "mgrReleases": "App releases",
+  "mgrMasters": "Master data",
+  "mgrUsers": "Users",
+  "mgrConfig": "Remote config",
+  "mgrMore": "More",
+  "kpiActiveTrips": "Active trips",
+  "kpiCriticalAlerts": "Open critical alerts",
+  "kpiAtRisk": "Batches at risk (< 12 h)",
+  "kpiDeliveries": "Deliveries today",
+  "kpiAvoided": "Spoilage avoided (30 days)",
+  "liveVehicles": "Vehicles on the road: {count}",
+  "@liveVehicles": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "vehiclesNoPosition": "{count} without a position yet",
+  "@vehiclesNoPosition": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "latestAlerts": "Latest alerts",
+  "seeAll": "See all",
+  "noAlerts": "No alerts",
+  "refresh": "Refresh",
+  "noDriver": "No driver",
+  "tripStatus": "Status",
+  "tripVehicleLabel": "Vehicle",
+  "tripDriver": "Driver",
+  "tripDistance": "Distance",
+  "tripCo2": "Emissions",
+  "tripRouteVersion": "Route",
+  "proposed": "proposed",
+  "assignDriver": "Assign driver and vehicle",
+  "telemetryTitle": "Reefer temperature",
+  "noTelemetry": "No sensor readings for this trip yet",
+  "chartAllInBand": "{count} readings, all inside the safe range",
+  "@chartAllInBand": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chartExcursions": "{bad} of {count} readings outside the safe range",
+  "@chartExcursions": {
+    "placeholders": {
+      "bad": {
+        "type": "int"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "stopsTitle": "Stops",
+  "batchesOnTrip": "Batches on the trip: {count}",
+  "@batchesOnTrip": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "alertsTab": "Alerts",
+  "incidentsTab": "Incidents",
+  "resolve": "Resolve",
+  "noIncidents": "No incidents",
+  "incidentSteps": "{count} steps",
+  "@incidentSteps": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "incidentTitle": "Incident",
+  "rescueBy": "rescue: {code}",
+  "@rescueBy": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "manualActions": "Take over",
+  "offersTitle": "Offers sent: {count}",
+  "@offersTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "decisionLog": "Decision log ({count})",
+  "@decisionLog": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "resolveIncident": "Mark this incident resolved?",
+  "markFailed": "Cargo lost",
+  "markFailedConfirm": "Close the incident as FAILED (cargo lost)?",
+  "pickBuyer": "Choose the buyer",
+  "pickRescueTrip": "Choose the rescue truck",
+  "nothingToPick": "Nothing to choose from",
+  "confirmAction": "Send {action}?",
+  "@confirmAction": {
+    "placeholders": {
+      "action": {
+        "type": "String"
+      }
+    }
+  },
+  "actionSent": "Action sent",
+  "siteLabel": "Site",
+  "productLabel": "Product",
+  "pickSiteProduct": "Choose a centre and a product",
+  "noForecast": "No forecast for these days yet",
+  "modelVersion": "Model {version}",
+  "@modelVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "runForecast": "Run forecast now",
+  "forecastRunning": "Forecast running…",
+  "forecastBusy": "A forecast is already running",
+  "jobStatus": "Last run: {status}",
+  "@jobStatus": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "planFor": "Plan for {day}",
+  "@planFor": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "changeDate": "Change date",
+  "runPlanner": "Run planner",
+  "loadExistingOrders": "Show existing orders for this day",
+  "plannerDone": "Draft orders ready",
+  "needsTitle": "Need per centre",
+  "forecastKg": "Forecast",
+  "onHandKg": "On hand",
+  "needKg": "Need",
+  "shortfallKg": "Shortfall",
+  "ordersTitle": "Orders: {count}",
+  "@ordersTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "approveAll": "Approve all ({count})",
+  "@approveAll": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noOrders": "No orders for this day",
+  "approve": "Approve",
+  "buildRoutes": "Build routes for {count} approved orders",
+  "@buildRoutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "noApprovedOrders": "Approve at least one order first",
+  "pickDepot": "Routes from which depot?",
+  "routesBuilt": "Routes built",
+  "tripsBuilt": "Trips planned: {count}",
+  "@tripsBuilt": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "editOrder": "Edit {code}",
+  "@editOrder": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "quantityKg": "Quantity",
+  "destination": "Destination",
+  "invalidQuantity": "Enter a quantity above 0",
+  "loadFailed": "Could not load the lists. Try again.",
+  "editRequestsTab": "Edit requests",
+  "disputesTab": "Grade disputes",
+  "nothingPending": "Nothing waiting",
+  "requestedBy": "{name} · {time}",
+  "@requestedBy": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "reasonIs": "Reason: {reason}",
+  "@reasonIs": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "rejected": "Rejected",
+  "approved": "Approved",
+  "aiConfidence": "AI confidence {percent} %",
+  "@aiConfidence": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "setGrade": "Set the grade",
+  "gradeSet": "Grade set to {grade}",
+  "@gradeSet": {
+    "placeholders": {
+      "grade": {
+        "type": "String"
+      }
+    }
+  },
+  "addBuyer": "Add buyer",
+  "editBuyer": "Edit buyer",
+  "noBuyers": "No buyers yet",
+  "minGradeIs": "min grade {grade}",
+  "@minGradeIs": {
+    "placeholders": {
+      "grade": {
+        "type": "String"
+      }
+    }
+  },
+  "acceptsProducts": "Accepts {count} products",
+  "@acceptsProducts": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "deactivate": "Deactivate",
+  "deactivateBuyer": "Deactivate this buyer? Past offers are kept.",
+  "fieldRequired": "Required",
+  "numberBetween": "A number from {min} to {max}",
+  "@numberBetween": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "hoursInvalid": "Check the hours for {day} (HH:MM, at most 4 ranges)",
+  "@hoursInvalid": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "pickOneProduct": "Choose at least one product",
+  "hoursFor": "Hours on {day}",
+  "@hoursFor": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "opens": "Opens",
+  "closes": "Closes",
+  "closedDay": "Closed",
+  "name": "Name",
+  "typeLabel": "Type",
+  "phoneE164": "Phone (+91…)",
+  "phoneInvalidE164": "Enter the number with the country code, e.g. +919812345678",
+  "emailOptional": "Email (optional)",
+  "latitude": "Latitude",
+  "longitude": "Longitude",
+  "discountPct": "Discount",
+  "minGrade": "Minimum grade",
+  "capacityOptional": "Capacity (optional)",
+  "acceptedProducts": "Products accepted",
+  "openingHours": "Opening hours (IST)",
+  "save": "Save",
+  "complianceReport": "Compliance report per batch",
+  "batchCodeOrTag": "Batch code or tag",
+  "search": "Search",
+  "periodIs": "{from} to {to}",
+  "@periodIs": {
+    "placeholders": {
+      "from": {
+        "type": "String"
+      },
+      "to": {
+        "type": "String"
+      }
+    }
+  },
+  "traceabilityCsv": "Traceability export (CSV)",
+  "emissionsReport": "Emissions",
+  "emissionsTotals": "{trips} trips · {km} km · {co2} kg CO₂",
+  "@emissionsTotals": {
+    "placeholders": {
+      "trips": {
+        "type": "int"
+      },
+      "km": {
+        "type": "String"
+      },
+      "co2": {
+        "type": "String"
+      }
+    }
+  },
+  "emissionFactor": "Factor {value} kg/km ({source})",
+  "@emissionFactor": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      },
+      "source": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadCsv": "Download CSV",
+  "reeferHealth": "Reefer health",
+  "noData": "Nothing here yet",
+  "noWeeks": "No weekly check yet",
+  "degradation": "Pull-down slower by {pct} %",
+  "@degradation": {
+    "placeholders": {
+      "pct": {
+        "type": "String"
+      }
+    }
+  },
+  "flagged": "Needs service",
+  "noReleases": "No releases published yet",
+  "noReleasesHint": "Releases appear here once the GitHub release sync runs.",
+  "mandatory": "mandatory",
+  "add": "Add",
+  "inactive": "inactive",
+  "notANumber": "Enter a number",
+  "secretHelp": "16–128 characters; it is stored hashed and never shown again",
+  "secretKeep": "Leave empty to keep the current secret",
+  "secretLength": "16 to 128 characters",
+  "immutable": "Cannot be changed",
+  "addUser": "Add user",
+  "disabled": "Disabled",
+  "roleLabel": "Role",
+  "emailInvalid": "Enter a valid email",
+  "siteRequired": "Drivers and operators need a site",
+  "emergencyContact": "Emergency contact (+91…)",
+  "enableUser": "Enable user",
+  "disableUser": "Disable user",
+  "disableUserConfirm": "Disable this user? They are signed out on every device.",
+  "configHint": "Values are checked by the server; a wrong shape is refused.",
+  "notSet": "Not set (default)",
+  "jsonValue": "JSON value",
+  "invalidJson": "That is not valid JSON",
+  "operatorSays": "Operator says: {reason}",
+  "@operatorSays": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "tripAssigned": "Driver and vehicle assigned"
 }

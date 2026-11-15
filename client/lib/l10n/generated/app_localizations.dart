@@ -2373,6 +2373,1008 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Vehicle {regNo}'**
   String tripVehicle(String regNo);
+
+  /// No description provided for @mgrDashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Dashboard'**
+  String get mgrDashboard;
+
+  /// No description provided for @mgrTrips.
+  ///
+  /// In en, this message translates to:
+  /// **'Trips'**
+  String get mgrTrips;
+
+  /// No description provided for @mgrAlerts.
+  ///
+  /// In en, this message translates to:
+  /// **'Alerts'**
+  String get mgrAlerts;
+
+  /// No description provided for @mgrPlanning.
+  ///
+  /// In en, this message translates to:
+  /// **'Planning'**
+  String get mgrPlanning;
+
+  /// No description provided for @mgrForecast.
+  ///
+  /// In en, this message translates to:
+  /// **'Forecast'**
+  String get mgrForecast;
+
+  /// No description provided for @mgrApprovals.
+  ///
+  /// In en, this message translates to:
+  /// **'Approvals'**
+  String get mgrApprovals;
+
+  /// No description provided for @mgrBuyers.
+  ///
+  /// In en, this message translates to:
+  /// **'Buyers & cold storage'**
+  String get mgrBuyers;
+
+  /// No description provided for @mgrReports.
+  ///
+  /// In en, this message translates to:
+  /// **'Reports'**
+  String get mgrReports;
+
+  /// No description provided for @mgrReleases.
+  ///
+  /// In en, this message translates to:
+  /// **'App releases'**
+  String get mgrReleases;
+
+  /// No description provided for @mgrMasters.
+  ///
+  /// In en, this message translates to:
+  /// **'Master data'**
+  String get mgrMasters;
+
+  /// No description provided for @mgrUsers.
+  ///
+  /// In en, this message translates to:
+  /// **'Users'**
+  String get mgrUsers;
+
+  /// No description provided for @mgrConfig.
+  ///
+  /// In en, this message translates to:
+  /// **'Remote config'**
+  String get mgrConfig;
+
+  /// No description provided for @mgrMore.
+  ///
+  /// In en, this message translates to:
+  /// **'More'**
+  String get mgrMore;
+
+  /// No description provided for @kpiActiveTrips.
+  ///
+  /// In en, this message translates to:
+  /// **'Active trips'**
+  String get kpiActiveTrips;
+
+  /// No description provided for @kpiCriticalAlerts.
+  ///
+  /// In en, this message translates to:
+  /// **'Open critical alerts'**
+  String get kpiCriticalAlerts;
+
+  /// No description provided for @kpiAtRisk.
+  ///
+  /// In en, this message translates to:
+  /// **'Batches at risk (< 12 h)'**
+  String get kpiAtRisk;
+
+  /// No description provided for @kpiDeliveries.
+  ///
+  /// In en, this message translates to:
+  /// **'Deliveries today'**
+  String get kpiDeliveries;
+
+  /// No description provided for @kpiAvoided.
+  ///
+  /// In en, this message translates to:
+  /// **'Spoilage avoided (30 days)'**
+  String get kpiAvoided;
+
+  /// No description provided for @liveVehicles.
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicles on the road: {count}'**
+  String liveVehicles(int count);
+
+  /// No description provided for @vehiclesNoPosition.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} without a position yet'**
+  String vehiclesNoPosition(int count);
+
+  /// No description provided for @latestAlerts.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest alerts'**
+  String get latestAlerts;
+
+  /// No description provided for @seeAll.
+  ///
+  /// In en, this message translates to:
+  /// **'See all'**
+  String get seeAll;
+
+  /// No description provided for @noAlerts.
+  ///
+  /// In en, this message translates to:
+  /// **'No alerts'**
+  String get noAlerts;
+
+  /// No description provided for @refresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get refresh;
+
+  /// No description provided for @noDriver.
+  ///
+  /// In en, this message translates to:
+  /// **'No driver'**
+  String get noDriver;
+
+  /// No description provided for @tripStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get tripStatus;
+
+  /// No description provided for @tripVehicleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicle'**
+  String get tripVehicleLabel;
+
+  /// No description provided for @tripDriver.
+  ///
+  /// In en, this message translates to:
+  /// **'Driver'**
+  String get tripDriver;
+
+  /// No description provided for @tripDistance.
+  ///
+  /// In en, this message translates to:
+  /// **'Distance'**
+  String get tripDistance;
+
+  /// No description provided for @tripCo2.
+  ///
+  /// In en, this message translates to:
+  /// **'Emissions'**
+  String get tripCo2;
+
+  /// No description provided for @tripRouteVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Route'**
+  String get tripRouteVersion;
+
+  /// No description provided for @proposed.
+  ///
+  /// In en, this message translates to:
+  /// **'proposed'**
+  String get proposed;
+
+  /// No description provided for @assignDriver.
+  ///
+  /// In en, this message translates to:
+  /// **'Assign driver and vehicle'**
+  String get assignDriver;
+
+  /// No description provided for @telemetryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reefer temperature'**
+  String get telemetryTitle;
+
+  /// No description provided for @noTelemetry.
+  ///
+  /// In en, this message translates to:
+  /// **'No sensor readings for this trip yet'**
+  String get noTelemetry;
+
+  /// No description provided for @chartAllInBand.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} readings, all inside the safe range'**
+  String chartAllInBand(int count);
+
+  /// No description provided for @chartExcursions.
+  ///
+  /// In en, this message translates to:
+  /// **'{bad} of {count} readings outside the safe range'**
+  String chartExcursions(int bad, int count);
+
+  /// No description provided for @stopsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Stops'**
+  String get stopsTitle;
+
+  /// No description provided for @batchesOnTrip.
+  ///
+  /// In en, this message translates to:
+  /// **'Batches on the trip: {count}'**
+  String batchesOnTrip(int count);
+
+  /// No description provided for @alertsTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Alerts'**
+  String get alertsTab;
+
+  /// No description provided for @incidentsTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Incidents'**
+  String get incidentsTab;
+
+  /// No description provided for @resolve.
+  ///
+  /// In en, this message translates to:
+  /// **'Resolve'**
+  String get resolve;
+
+  /// No description provided for @noIncidents.
+  ///
+  /// In en, this message translates to:
+  /// **'No incidents'**
+  String get noIncidents;
+
+  /// No description provided for @incidentSteps.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} steps'**
+  String incidentSteps(int count);
+
+  /// No description provided for @incidentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Incident'**
+  String get incidentTitle;
+
+  /// No description provided for @rescueBy.
+  ///
+  /// In en, this message translates to:
+  /// **'rescue: {code}'**
+  String rescueBy(String code);
+
+  /// No description provided for @manualActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Take over'**
+  String get manualActions;
+
+  /// No description provided for @offersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Offers sent: {count}'**
+  String offersTitle(int count);
+
+  /// No description provided for @decisionLog.
+  ///
+  /// In en, this message translates to:
+  /// **'Decision log ({count})'**
+  String decisionLog(int count);
+
+  /// No description provided for @resolveIncident.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark this incident resolved?'**
+  String get resolveIncident;
+
+  /// No description provided for @markFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Cargo lost'**
+  String get markFailed;
+
+  /// No description provided for @markFailedConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Close the incident as FAILED (cargo lost)?'**
+  String get markFailedConfirm;
+
+  /// No description provided for @pickBuyer.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the buyer'**
+  String get pickBuyer;
+
+  /// No description provided for @pickRescueTrip.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the rescue truck'**
+  String get pickRescueTrip;
+
+  /// No description provided for @nothingToPick.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing to choose from'**
+  String get nothingToPick;
+
+  /// No description provided for @confirmAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Send {action}?'**
+  String confirmAction(String action);
+
+  /// No description provided for @actionSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Action sent'**
+  String get actionSent;
+
+  /// No description provided for @siteLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Site'**
+  String get siteLabel;
+
+  /// No description provided for @productLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Product'**
+  String get productLabel;
+
+  /// No description provided for @pickSiteProduct.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose a centre and a product'**
+  String get pickSiteProduct;
+
+  /// No description provided for @noForecast.
+  ///
+  /// In en, this message translates to:
+  /// **'No forecast for these days yet'**
+  String get noForecast;
+
+  /// No description provided for @modelVersion.
+  ///
+  /// In en, this message translates to:
+  /// **'Model {version}'**
+  String modelVersion(String version);
+
+  /// No description provided for @runForecast.
+  ///
+  /// In en, this message translates to:
+  /// **'Run forecast now'**
+  String get runForecast;
+
+  /// No description provided for @forecastRunning.
+  ///
+  /// In en, this message translates to:
+  /// **'Forecast running…'**
+  String get forecastRunning;
+
+  /// No description provided for @forecastBusy.
+  ///
+  /// In en, this message translates to:
+  /// **'A forecast is already running'**
+  String get forecastBusy;
+
+  /// No description provided for @jobStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Last run: {status}'**
+  String jobStatus(String status);
+
+  /// No description provided for @planFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Plan for {day}'**
+  String planFor(String day);
+
+  /// No description provided for @changeDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Change date'**
+  String get changeDate;
+
+  /// No description provided for @runPlanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Run planner'**
+  String get runPlanner;
+
+  /// No description provided for @loadExistingOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Show existing orders for this day'**
+  String get loadExistingOrders;
+
+  /// No description provided for @plannerDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft orders ready'**
+  String get plannerDone;
+
+  /// No description provided for @needsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Need per centre'**
+  String get needsTitle;
+
+  /// No description provided for @forecastKg.
+  ///
+  /// In en, this message translates to:
+  /// **'Forecast'**
+  String get forecastKg;
+
+  /// No description provided for @onHandKg.
+  ///
+  /// In en, this message translates to:
+  /// **'On hand'**
+  String get onHandKg;
+
+  /// No description provided for @needKg.
+  ///
+  /// In en, this message translates to:
+  /// **'Need'**
+  String get needKg;
+
+  /// No description provided for @shortfallKg.
+  ///
+  /// In en, this message translates to:
+  /// **'Shortfall'**
+  String get shortfallKg;
+
+  /// No description provided for @ordersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Orders: {count}'**
+  String ordersTitle(int count);
+
+  /// No description provided for @approveAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve all ({count})'**
+  String approveAll(int count);
+
+  /// No description provided for @noOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'No orders for this day'**
+  String get noOrders;
+
+  /// No description provided for @approve.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve'**
+  String get approve;
+
+  /// No description provided for @buildRoutes.
+  ///
+  /// In en, this message translates to:
+  /// **'Build routes for {count} approved orders'**
+  String buildRoutes(int count);
+
+  /// No description provided for @noApprovedOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve at least one order first'**
+  String get noApprovedOrders;
+
+  /// No description provided for @pickDepot.
+  ///
+  /// In en, this message translates to:
+  /// **'Routes from which depot?'**
+  String get pickDepot;
+
+  /// No description provided for @routesBuilt.
+  ///
+  /// In en, this message translates to:
+  /// **'Routes built'**
+  String get routesBuilt;
+
+  /// No description provided for @tripsBuilt.
+  ///
+  /// In en, this message translates to:
+  /// **'Trips planned: {count}'**
+  String tripsBuilt(int count);
+
+  /// No description provided for @editOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit {code}'**
+  String editOrder(String code);
+
+  /// No description provided for @quantityKg.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity'**
+  String get quantityKg;
+
+  /// No description provided for @destination.
+  ///
+  /// In en, this message translates to:
+  /// **'Destination'**
+  String get destination;
+
+  /// No description provided for @invalidQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a quantity above 0'**
+  String get invalidQuantity;
+
+  /// No description provided for @loadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load the lists. Try again.'**
+  String get loadFailed;
+
+  /// No description provided for @editRequestsTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit requests'**
+  String get editRequestsTab;
+
+  /// No description provided for @disputesTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Grade disputes'**
+  String get disputesTab;
+
+  /// No description provided for @nothingPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing waiting'**
+  String get nothingPending;
+
+  /// No description provided for @requestedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} · {time}'**
+  String requestedBy(String name, String time);
+
+  /// No description provided for @reasonIs.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason: {reason}'**
+  String reasonIs(String reason);
+
+  /// No description provided for @rejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get rejected;
+
+  /// No description provided for @approved.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved'**
+  String get approved;
+
+  /// No description provided for @aiConfidence.
+  ///
+  /// In en, this message translates to:
+  /// **'AI confidence {percent} %'**
+  String aiConfidence(int percent);
+
+  /// No description provided for @setGrade.
+  ///
+  /// In en, this message translates to:
+  /// **'Set the grade'**
+  String get setGrade;
+
+  /// No description provided for @gradeSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Grade set to {grade}'**
+  String gradeSet(String grade);
+
+  /// No description provided for @addBuyer.
+  ///
+  /// In en, this message translates to:
+  /// **'Add buyer'**
+  String get addBuyer;
+
+  /// No description provided for @editBuyer.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit buyer'**
+  String get editBuyer;
+
+  /// No description provided for @noBuyers.
+  ///
+  /// In en, this message translates to:
+  /// **'No buyers yet'**
+  String get noBuyers;
+
+  /// No description provided for @minGradeIs.
+  ///
+  /// In en, this message translates to:
+  /// **'min grade {grade}'**
+  String minGradeIs(String grade);
+
+  /// No description provided for @acceptsProducts.
+  ///
+  /// In en, this message translates to:
+  /// **'Accepts {count} products'**
+  String acceptsProducts(int count);
+
+  /// No description provided for @deactivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Deactivate'**
+  String get deactivate;
+
+  /// No description provided for @deactivateBuyer.
+  ///
+  /// In en, this message translates to:
+  /// **'Deactivate this buyer? Past offers are kept.'**
+  String get deactivateBuyer;
+
+  /// No description provided for @fieldRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Required'**
+  String get fieldRequired;
+
+  /// No description provided for @numberBetween.
+  ///
+  /// In en, this message translates to:
+  /// **'A number from {min} to {max}'**
+  String numberBetween(String min, String max);
+
+  /// No description provided for @hoursInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Check the hours for {day} (HH:MM, at most 4 ranges)'**
+  String hoursInvalid(String day);
+
+  /// No description provided for @pickOneProduct.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose at least one product'**
+  String get pickOneProduct;
+
+  /// No description provided for @hoursFor.
+  ///
+  /// In en, this message translates to:
+  /// **'Hours on {day}'**
+  String hoursFor(String day);
+
+  /// No description provided for @opens.
+  ///
+  /// In en, this message translates to:
+  /// **'Opens'**
+  String get opens;
+
+  /// No description provided for @closes.
+  ///
+  /// In en, this message translates to:
+  /// **'Closes'**
+  String get closes;
+
+  /// No description provided for @closedDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed'**
+  String get closedDay;
+
+  /// No description provided for @name.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get name;
+
+  /// No description provided for @typeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get typeLabel;
+
+  /// No description provided for @phoneE164.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone (+91…)'**
+  String get phoneE164;
+
+  /// No description provided for @phoneInvalidE164.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the number with the country code, e.g. +919812345678'**
+  String get phoneInvalidE164;
+
+  /// No description provided for @emailOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Email (optional)'**
+  String get emailOptional;
+
+  /// No description provided for @latitude.
+  ///
+  /// In en, this message translates to:
+  /// **'Latitude'**
+  String get latitude;
+
+  /// No description provided for @longitude.
+  ///
+  /// In en, this message translates to:
+  /// **'Longitude'**
+  String get longitude;
+
+  /// No description provided for @discountPct.
+  ///
+  /// In en, this message translates to:
+  /// **'Discount'**
+  String get discountPct;
+
+  /// No description provided for @minGrade.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum grade'**
+  String get minGrade;
+
+  /// No description provided for @capacityOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Capacity (optional)'**
+  String get capacityOptional;
+
+  /// No description provided for @acceptedProducts.
+  ///
+  /// In en, this message translates to:
+  /// **'Products accepted'**
+  String get acceptedProducts;
+
+  /// No description provided for @openingHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Opening hours (IST)'**
+  String get openingHours;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @complianceReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Compliance report per batch'**
+  String get complianceReport;
+
+  /// No description provided for @batchCodeOrTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Batch code or tag'**
+  String get batchCodeOrTag;
+
+  /// No description provided for @search.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get search;
+
+  /// No description provided for @periodIs.
+  ///
+  /// In en, this message translates to:
+  /// **'{from} to {to}'**
+  String periodIs(String from, String to);
+
+  /// No description provided for @traceabilityCsv.
+  ///
+  /// In en, this message translates to:
+  /// **'Traceability export (CSV)'**
+  String get traceabilityCsv;
+
+  /// No description provided for @emissionsReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Emissions'**
+  String get emissionsReport;
+
+  /// No description provided for @emissionsTotals.
+  ///
+  /// In en, this message translates to:
+  /// **'{trips} trips · {km} km · {co2} kg CO₂'**
+  String emissionsTotals(int trips, String km, String co2);
+
+  /// No description provided for @emissionFactor.
+  ///
+  /// In en, this message translates to:
+  /// **'Factor {value} kg/km ({source})'**
+  String emissionFactor(String value, String source);
+
+  /// No description provided for @downloadCsv.
+  ///
+  /// In en, this message translates to:
+  /// **'Download CSV'**
+  String get downloadCsv;
+
+  /// No description provided for @reeferHealth.
+  ///
+  /// In en, this message translates to:
+  /// **'Reefer health'**
+  String get reeferHealth;
+
+  /// No description provided for @noData.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing here yet'**
+  String get noData;
+
+  /// No description provided for @noWeeks.
+  ///
+  /// In en, this message translates to:
+  /// **'No weekly check yet'**
+  String get noWeeks;
+
+  /// No description provided for @degradation.
+  ///
+  /// In en, this message translates to:
+  /// **'Pull-down slower by {pct} %'**
+  String degradation(String pct);
+
+  /// No description provided for @flagged.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs service'**
+  String get flagged;
+
+  /// No description provided for @noReleases.
+  ///
+  /// In en, this message translates to:
+  /// **'No releases published yet'**
+  String get noReleases;
+
+  /// No description provided for @noReleasesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Releases appear here once the GitHub release sync runs.'**
+  String get noReleasesHint;
+
+  /// No description provided for @mandatory.
+  ///
+  /// In en, this message translates to:
+  /// **'mandatory'**
+  String get mandatory;
+
+  /// No description provided for @add.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get add;
+
+  /// No description provided for @inactive.
+  ///
+  /// In en, this message translates to:
+  /// **'inactive'**
+  String get inactive;
+
+  /// No description provided for @notANumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a number'**
+  String get notANumber;
+
+  /// No description provided for @secretHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'16–128 characters; it is stored hashed and never shown again'**
+  String get secretHelp;
+
+  /// No description provided for @secretKeep.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave empty to keep the current secret'**
+  String get secretKeep;
+
+  /// No description provided for @secretLength.
+  ///
+  /// In en, this message translates to:
+  /// **'16 to 128 characters'**
+  String get secretLength;
+
+  /// No description provided for @immutable.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot be changed'**
+  String get immutable;
+
+  /// No description provided for @addUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Add user'**
+  String get addUser;
+
+  /// No description provided for @disabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Disabled'**
+  String get disabled;
+
+  /// No description provided for @roleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Role'**
+  String get roleLabel;
+
+  /// No description provided for @emailInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid email'**
+  String get emailInvalid;
+
+  /// No description provided for @siteRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Drivers and operators need a site'**
+  String get siteRequired;
+
+  /// No description provided for @emergencyContact.
+  ///
+  /// In en, this message translates to:
+  /// **'Emergency contact (+91…)'**
+  String get emergencyContact;
+
+  /// No description provided for @enableUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable user'**
+  String get enableUser;
+
+  /// No description provided for @disableUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable user'**
+  String get disableUser;
+
+  /// No description provided for @disableUserConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable this user? They are signed out on every device.'**
+  String get disableUserConfirm;
+
+  /// No description provided for @configHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Values are checked by the server; a wrong shape is refused.'**
+  String get configHint;
+
+  /// No description provided for @notSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set (default)'**
+  String get notSet;
+
+  /// No description provided for @jsonValue.
+  ///
+  /// In en, this message translates to:
+  /// **'JSON value'**
+  String get jsonValue;
+
+  /// No description provided for @invalidJson.
+  ///
+  /// In en, this message translates to:
+  /// **'That is not valid JSON'**
+  String get invalidJson;
+
+  /// No description provided for @operatorSays.
+  ///
+  /// In en, this message translates to:
+  /// **'Operator says: {reason}'**
+  String operatorSays(String reason);
+
+  /// No description provided for @tripAssigned.
+  ///
+  /// In en, this message translates to:
+  /// **'Driver and vehicle assigned'**
+  String get tripAssigned;
 }
 
 class _AppLocalizationsDelegate

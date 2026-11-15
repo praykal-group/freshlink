@@ -1306,4 +1306,574 @@ class AppLocalizationsEn extends AppLocalizations {
   String tripVehicle(String regNo) {
     return 'Vehicle $regNo';
   }
+
+  @override
+  String get mgrDashboard => 'Dashboard';
+
+  @override
+  String get mgrTrips => 'Trips';
+
+  @override
+  String get mgrAlerts => 'Alerts';
+
+  @override
+  String get mgrPlanning => 'Planning';
+
+  @override
+  String get mgrForecast => 'Forecast';
+
+  @override
+  String get mgrApprovals => 'Approvals';
+
+  @override
+  String get mgrBuyers => 'Buyers & cold storage';
+
+  @override
+  String get mgrReports => 'Reports';
+
+  @override
+  String get mgrReleases => 'App releases';
+
+  @override
+  String get mgrMasters => 'Master data';
+
+  @override
+  String get mgrUsers => 'Users';
+
+  @override
+  String get mgrConfig => 'Remote config';
+
+  @override
+  String get mgrMore => 'More';
+
+  @override
+  String get kpiActiveTrips => 'Active trips';
+
+  @override
+  String get kpiCriticalAlerts => 'Open critical alerts';
+
+  @override
+  String get kpiAtRisk => 'Batches at risk (< 12 h)';
+
+  @override
+  String get kpiDeliveries => 'Deliveries today';
+
+  @override
+  String get kpiAvoided => 'Spoilage avoided (30 days)';
+
+  @override
+  String liveVehicles(int count) {
+    return 'Vehicles on the road: $count';
+  }
+
+  @override
+  String vehiclesNoPosition(int count) {
+    return '$count without a position yet';
+  }
+
+  @override
+  String get latestAlerts => 'Latest alerts';
+
+  @override
+  String get seeAll => 'See all';
+
+  @override
+  String get noAlerts => 'No alerts';
+
+  @override
+  String get refresh => 'Refresh';
+
+  @override
+  String get noDriver => 'No driver';
+
+  @override
+  String get tripStatus => 'Status';
+
+  @override
+  String get tripVehicleLabel => 'Vehicle';
+
+  @override
+  String get tripDriver => 'Driver';
+
+  @override
+  String get tripDistance => 'Distance';
+
+  @override
+  String get tripCo2 => 'Emissions';
+
+  @override
+  String get tripRouteVersion => 'Route';
+
+  @override
+  String get proposed => 'proposed';
+
+  @override
+  String get assignDriver => 'Assign driver and vehicle';
+
+  @override
+  String get telemetryTitle => 'Reefer temperature';
+
+  @override
+  String get noTelemetry => 'No sensor readings for this trip yet';
+
+  @override
+  String chartAllInBand(int count) {
+    return '$count readings, all inside the safe range';
+  }
+
+  @override
+  String chartExcursions(int bad, int count) {
+    return '$bad of $count readings outside the safe range';
+  }
+
+  @override
+  String get stopsTitle => 'Stops';
+
+  @override
+  String batchesOnTrip(int count) {
+    return 'Batches on the trip: $count';
+  }
+
+  @override
+  String get alertsTab => 'Alerts';
+
+  @override
+  String get incidentsTab => 'Incidents';
+
+  @override
+  String get resolve => 'Resolve';
+
+  @override
+  String get noIncidents => 'No incidents';
+
+  @override
+  String incidentSteps(int count) {
+    return '$count steps';
+  }
+
+  @override
+  String get incidentTitle => 'Incident';
+
+  @override
+  String rescueBy(String code) {
+    return 'rescue: $code';
+  }
+
+  @override
+  String get manualActions => 'Take over';
+
+  @override
+  String offersTitle(int count) {
+    return 'Offers sent: $count';
+  }
+
+  @override
+  String decisionLog(int count) {
+    return 'Decision log ($count)';
+  }
+
+  @override
+  String get resolveIncident => 'Mark this incident resolved?';
+
+  @override
+  String get markFailed => 'Cargo lost';
+
+  @override
+  String get markFailedConfirm => 'Close the incident as FAILED (cargo lost)?';
+
+  @override
+  String get pickBuyer => 'Choose the buyer';
+
+  @override
+  String get pickRescueTrip => 'Choose the rescue truck';
+
+  @override
+  String get nothingToPick => 'Nothing to choose from';
+
+  @override
+  String confirmAction(String action) {
+    return 'Send $action?';
+  }
+
+  @override
+  String get actionSent => 'Action sent';
+
+  @override
+  String get siteLabel => 'Site';
+
+  @override
+  String get productLabel => 'Product';
+
+  @override
+  String get pickSiteProduct => 'Choose a centre and a product';
+
+  @override
+  String get noForecast => 'No forecast for these days yet';
+
+  @override
+  String modelVersion(String version) {
+    return 'Model $version';
+  }
+
+  @override
+  String get runForecast => 'Run forecast now';
+
+  @override
+  String get forecastRunning => 'Forecast running…';
+
+  @override
+  String get forecastBusy => 'A forecast is already running';
+
+  @override
+  String jobStatus(String status) {
+    return 'Last run: $status';
+  }
+
+  @override
+  String planFor(String day) {
+    return 'Plan for $day';
+  }
+
+  @override
+  String get changeDate => 'Change date';
+
+  @override
+  String get runPlanner => 'Run planner';
+
+  @override
+  String get loadExistingOrders => 'Show existing orders for this day';
+
+  @override
+  String get plannerDone => 'Draft orders ready';
+
+  @override
+  String get needsTitle => 'Need per centre';
+
+  @override
+  String get forecastKg => 'Forecast';
+
+  @override
+  String get onHandKg => 'On hand';
+
+  @override
+  String get needKg => 'Need';
+
+  @override
+  String get shortfallKg => 'Shortfall';
+
+  @override
+  String ordersTitle(int count) {
+    return 'Orders: $count';
+  }
+
+  @override
+  String approveAll(int count) {
+    return 'Approve all ($count)';
+  }
+
+  @override
+  String get noOrders => 'No orders for this day';
+
+  @override
+  String get approve => 'Approve';
+
+  @override
+  String buildRoutes(int count) {
+    return 'Build routes for $count approved orders';
+  }
+
+  @override
+  String get noApprovedOrders => 'Approve at least one order first';
+
+  @override
+  String get pickDepot => 'Routes from which depot?';
+
+  @override
+  String get routesBuilt => 'Routes built';
+
+  @override
+  String tripsBuilt(int count) {
+    return 'Trips planned: $count';
+  }
+
+  @override
+  String editOrder(String code) {
+    return 'Edit $code';
+  }
+
+  @override
+  String get quantityKg => 'Quantity';
+
+  @override
+  String get destination => 'Destination';
+
+  @override
+  String get invalidQuantity => 'Enter a quantity above 0';
+
+  @override
+  String get loadFailed => 'Could not load the lists. Try again.';
+
+  @override
+  String get editRequestsTab => 'Edit requests';
+
+  @override
+  String get disputesTab => 'Grade disputes';
+
+  @override
+  String get nothingPending => 'Nothing waiting';
+
+  @override
+  String requestedBy(String name, String time) {
+    return '$name · $time';
+  }
+
+  @override
+  String reasonIs(String reason) {
+    return 'Reason: $reason';
+  }
+
+  @override
+  String get rejected => 'Rejected';
+
+  @override
+  String get approved => 'Approved';
+
+  @override
+  String aiConfidence(int percent) {
+    return 'AI confidence $percent %';
+  }
+
+  @override
+  String get setGrade => 'Set the grade';
+
+  @override
+  String gradeSet(String grade) {
+    return 'Grade set to $grade';
+  }
+
+  @override
+  String get addBuyer => 'Add buyer';
+
+  @override
+  String get editBuyer => 'Edit buyer';
+
+  @override
+  String get noBuyers => 'No buyers yet';
+
+  @override
+  String minGradeIs(String grade) {
+    return 'min grade $grade';
+  }
+
+  @override
+  String acceptsProducts(int count) {
+    return 'Accepts $count products';
+  }
+
+  @override
+  String get deactivate => 'Deactivate';
+
+  @override
+  String get deactivateBuyer => 'Deactivate this buyer? Past offers are kept.';
+
+  @override
+  String get fieldRequired => 'Required';
+
+  @override
+  String numberBetween(String min, String max) {
+    return 'A number from $min to $max';
+  }
+
+  @override
+  String hoursInvalid(String day) {
+    return 'Check the hours for $day (HH:MM, at most 4 ranges)';
+  }
+
+  @override
+  String get pickOneProduct => 'Choose at least one product';
+
+  @override
+  String hoursFor(String day) {
+    return 'Hours on $day';
+  }
+
+  @override
+  String get opens => 'Opens';
+
+  @override
+  String get closes => 'Closes';
+
+  @override
+  String get closedDay => 'Closed';
+
+  @override
+  String get name => 'Name';
+
+  @override
+  String get typeLabel => 'Type';
+
+  @override
+  String get phoneE164 => 'Phone (+91…)';
+
+  @override
+  String get phoneInvalidE164 =>
+      'Enter the number with the country code, e.g. +919812345678';
+
+  @override
+  String get emailOptional => 'Email (optional)';
+
+  @override
+  String get latitude => 'Latitude';
+
+  @override
+  String get longitude => 'Longitude';
+
+  @override
+  String get discountPct => 'Discount';
+
+  @override
+  String get minGrade => 'Minimum grade';
+
+  @override
+  String get capacityOptional => 'Capacity (optional)';
+
+  @override
+  String get acceptedProducts => 'Products accepted';
+
+  @override
+  String get openingHours => 'Opening hours (IST)';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get complianceReport => 'Compliance report per batch';
+
+  @override
+  String get batchCodeOrTag => 'Batch code or tag';
+
+  @override
+  String get search => 'Search';
+
+  @override
+  String periodIs(String from, String to) {
+    return '$from to $to';
+  }
+
+  @override
+  String get traceabilityCsv => 'Traceability export (CSV)';
+
+  @override
+  String get emissionsReport => 'Emissions';
+
+  @override
+  String emissionsTotals(int trips, String km, String co2) {
+    return '$trips trips · $km km · $co2 kg CO₂';
+  }
+
+  @override
+  String emissionFactor(String value, String source) {
+    return 'Factor $value kg/km ($source)';
+  }
+
+  @override
+  String get downloadCsv => 'Download CSV';
+
+  @override
+  String get reeferHealth => 'Reefer health';
+
+  @override
+  String get noData => 'Nothing here yet';
+
+  @override
+  String get noWeeks => 'No weekly check yet';
+
+  @override
+  String degradation(String pct) {
+    return 'Pull-down slower by $pct %';
+  }
+
+  @override
+  String get flagged => 'Needs service';
+
+  @override
+  String get noReleases => 'No releases published yet';
+
+  @override
+  String get noReleasesHint =>
+      'Releases appear here once the GitHub release sync runs.';
+
+  @override
+  String get mandatory => 'mandatory';
+
+  @override
+  String get add => 'Add';
+
+  @override
+  String get inactive => 'inactive';
+
+  @override
+  String get notANumber => 'Enter a number';
+
+  @override
+  String get secretHelp =>
+      '16–128 characters; it is stored hashed and never shown again';
+
+  @override
+  String get secretKeep => 'Leave empty to keep the current secret';
+
+  @override
+  String get secretLength => '16 to 128 characters';
+
+  @override
+  String get immutable => 'Cannot be changed';
+
+  @override
+  String get addUser => 'Add user';
+
+  @override
+  String get disabled => 'Disabled';
+
+  @override
+  String get roleLabel => 'Role';
+
+  @override
+  String get emailInvalid => 'Enter a valid email';
+
+  @override
+  String get siteRequired => 'Drivers and operators need a site';
+
+  @override
+  String get emergencyContact => 'Emergency contact (+91…)';
+
+  @override
+  String get enableUser => 'Enable user';
+
+  @override
+  String get disableUser => 'Disable user';
+
+  @override
+  String get disableUserConfirm =>
+      'Disable this user? They are signed out on every device.';
+
+  @override
+  String get configHint =>
+      'Values are checked by the server; a wrong shape is refused.';
+
+  @override
+  String get notSet => 'Not set (default)';
+
+  @override
+  String get jsonValue => 'JSON value';
+
+  @override
+  String get invalidJson => 'That is not valid JSON';
+
+  @override
+  String operatorSays(String reason) {
+    return 'Operator says: $reason';
+  }
+
+  @override
+  String get tripAssigned => 'Driver and vehicle assigned';
 }

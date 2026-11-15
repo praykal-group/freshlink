@@ -270,3 +270,25 @@ cd server && npx jest
 cd client && flutter analyze && flutter test
 scripts/build_apk.sh driver dev && scripts/verify_apk_isolation.sh driver
 ```
+
+## M13 — Control Tower (Manager) APK + Web Console (2026-11-15)
+
+**Implemented**
+- `server/`: `modules/control` (dashboard KPIs + vehicle positions, drivers for assignment, releases list, D-151), `GET /admin/users` (D-152); role checks of every admin route the console calls.
+- `client/lib/apps/manager/`: `data` (models, repository), `providers.dart` (live summary + alerts on realtime events, master pickers, admin flag), `shell.dart` (bottom bar / rail, More), `widgets`, `screens` (dashboard, trips + chart, alerts + incidents, forecast + planning, approvals + buyers, reports, releases, masters, users, remote config), `router.dart` (ShellRoute, admin redirects).
+- `client/lib/core/files/` report save / share (native share sheet, web download); `ApiClient.put`; `fl_chart`, `web` pins; 167 strings EN / HI / MR.
+- `.github/workflows/release-console.yml` (D-157).
+
+**Bugs found and fixed during the milestone:** see TESTING.md (M13).
+
+**Tests:** see TESTING.md (M13).
+
+**Limitations / pending:** the console was opened in a real browser at 1280 px and phone width, but only up to the sign-in screen (no Supabase project, so no session); every screen behind it is covered by widget tests at both widths. "A manager runs a whole day from the APK and the web console" (done-when) needs a signed-in manager on the live stack. HI/MR strings need review. M15: `abi` on `app_releases` (D-159).
+
+**Repro**
+```bash
+cd server && npx jest src/modules/control src/modules/users
+cd client && flutter test test/manager
+MSYS_NO_PATHCONV=1 flutter build web --release -t lib/main_manager.dart --dart-define-from-file=env/dev.json --base-href /console/
+scripts/build_apk.sh manager dev && scripts/verify_apk_isolation.sh manager
+```

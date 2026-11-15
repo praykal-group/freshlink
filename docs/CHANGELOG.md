@@ -2,6 +2,15 @@
 
 All notable changes, per milestone (Keep a Changelog style).
 
+## [m13] - 2026-11-15
+### Added
+- Control Tower app + web console (Section 10.6): responsive shell (bottom bar on phones, navigation rail ≥ 840 px); dashboard with KPI cards, live vehicle map and latest alerts (realtime); trips list + detail with route version, stops, batches and a temperature chart with the safe band; alerts (ack / resolve) and incidents (decision log, offers, manual actions, resolve / cargo lost); forecast with bars + range whiskers and "run now"; planning (run → edit drafts → approve → build routes → assign driver + vehicle); approvals (edit requests, grade disputes); buyers & cold storages with product multi-select and an opening-hours editor; reports (compliance HTML, traceability CSV, emissions, reefer health); app releases; ADMIN-only master data, users and remote config.
+- Backend: `GET /control/summary`, `/control/drivers`, `/control/releases`; `GET /admin/users`.
+- `.github/workflows/release-console.yml`; report download / share helper; `ApiClient.put`.
+- 167 strings in EN / HI / MR.
+### Changed
+- The manager home is the dashboard (was the M10 placeholder).
+
 ## [m12] - 2026-11-15
 ### Added
 - Driver app (Section 10.5): today's trip card, pre-trip check, Start Trip (tracking + device binding), active trip with map (route, stops, truck), next stop + Google Maps hand-off, cargo strip and cargo screen (60 s refresh), critical alert screen (alarm + voice until Acknowledge), reroute proposal (old vs new stop, extra km, Accept; Decline only for non-critical replans), 2-tap incident report with optional photo and 60 s voice note, SOS, stop / PoD (arrive, crate scan checked on the phone, accepted / partial / rejected with kg + reason, receiver, signature, photo), history + pending uploads.

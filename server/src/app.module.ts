@@ -22,6 +22,7 @@ import { AlertsModule } from './modules/alerts/alerts.module';
 import { BuyersModule } from './modules/buyers/buyers.module';
 import { IncidentsModule } from './modules/incidents/incidents.module';
 import { OperatorModule } from './modules/operator/operator.module';
+import { ControlModule } from './modules/control/control.module';
 import { ReportsModule } from './modules/reports/reports.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { TelemetryModule } from './modules/telemetry/telemetry.module';
@@ -91,6 +92,7 @@ import { UsersModule } from './modules/users/users.module';
     IncidentsModule,
     ReportsModule,
     OperatorModule,
+    ControlModule,
   ],
   providers: [
     { provide: APP_FILTER, useClass: AllExceptionsFilter },

@@ -321,6 +321,40 @@ No ERROR lines in the API or worker logs during the run.
 - "A full simulated trip with one incident and diversion completed from the driver phone" (M12 done-when): needs the phone + Supabase login.
 - Hindi and Marathi strings need a native-speaker review.
 
+### M13 — 2026-11-15
+`cd client && flutter analyze` → **no issues**. `flutter test` → **253 tests, all pass** (56 new). `cd server && npx jest` → **314 pass** (24 new); `tsc --noEmit` and eslint on the changed modules clean. `scripts/check_flavor_isolation.sh` OK.
+
+| File | M13 test item covered |
+|------|----------------------|
+| `test/manager/manager_flow_test.dart` (5) | Real screens + API client against a scripted backend. **Planning flow**: run planner (needs table + 2 drafts) → edit a draft's quantity (PATCH body checked) → approve all → build routes from the depot → assign driver + vehicle (POST body checked). **MANAGER never sees the admin destinations and `/admin/*` URLs redirect to the dashboard, with no admin call made**; ADMIN sees and opens Users. **Live alert**: an injected `alert.raised` shows on the dashboard within 1 s of test time (not the 60 s poll) and the critical-alert KPI refreshes; `vehicle.position` moves a marker. **Charts match the API**: the trip chart has exactly the API's points and the band limits 0 / 4 °C, "1 of 12 readings outside"; the forecast chart's 7 bars and whiskers equal predicted / lower / upper. Phone layout: bottom bar + More (no admin items for a manager); incident detail with log, offers and a manual REPLAN |
+| `test/manager/manager_text_scale_test.dart` (51) | **Every control-tower screen at text scale 2.0 on 360×640 dp in EN, HI and MR** (dashboard, trips, trip detail with chart, alerts, incident, forecast, planning after a run, approvals, buyers, buyer form, reports, users, user form, masters, product form, remote config, More) — no overflow |
+| `test/session_test.dart` | The manager flavor now lands on the dashboard (scrolls the list in code: a drag over the map is taken by the map) |
+| `server/src/modules/control/control.spec.ts` (4) | KPIs with their defining queries (IST day, < 12 h, open-drop types), positions from the last reading, no Redis → positions null; drivers with their current trip; releases (BigInt size → number, unknown flavor ignored); MANAGER / ADMIN only |
+| `server/src/modules/control/admin-routes.spec.ts` (18) | **The real RolesGuard on all 17 admin routes behind the console's admin screens: MANAGER → 403 FORBIDDEN_ROLE, ADMIN allowed**; control reads refused to DRIVER / OPERATOR |
+| `server/src/modules/users/users-list.spec.ts` (2) | User list filters, search, paging, no Supabase uid selected; ADMIN only |
+
+**Builds and browser (measured):**
+
+| Check | Result |
+|-------|--------|
+| `flutter build web --release -t lib/main_manager.dart --base-href /console/` | Built in 187 s; `main.dart.js` 4.4 MB. Wasm dry run: third-party lints only (flutter_tts, socket_io_common, D-160) |
+| Console in a real browser (served locally under `/console/`, built-in browser) | **1280×800: renders** (sign-in screen, dark theme, EN / हिन्दी / मराठी picker), **375×812 phone: renders**, no console errors. Not signed in: no Supabase project (see below) |
+| `scripts/build_apk.sh manager dev` | arm64-v8a **31.8 MB**, armeabi-v7a **26.8 MB** (fl_chart is pure Dart, no native size); isolation OK for both; permissions unchanged (notifications only). `dist/` files now open in Windows tools directly (the M12 CR fix) |
+
+**Found and fixed during the milestone:**
+- Every dialog disposed its text controllers as soon as `showDialog` returned, while the dialog was still animating out → crash on Save; dialogs now own their controllers (`TextFieldsDialog`).
+- The forecast screen called `setState(() => _rows = future)`, which hands a Future to setState → error on the first site + product pick.
+- The rail wrapper (scroll view + IntrinsicHeight) cannot lay out a NavigationRail → `NavigationRail(scrollable: true)`; the "no position" card on the map had no width bound.
+- Text scale 2.0: title + status-chip rows, a date button in the app bar, section headers with long buttons, dropdowns without `isExpanded`, trailing chips in list tiles and the fixed-size map marker label overflowed (up to 257 px) → wrapping layouts, expanded dropdowns, chips under the text, scaled-down marker label.
+- No user list endpoint existed → `GET /admin/users` (D-152).
+- Keys that already existed with another meaning (`assigned` = operator storage, `disputeReason` = operator form label) → new manager keys.
+
+**Deferred M13 checks (NOT RUN):**
+- A manager runs a whole day (plan → monitor → incident → reports) from the APK and the web console on the live stack: needs a Supabase dev project and a signed-in manager; the screens and calls are covered against a scripted backend only.
+- A live alert from the incident engine reaching a real dashboard within 5 s (the realtime path is tested with an injected event; the M9 live run measured the server side).
+- The deploy step of `release-console.yml` (no host until M14) and Google sign-in on the console.
+- Hindi and Marathi strings need a native-speaker review.
+
 ## Measured metrics
 - M8 pipeline (dev stack on one Windows PC, time scale 60): breach → shelf life 110–152 ms; 500 devices × 10 packets → 5,000 / 5,000 stored; warm publish → Kafka p95 222 ms. Sensor → Influx p95 **not verified** (see M8).
 - M9 incident engine (dev stack, time scale 60): diversion route proposed 217–509 ms after a buyer accepts; 26 / 26 live checks.
