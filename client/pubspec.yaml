@@ -45,6 +45,17 @@ dependencies:
   uuid: 4.6.0
   intl: 0.20.2
   animations: 3.0.0
+  # operator app (M11). permission_handler is not used: every 14.x Android part needs SDK 37 (D-129);
+  # camera, scanner, speech and the printer plugin request their own permissions.
+  camera: 0.12.2
+  mobile_scanner: 7.5.0
+  nfc_manager: 4.3.0
+  flutter_image_compress: 2.5.1
+  speech_to_text: 7.5.0
+  print_bluetooth_thermal: 1.2.5
+  esc_pos_utils_plus: 2.0.4
+  share_plus: 13.3.1
+  qr: 4.0.0 # 4.0.1 needs Dart 3.13
 
 dev_dependencies:
   flutter_test:

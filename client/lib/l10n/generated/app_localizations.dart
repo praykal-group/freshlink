@@ -651,6 +651,888 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Speak the value'**
   String get voiceInput;
+
+  /// No description provided for @ok.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
+  String get ok;
+
+  /// No description provided for @close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get close;
+
+  /// No description provided for @next.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get next;
+
+  /// No description provided for @back.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get back;
+
+  /// No description provided for @skip.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get skip;
+
+  /// No description provided for @send.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get send;
+
+  /// No description provided for @saved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved'**
+  String get saved;
+
+  /// No description provided for @todayAtSite.
+  ///
+  /// In en, this message translates to:
+  /// **'Today at {site}'**
+  String todayAtSite(String site);
+
+  /// No description provided for @countRegistered.
+  ///
+  /// In en, this message translates to:
+  /// **'Registered'**
+  String get countRegistered;
+
+  /// No description provided for @countGraded.
+  ///
+  /// In en, this message translates to:
+  /// **'Graded'**
+  String get countGraded;
+
+  /// No description provided for @countStored.
+  ///
+  /// In en, this message translates to:
+  /// **'In storage'**
+  String get countStored;
+
+  /// No description provided for @countDispatched.
+  ///
+  /// In en, this message translates to:
+  /// **'Dispatched'**
+  String get countDispatched;
+
+  /// No description provided for @newFishBatch.
+  ///
+  /// In en, this message translates to:
+  /// **'New fish batch'**
+  String get newFishBatch;
+
+  /// No description provided for @newProduceBatch.
+  ///
+  /// In en, this message translates to:
+  /// **'New produce batch'**
+  String get newProduceBatch;
+
+  /// No description provided for @receive.
+  ///
+  /// In en, this message translates to:
+  /// **'Receive'**
+  String get receive;
+
+  /// No description provided for @loadTruck.
+  ///
+  /// In en, this message translates to:
+  /// **'Load truck'**
+  String get loadTruck;
+
+  /// No description provided for @batches.
+  ///
+  /// In en, this message translates to:
+  /// **'Batches'**
+  String get batches;
+
+  /// No description provided for @printer.
+  ///
+  /// In en, this message translates to:
+  /// **'Printer'**
+  String get printer;
+
+  /// No description provided for @resumeDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue the batch you started'**
+  String get resumeDraft;
+
+  /// No description provided for @discardDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get discardDraft;
+
+  /// No description provided for @stepForm.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get stepForm;
+
+  /// No description provided for @stepTag.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag'**
+  String get stepTag;
+
+  /// No description provided for @stepPhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos'**
+  String get stepPhotos;
+
+  /// No description provided for @stepGrade.
+  ///
+  /// In en, this message translates to:
+  /// **'Grade'**
+  String get stepGrade;
+
+  /// No description provided for @stepStorage.
+  ///
+  /// In en, this message translates to:
+  /// **'Storage'**
+  String get stepStorage;
+
+  /// No description provided for @stepLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Label'**
+  String get stepLabel;
+
+  /// No description provided for @stepDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get stepDone;
+
+  /// No description provided for @stepOf.
+  ///
+  /// In en, this message translates to:
+  /// **'Step {n} of {total}'**
+  String stepOf(int n, int total);
+
+  /// No description provided for @product.
+  ///
+  /// In en, this message translates to:
+  /// **'Product'**
+  String get product;
+
+  /// No description provided for @catchTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Catch time'**
+  String get catchTime;
+
+  /// No description provided for @harvestTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Harvest time'**
+  String get harvestTime;
+
+  /// No description provided for @weight.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight'**
+  String get weight;
+
+  /// No description provided for @vesselId.
+  ///
+  /// In en, this message translates to:
+  /// **'Vessel ID'**
+  String get vesselId;
+
+  /// No description provided for @farmRef.
+  ///
+  /// In en, this message translates to:
+  /// **'Farm ID'**
+  String get farmRef;
+
+  /// No description provided for @iceRatio.
+  ///
+  /// In en, this message translates to:
+  /// **'Ice-to-fish ratio'**
+  String get iceRatio;
+
+  /// No description provided for @coreTemp.
+  ///
+  /// In en, this message translates to:
+  /// **'Core temperature'**
+  String get coreTemp;
+
+  /// No description provided for @maturity.
+  ///
+  /// In en, this message translates to:
+  /// **'Maturity index'**
+  String get maturity;
+
+  /// No description provided for @brix.
+  ///
+  /// In en, this message translates to:
+  /// **'Brix'**
+  String get brix;
+
+  /// No description provided for @fieldTemp.
+  ///
+  /// In en, this message translates to:
+  /// **'Field temperature'**
+  String get fieldTemp;
+
+  /// No description provided for @fieldHumidity.
+  ///
+  /// In en, this message translates to:
+  /// **'Field humidity'**
+  String get fieldHumidity;
+
+  /// No description provided for @listening.
+  ///
+  /// In en, this message translates to:
+  /// **'Listening… say the number'**
+  String get listening;
+
+  /// No description provided for @voiceNotHeard.
+  ///
+  /// In en, this message translates to:
+  /// **'Didn\'t catch a number. Try again or type it.'**
+  String get voiceNotHeard;
+
+  /// No description provided for @mastersMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Master lists are not downloaded yet. Connect once to download them.'**
+  String get mastersMissing;
+
+  /// No description provided for @tagChoose.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag the crate'**
+  String get tagChoose;
+
+  /// No description provided for @tagNfc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap NFC tag'**
+  String get tagNfc;
+
+  /// No description provided for @tagQr.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan QR'**
+  String get tagQr;
+
+  /// No description provided for @tagWedge.
+  ///
+  /// In en, this message translates to:
+  /// **'RFID reader'**
+  String get tagWedge;
+
+  /// No description provided for @tagRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag {uid}'**
+  String tagRead(String uid);
+
+  /// No description provided for @tagInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'This is not a valid tag'**
+  String get tagInvalid;
+
+  /// No description provided for @tagWedgeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan with the RFID reader'**
+  String get tagWedgeTitle;
+
+  /// No description provided for @tagWedgeHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Pull the reader trigger, or type the tag number and press Enter.'**
+  String get tagWedgeHelp;
+
+  /// No description provided for @nfcHold.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold the tag to the back of the phone'**
+  String get nfcHold;
+
+  /// No description provided for @nfcUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'NFC is off or not available. Use QR or the RFID reader.'**
+  String get nfcUnavailable;
+
+  /// No description provided for @scanQr.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan QR'**
+  String get scanQr;
+
+  /// No description provided for @scanQrHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Point the camera at the QR code'**
+  String get scanQrHelp;
+
+  /// No description provided for @photoTop.
+  ///
+  /// In en, this message translates to:
+  /// **'Top'**
+  String get photoTop;
+
+  /// No description provided for @photoSide.
+  ///
+  /// In en, this message translates to:
+  /// **'Side'**
+  String get photoSide;
+
+  /// No description provided for @photoCloseup.
+  ///
+  /// In en, this message translates to:
+  /// **'Close-up'**
+  String get photoCloseup;
+
+  /// No description provided for @photoHelpTop.
+  ///
+  /// In en, this message translates to:
+  /// **'From above: the whole crate inside the frame'**
+  String get photoHelpTop;
+
+  /// No description provided for @photoHelpSide.
+  ///
+  /// In en, this message translates to:
+  /// **'From the side: show the depth of the crate'**
+  String get photoHelpSide;
+
+  /// No description provided for @photoHelpCloseup.
+  ///
+  /// In en, this message translates to:
+  /// **'Close-up: one fish or fruit fills the frame'**
+  String get photoHelpCloseup;
+
+  /// No description provided for @retake.
+  ///
+  /// In en, this message translates to:
+  /// **'Retake'**
+  String get retake;
+
+  /// No description provided for @photosNeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Take all three photos'**
+  String get photosNeeded;
+
+  /// No description provided for @cameraUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'The camera is not available'**
+  String get cameraUnavailable;
+
+  /// No description provided for @gradeWaiting.
+  ///
+  /// In en, this message translates to:
+  /// **'Grading…'**
+  String get gradeWaiting;
+
+  /// No description provided for @gradeQueued.
+  ///
+  /// In en, this message translates to:
+  /// **'Grading queued. The grade arrives when the phone is online.'**
+  String get gradeQueued;
+
+  /// No description provided for @gradeUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Grading is not available right now. It is queued and runs later.'**
+  String get gradeUnavailable;
+
+  /// No description provided for @gradeResult.
+  ///
+  /// In en, this message translates to:
+  /// **'Grade {grade}'**
+  String gradeResult(String grade);
+
+  /// No description provided for @confidence.
+  ///
+  /// In en, this message translates to:
+  /// **'Confidence {pct}%'**
+  String confidence(int pct);
+
+  /// No description provided for @defects.
+  ///
+  /// In en, this message translates to:
+  /// **'Defects'**
+  String get defects;
+
+  /// No description provided for @noDefects.
+  ///
+  /// In en, this message translates to:
+  /// **'No defects found'**
+  String get noDefects;
+
+  /// No description provided for @dispute.
+  ///
+  /// In en, this message translates to:
+  /// **'Dispute'**
+  String get dispute;
+
+  /// No description provided for @disputeReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Why is the grade wrong?'**
+  String get disputeReason;
+
+  /// No description provided for @disputeSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Dispute sent to the manager'**
+  String get disputeSent;
+
+  /// No description provided for @pathBlastChiller.
+  ///
+  /// In en, this message translates to:
+  /// **'Blast chiller'**
+  String get pathBlastChiller;
+
+  /// No description provided for @pathRipening.
+  ///
+  /// In en, this message translates to:
+  /// **'Ripening chamber'**
+  String get pathRipening;
+
+  /// No description provided for @pathColdRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Cold room'**
+  String get pathColdRoom;
+
+  /// No description provided for @sellFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Sell first'**
+  String get sellFirst;
+
+  /// No description provided for @recommendedUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended: {unit} ({free} kg free)'**
+  String recommendedUnit(String unit, String free);
+
+  /// No description provided for @noUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'No suitable unit is free at this site'**
+  String get noUnit;
+
+  /// No description provided for @assign.
+  ///
+  /// In en, this message translates to:
+  /// **'Assign'**
+  String get assign;
+
+  /// No description provided for @assigned.
+  ///
+  /// In en, this message translates to:
+  /// **'Stored in {unit}'**
+  String assigned(String unit);
+
+  /// No description provided for @storageOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Shown from this phone\'s lists. Assign it when you are online.'**
+  String get storageOffline;
+
+  /// No description provided for @print.
+  ///
+  /// In en, this message translates to:
+  /// **'Print'**
+  String get print;
+
+  /// No description provided for @shareImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Share image'**
+  String get shareImage;
+
+  /// No description provided for @labelOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'The label is ready once the batch has synced.'**
+  String get labelOffline;
+
+  /// No description provided for @noPrinter.
+  ///
+  /// In en, this message translates to:
+  /// **'No printer set up'**
+  String get noPrinter;
+
+  /// No description provided for @printed.
+  ///
+  /// In en, this message translates to:
+  /// **'Label sent to the printer'**
+  String get printed;
+
+  /// No description provided for @printFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Printing failed. Share the label as an image instead.'**
+  String get printFailed;
+
+  /// No description provided for @doneTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Batch registered'**
+  String get doneTitle;
+
+  /// No description provided for @doneTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Done in {seconds} s'**
+  String doneTime(int seconds);
+
+  /// No description provided for @newBatch.
+  ///
+  /// In en, this message translates to:
+  /// **'New batch'**
+  String get newBatch;
+
+  /// No description provided for @goHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get goHome;
+
+  /// No description provided for @pendingSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Not synced yet'**
+  String get pendingSync;
+
+  /// No description provided for @searchBatches.
+  ///
+  /// In en, this message translates to:
+  /// **'Search code or tag'**
+  String get searchBatches;
+
+  /// No description provided for @all.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get all;
+
+  /// No description provided for @stRegistered.
+  ///
+  /// In en, this message translates to:
+  /// **'Registered'**
+  String get stRegistered;
+
+  /// No description provided for @stGraded.
+  ///
+  /// In en, this message translates to:
+  /// **'Graded'**
+  String get stGraded;
+
+  /// No description provided for @stStored.
+  ///
+  /// In en, this message translates to:
+  /// **'Stored'**
+  String get stStored;
+
+  /// No description provided for @stAllocated.
+  ///
+  /// In en, this message translates to:
+  /// **'Allocated'**
+  String get stAllocated;
+
+  /// No description provided for @stLoaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Loaded'**
+  String get stLoaded;
+
+  /// No description provided for @stInTransit.
+  ///
+  /// In en, this message translates to:
+  /// **'In transit'**
+  String get stInTransit;
+
+  /// No description provided for @stDiverted.
+  ///
+  /// In en, this message translates to:
+  /// **'Diverted'**
+  String get stDiverted;
+
+  /// No description provided for @stDelivered.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivered'**
+  String get stDelivered;
+
+  /// No description provided for @stPartial.
+  ///
+  /// In en, this message translates to:
+  /// **'Partly delivered'**
+  String get stPartial;
+
+  /// No description provided for @stRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get stRejected;
+
+  /// No description provided for @stSpoiled.
+  ///
+  /// In en, this message translates to:
+  /// **'Spoiled'**
+  String get stSpoiled;
+
+  /// No description provided for @shelfLifeHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Shelf life {hours} h'**
+  String shelfLifeHours(String hours);
+
+  /// No description provided for @history.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get history;
+
+  /// No description provided for @chainVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Record chain verified'**
+  String get chainVerified;
+
+  /// No description provided for @chainBroken.
+  ///
+  /// In en, this message translates to:
+  /// **'Record chain NOT verified'**
+  String get chainBroken;
+
+  /// No description provided for @edit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
+
+  /// No description provided for @requestEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Request edit'**
+  String get requestEdit;
+
+  /// No description provided for @editMinutesLeft.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes, plural, =1{1 min left to edit} other{{minutes} min left to edit}}'**
+  String editMinutesLeft(int minutes);
+
+  /// No description provided for @editClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'The 30-minute edit window has closed. Ask the manager.'**
+  String get editClosed;
+
+  /// No description provided for @reason.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason'**
+  String get reason;
+
+  /// No description provided for @requestSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Request sent to the manager'**
+  String get requestSent;
+
+  /// No description provided for @printLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Print label'**
+  String get printLabel;
+
+  /// No description provided for @tags.
+  ///
+  /// In en, this message translates to:
+  /// **'Tags'**
+  String get tags;
+
+  /// No description provided for @onlineOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'This needs an internet connection.'**
+  String get onlineOnly;
+
+  /// No description provided for @scanBatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan the batch'**
+  String get scanBatch;
+
+  /// No description provided for @notFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No batch found for {value}'**
+  String notFound(String value);
+
+  /// No description provided for @condition.
+  ///
+  /// In en, this message translates to:
+  /// **'Condition'**
+  String get condition;
+
+  /// No description provided for @condGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get condGood;
+
+  /// No description provided for @condFair.
+  ///
+  /// In en, this message translates to:
+  /// **'Fair'**
+  String get condFair;
+
+  /// No description provided for @condPoor.
+  ///
+  /// In en, this message translates to:
+  /// **'Poor'**
+  String get condPoor;
+
+  /// No description provided for @damagePhotos.
+  ///
+  /// In en, this message translates to:
+  /// **'Damage photos'**
+  String get damagePhotos;
+
+  /// No description provided for @addPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Add photo'**
+  String get addPhoto;
+
+  /// No description provided for @outcome.
+  ///
+  /// In en, this message translates to:
+  /// **'Outcome'**
+  String get outcome;
+
+  /// No description provided for @accept.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept'**
+  String get accept;
+
+  /// No description provided for @partial.
+  ///
+  /// In en, this message translates to:
+  /// **'Partial'**
+  String get partial;
+
+  /// No description provided for @reject.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject'**
+  String get reject;
+
+  /// No description provided for @acceptedWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Accepted weight'**
+  String get acceptedWeight;
+
+  /// No description provided for @submit.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit'**
+  String get submit;
+
+  /// No description provided for @receiveSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Receiving saved. It syncs when the phone is online.'**
+  String get receiveSaved;
+
+  /// No description provided for @noTrips.
+  ///
+  /// In en, this message translates to:
+  /// **'No trips to load today'**
+  String get noTrips;
+
+  /// No description provided for @loadedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{n} of {total} loaded'**
+  String loadedCount(int n, int total);
+
+  /// No description provided for @wrongBatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Not for this trip: {code}'**
+  String wrongBatch(String code);
+
+  /// No description provided for @alreadyScanned.
+  ///
+  /// In en, this message translates to:
+  /// **'Already scanned'**
+  String get alreadyScanned;
+
+  /// No description provided for @confirmLoad.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm loading'**
+  String get confirmLoad;
+
+  /// No description provided for @loadSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading saved. It syncs when the phone is online.'**
+  String get loadSaved;
+
+  /// No description provided for @scanNext.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan next crate'**
+  String get scanNext;
+
+  /// No description provided for @pairedPrinters.
+  ///
+  /// In en, this message translates to:
+  /// **'Paired printers'**
+  String get pairedPrinters;
+
+  /// No description provided for @noPairedPrinters.
+  ///
+  /// In en, this message translates to:
+  /// **'No paired printer. Pair the printer in the phone’s Bluetooth settings first.'**
+  String get noPairedPrinters;
+
+  /// No description provided for @testPrint.
+  ///
+  /// In en, this message translates to:
+  /// **'Test print'**
+  String get testPrint;
+
+  /// No description provided for @selectedPrinter.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected'**
+  String get selectedPrinter;
+
+  /// No description provided for @bluetoothOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Bluetooth is off. Turn it on to print.'**
+  String get bluetoothOff;
 }
 
 class _AppLocalizationsDelegate

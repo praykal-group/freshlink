@@ -34,6 +34,20 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+
+        // Package only the ABIs Flutter builds for (`flutter build/run --target-platform`, passed
+        // as -Ptarget-platform). The Flutter plugin otherwise sets arm + arm64 + x86_64, so plugin
+        // AARs ship x86_64 libraries in arm-only release APKs (ML Kit's barcode engine: 5.6 MB).
+        // `flutter run` on an x86_64 emulator passes android-x64 and keeps working (D-140).
+        val abiOf = mapOf("android-arm" to "armeabi-v7a", "android-arm64" to "arm64-v8a", "android-x64" to "x86_64")
+        val targetAbis = (project.findProperty("target-platform") as String?)
+            ?.split(",")?.mapNotNull { abiOf[it.trim()] }.orEmpty()
+        if (targetAbis.isNotEmpty()) {
+            ndk {
+                abiFilters.clear()
+                abiFilters.addAll(targetAbis)
+            }
+        }
     }
 
     // AGP 9 turns resValue() off by default; the flavors use it for their app_name.

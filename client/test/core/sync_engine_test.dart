@@ -224,6 +224,18 @@ void main() {
     expect(await db.kvGet('batch:x'), isNull);
   });
 
+  test('a forced pass (reconnect / Sync now) ignores the network backoff; a normal pass waits', () async {
+    await op('t1', 1);
+    server.failNextPush = const AppException(AppException.network, 'offline');
+    await engine.run();
+    expect((await left()).single.nextAttemptAt!.isAfter(now), isTrue);
+    await engine.run();
+    expect(server.pushes.length, 1, reason: 'backoff respected');
+    final r = await engine.run(force: true);
+    expect(r.applied, 1);
+    expect(await left(), isEmpty);
+  });
+
   test('concurrent run() calls share one pass', () async {
     await op('t1', 1);
     final a = engine.run();

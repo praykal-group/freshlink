@@ -227,3 +227,24 @@ WORKER_LOG=worker.log API_LOG=api.log node --env-file=.env -r ts-node/register/t
 cd client && flutter pub get && dart run build_runner build --delete-conflicting-outputs && flutter analyze && flutter test
 scripts/build_apk.sh driver dev && scripts/verify_apk_isolation.sh driver
 ```
+
+## M11 — Operator APK (2026-11-15)
+
+**Implemented**
+- `server/src/modules/operator/`: `GET /operator/summary`, `GET /operator/trips` (D-131).
+- `client/lib/core/`: `tags` (NFC, QR, keyboard-wedge UHF readers + value normalisation), `media/photo_compress.dart` (≤ 1280 px, ≤ 500 KB), `voice/voice_number.dart`, `printing/label_printer.dart` (ESC/POS 58 mm); `shared/widgets/qr_view.dart`; sync engine `force` pass (D-134).
+- `client/lib/apps/operator/`: `data` (models, repository: masters cache, outbox writes, online calls, grading queue, wizard draft), `providers.dart`, `widgets`, `screens` (home, 7-step wizard, camera, batch list/detail, receive, load, printer setup), `router.dart`.
+- Operator manifest permissions; plugin pins (D-129); 147 new strings in EN / HI / MR.
+
+**Bugs found and fixed during the milestone:** see TESTING.md (M11): the grade step read localisations in `initState`; the home "resume" card showed a stale draft; the success snackbar covered the pinned Next button; after reconnecting, queued ops waited out the network backoff (up to 30 min); plugin manifests gave the driver and manager APKs camera / microphone / Bluetooth and every flavor storage access (D-140); x86_64 plugin libraries in arm-only release APKs (D-140).
+
+**Tests:** 142 Flutter tests, 285 backend tests; 3 release APKs (53–54 MB) built, isolation and permissions verified (TESTING.md, M11).
+
+**Limitations / pending:** no device here, so NFC, the Bluetooth printer, the camera, voice input and the "< 60 s per batch" timing are not measured on a phone; no vision model (grading returns 503 and stays queued, D-57); storage assignment and labels need the network (D-133); HI/MR strings need review.
+
+**Repro**
+```bash
+cd server && npx jest src/modules/operator
+cd client && flutter analyze && flutter test
+scripts/build_apk.sh operator dev && scripts/verify_apk_isolation.sh operator
+```

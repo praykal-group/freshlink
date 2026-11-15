@@ -344,4 +344,487 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get voiceInput => 'Speak the value';
+
+  @override
+  String get ok => 'OK';
+
+  @override
+  String get close => 'Close';
+
+  @override
+  String get next => 'Next';
+
+  @override
+  String get back => 'Back';
+
+  @override
+  String get skip => 'Skip';
+
+  @override
+  String get send => 'Send';
+
+  @override
+  String get saved => 'Saved';
+
+  @override
+  String todayAtSite(String site) {
+    return 'Today at $site';
+  }
+
+  @override
+  String get countRegistered => 'Registered';
+
+  @override
+  String get countGraded => 'Graded';
+
+  @override
+  String get countStored => 'In storage';
+
+  @override
+  String get countDispatched => 'Dispatched';
+
+  @override
+  String get newFishBatch => 'New fish batch';
+
+  @override
+  String get newProduceBatch => 'New produce batch';
+
+  @override
+  String get receive => 'Receive';
+
+  @override
+  String get loadTruck => 'Load truck';
+
+  @override
+  String get batches => 'Batches';
+
+  @override
+  String get printer => 'Printer';
+
+  @override
+  String get resumeDraft => 'Continue the batch you started';
+
+  @override
+  String get discardDraft => 'Discard';
+
+  @override
+  String get stepForm => 'Details';
+
+  @override
+  String get stepTag => 'Tag';
+
+  @override
+  String get stepPhotos => 'Photos';
+
+  @override
+  String get stepGrade => 'Grade';
+
+  @override
+  String get stepStorage => 'Storage';
+
+  @override
+  String get stepLabel => 'Label';
+
+  @override
+  String get stepDone => 'Done';
+
+  @override
+  String stepOf(int n, int total) {
+    return 'Step $n of $total';
+  }
+
+  @override
+  String get product => 'Product';
+
+  @override
+  String get catchTime => 'Catch time';
+
+  @override
+  String get harvestTime => 'Harvest time';
+
+  @override
+  String get weight => 'Weight';
+
+  @override
+  String get vesselId => 'Vessel ID';
+
+  @override
+  String get farmRef => 'Farm ID';
+
+  @override
+  String get iceRatio => 'Ice-to-fish ratio';
+
+  @override
+  String get coreTemp => 'Core temperature';
+
+  @override
+  String get maturity => 'Maturity index';
+
+  @override
+  String get brix => 'Brix';
+
+  @override
+  String get fieldTemp => 'Field temperature';
+
+  @override
+  String get fieldHumidity => 'Field humidity';
+
+  @override
+  String get listening => 'Listening… say the number';
+
+  @override
+  String get voiceNotHeard => 'Didn\'t catch a number. Try again or type it.';
+
+  @override
+  String get mastersMissing =>
+      'Master lists are not downloaded yet. Connect once to download them.';
+
+  @override
+  String get tagChoose => 'Tag the crate';
+
+  @override
+  String get tagNfc => 'Tap NFC tag';
+
+  @override
+  String get tagQr => 'Scan QR';
+
+  @override
+  String get tagWedge => 'RFID reader';
+
+  @override
+  String tagRead(String uid) {
+    return 'Tag $uid';
+  }
+
+  @override
+  String get tagInvalid => 'This is not a valid tag';
+
+  @override
+  String get tagWedgeTitle => 'Scan with the RFID reader';
+
+  @override
+  String get tagWedgeHelp =>
+      'Pull the reader trigger, or type the tag number and press Enter.';
+
+  @override
+  String get nfcHold => 'Hold the tag to the back of the phone';
+
+  @override
+  String get nfcUnavailable =>
+      'NFC is off or not available. Use QR or the RFID reader.';
+
+  @override
+  String get scanQr => 'Scan QR';
+
+  @override
+  String get scanQrHelp => 'Point the camera at the QR code';
+
+  @override
+  String get photoTop => 'Top';
+
+  @override
+  String get photoSide => 'Side';
+
+  @override
+  String get photoCloseup => 'Close-up';
+
+  @override
+  String get photoHelpTop => 'From above: the whole crate inside the frame';
+
+  @override
+  String get photoHelpSide => 'From the side: show the depth of the crate';
+
+  @override
+  String get photoHelpCloseup => 'Close-up: one fish or fruit fills the frame';
+
+  @override
+  String get retake => 'Retake';
+
+  @override
+  String get photosNeeded => 'Take all three photos';
+
+  @override
+  String get cameraUnavailable => 'The camera is not available';
+
+  @override
+  String get gradeWaiting => 'Grading…';
+
+  @override
+  String get gradeQueued =>
+      'Grading queued. The grade arrives when the phone is online.';
+
+  @override
+  String get gradeUnavailable =>
+      'Grading is not available right now. It is queued and runs later.';
+
+  @override
+  String gradeResult(String grade) {
+    return 'Grade $grade';
+  }
+
+  @override
+  String confidence(int pct) {
+    return 'Confidence $pct%';
+  }
+
+  @override
+  String get defects => 'Defects';
+
+  @override
+  String get noDefects => 'No defects found';
+
+  @override
+  String get dispute => 'Dispute';
+
+  @override
+  String get disputeReason => 'Why is the grade wrong?';
+
+  @override
+  String get disputeSent => 'Dispute sent to the manager';
+
+  @override
+  String get pathBlastChiller => 'Blast chiller';
+
+  @override
+  String get pathRipening => 'Ripening chamber';
+
+  @override
+  String get pathColdRoom => 'Cold room';
+
+  @override
+  String get sellFirst => 'Sell first';
+
+  @override
+  String recommendedUnit(String unit, String free) {
+    return 'Recommended: $unit ($free kg free)';
+  }
+
+  @override
+  String get noUnit => 'No suitable unit is free at this site';
+
+  @override
+  String get assign => 'Assign';
+
+  @override
+  String assigned(String unit) {
+    return 'Stored in $unit';
+  }
+
+  @override
+  String get storageOffline =>
+      'Shown from this phone\'s lists. Assign it when you are online.';
+
+  @override
+  String get print => 'Print';
+
+  @override
+  String get shareImage => 'Share image';
+
+  @override
+  String get labelOffline => 'The label is ready once the batch has synced.';
+
+  @override
+  String get noPrinter => 'No printer set up';
+
+  @override
+  String get printed => 'Label sent to the printer';
+
+  @override
+  String get printFailed =>
+      'Printing failed. Share the label as an image instead.';
+
+  @override
+  String get doneTitle => 'Batch registered';
+
+  @override
+  String doneTime(int seconds) {
+    return 'Done in $seconds s';
+  }
+
+  @override
+  String get newBatch => 'New batch';
+
+  @override
+  String get goHome => 'Home';
+
+  @override
+  String get pendingSync => 'Not synced yet';
+
+  @override
+  String get searchBatches => 'Search code or tag';
+
+  @override
+  String get all => 'All';
+
+  @override
+  String get stRegistered => 'Registered';
+
+  @override
+  String get stGraded => 'Graded';
+
+  @override
+  String get stStored => 'Stored';
+
+  @override
+  String get stAllocated => 'Allocated';
+
+  @override
+  String get stLoaded => 'Loaded';
+
+  @override
+  String get stInTransit => 'In transit';
+
+  @override
+  String get stDiverted => 'Diverted';
+
+  @override
+  String get stDelivered => 'Delivered';
+
+  @override
+  String get stPartial => 'Partly delivered';
+
+  @override
+  String get stRejected => 'Rejected';
+
+  @override
+  String get stSpoiled => 'Spoiled';
+
+  @override
+  String shelfLifeHours(String hours) {
+    return 'Shelf life $hours h';
+  }
+
+  @override
+  String get history => 'History';
+
+  @override
+  String get chainVerified => 'Record chain verified';
+
+  @override
+  String get chainBroken => 'Record chain NOT verified';
+
+  @override
+  String get edit => 'Edit';
+
+  @override
+  String get requestEdit => 'Request edit';
+
+  @override
+  String editMinutesLeft(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: '$minutes min left to edit',
+      one: '1 min left to edit',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get editClosed =>
+      'The 30-minute edit window has closed. Ask the manager.';
+
+  @override
+  String get reason => 'Reason';
+
+  @override
+  String get requestSent => 'Request sent to the manager';
+
+  @override
+  String get printLabel => 'Print label';
+
+  @override
+  String get tags => 'Tags';
+
+  @override
+  String get onlineOnly => 'This needs an internet connection.';
+
+  @override
+  String get scanBatch => 'Scan the batch';
+
+  @override
+  String notFound(String value) {
+    return 'No batch found for $value';
+  }
+
+  @override
+  String get condition => 'Condition';
+
+  @override
+  String get condGood => 'Good';
+
+  @override
+  String get condFair => 'Fair';
+
+  @override
+  String get condPoor => 'Poor';
+
+  @override
+  String get damagePhotos => 'Damage photos';
+
+  @override
+  String get addPhoto => 'Add photo';
+
+  @override
+  String get outcome => 'Outcome';
+
+  @override
+  String get accept => 'Accept';
+
+  @override
+  String get partial => 'Partial';
+
+  @override
+  String get reject => 'Reject';
+
+  @override
+  String get acceptedWeight => 'Accepted weight';
+
+  @override
+  String get submit => 'Submit';
+
+  @override
+  String get receiveSaved =>
+      'Receiving saved. It syncs when the phone is online.';
+
+  @override
+  String get noTrips => 'No trips to load today';
+
+  @override
+  String loadedCount(int n, int total) {
+    return '$n of $total loaded';
+  }
+
+  @override
+  String wrongBatch(String code) {
+    return 'Not for this trip: $code';
+  }
+
+  @override
+  String get alreadyScanned => 'Already scanned';
+
+  @override
+  String get confirmLoad => 'Confirm loading';
+
+  @override
+  String get loadSaved => 'Loading saved. It syncs when the phone is online.';
+
+  @override
+  String get scanNext => 'Scan next crate';
+
+  @override
+  String get pairedPrinters => 'Paired printers';
+
+  @override
+  String get noPairedPrinters =>
+      'No paired printer. Pair the printer in the phone’s Bluetooth settings first.';
+
+  @override
+  String get testPrint => 'Test print';
+
+  @override
+  String get selectedPrinter => 'Selected';
+
+  @override
+  String get bluetoothOff => 'Bluetooth is off. Turn it on to print.';
 }

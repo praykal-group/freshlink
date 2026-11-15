@@ -194,6 +194,12 @@ ADMIN: `GET /admin/integration-clients`, `POST /admin/integration-clients {name,
 | POST | `/trips/:id/stops/:stopId/arrive` | DRIVER | `{arrivedAt?, lat?, lng?}` → ARRIVED |
 | POST | `/trips/:id/stops/:stopId/pod` | DRIVER | `{receiverName, signatureKey (POD_SIGNATURE upload), photoKey (POD_PHOTO upload), capturedAt, lat, lng, items[{id, batchId, outcome: ACCEPTED\|PARTIAL\|REJECTED, acceptedKg, reason?, scannedTagUid}]}`. The scan must be one of the batch's tag UIDs or its code (409 `TAG_MISMATCH`). ACCEPTED = full weight; PARTIAL 0 < kg < weight (+ reason); REJECTED 0 kg (+ reason). Batch → DELIVERED / PARTIALLY_DELIVERED / REJECTED with a `DELIVERED`/`REJECTED` trace event. Stop COMPLETED when every expected batch has a PoD; its order → DELIVERED. When all stops are done the trip completes: vehicle AVAILABLE, `co2Kg = distanceKm × emissionFactorKgPerKm` (SYN-16). Rows are idempotent on `items[].id` |
 
+### Operator (OPERATOR, ADMIN; M11)
+| Method | Path | Notes |
+|--------|------|-------|
+| GET | `/operator/summary?date=YYYY-MM-DD` | Today's counts at the operator's site (IST day, default today): `{date, site{id, code, name, type}, registered, graded, stored, dispatched}`. A user without a site → 422 `NO_SITE` |
+| GET | `/operator/trips?date=YYYY-MM-DD` | Loadable trips (PLANNED / ASSIGNED / PRE_CHECK_DONE) leaving the operator's site that day: `{date, items[{id, code, status, plannedStart, vehicle{regNo, capacityKg}, driverName, allocated[{id, code, weightKg}], loadedBatchIds[]}]}`. `allocated` = the batches on the current route version's stops. Loading itself is the `LOAD` sync op (or `POST /trips/:id/load`) |
+
 ### Sync additions
 `LOAD {tripId, batchIds}` (OPERATOR), `TRIP_EVENT {tripId, ...event}`, `POD {tripId, stopId, ...pod}`, `ROUTE_ACCEPT {tripId, version}` (DRIVER). M8: `GPS_POINTS {tripId, points[1..500]{at, lat, lng, speedKmh?, accuracyM?}}` (DRIVER, trip IN_PROGRESS, written to InfluxDB `driver_gps`), `ALERT_ACK {alertId}` (same rules as `POST /alerts/:id/ack`; replay is idempotent).
 

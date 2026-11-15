@@ -10,11 +10,23 @@
   "language": "Language",
   "otpTitle": "Enter the code",
   "otpSentTo": "Code sent to {phone}",
-  "@otpSentTo": { "placeholders": { "phone": { "type": "String" } } },
+  "@otpSentTo": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
   "otpLabel": "6-digit code",
   "verify": "Verify",
   "resendIn": "Resend in {seconds} s",
-  "@resendIn": { "placeholders": { "seconds": { "type": "int" } } },
+  "@resendIn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
   "resendCode": "Resend code",
   "codeResent": "A new code is on its way",
   "changeNumber": "Change number",
@@ -29,7 +41,13 @@
   "resetSent": "If this email has an account, a reset link is on its way.",
   "verifyEmailTitle": "Check your inbox",
   "verifyEmailBody": "We sent a confirmation link to {email}. Open it, then sign in again.",
-  "@verifyEmailBody": { "placeholders": { "email": { "type": "String" } } },
+  "@verifyEmailBody": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
   "resendEmail": "Resend email",
   "emailResent": "Email sent again",
   "backToLogin": "Back to sign in",
@@ -38,12 +56,30 @@
   "errorOtp": "Enter the 6-digit code",
   "errorEmail": "Enter a valid email address",
   "errorPasswordShort": "At least {min} characters",
-  "@errorPasswordShort": { "placeholders": { "min": { "type": "int" } } },
+  "@errorPasswordShort": {
+    "placeholders": {
+      "min": {
+        "type": "int"
+      }
+    }
+  },
   "errorNotANumber": "Enter a number",
   "errorBelowMin": "Must be at least {min}",
-  "@errorBelowMin": { "placeholders": { "min": { "type": "String" } } },
+  "@errorBelowMin": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      }
+    }
+  },
   "errorAboveMax": "Must be at most {max}",
-  "@errorAboveMax": { "placeholders": { "max": { "type": "String" } } },
+  "@errorAboveMax": {
+    "placeholders": {
+      "max": {
+        "type": "String"
+      }
+    }
+  },
   "authInvalidCredentials": "Wrong email or password.",
   "authEmailNotConfirmed": "Confirm your email first. Check your inbox.",
   "authOtpInvalid": "That code is not right. Check the SMS and try again.",
@@ -59,7 +95,13 @@
   "reasonOtherDevice": "You logged in on another phone, so this phone was signed out.",
   "reasonUnauthorized": "Your session has ended. Please sign in again.",
   "reasonGeneric": "Could not sign in ({code}). Try again.",
-  "@reasonGeneric": { "placeholders": { "code": { "type": "String" } } },
+  "@reasonGeneric": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
   "settingsTitle": "Settings",
   "settingsLanguage": "Language",
   "settingsTheme": "Theme",
@@ -68,22 +110,49 @@
   "themeDark": "Dark",
   "settingsSync": "Sync",
   "syncPending": "{count, plural, =0{Everything is synced} =1{1 change waiting to sync} other{{count} changes waiting to sync}}",
-  "@syncPending": { "placeholders": { "count": { "type": "int" } } },
+  "@syncPending": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "openSyncQueue": "Open sync queue",
   "settingsAbout": "About",
   "aboutVersion": "Version {version} (build {code})",
-  "@aboutVersion": { "placeholders": { "version": { "type": "String" }, "code": { "type": "String" } } },
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      }
+    }
+  },
   "signOut": "Sign out",
   "signOutConfirm": "Sign out of this phone?",
   "signOutPendingWarning": "{count, plural, =1{1 change has not synced yet. It stays on this phone and syncs after you sign in again.} other{{count} changes have not synced yet. They stay on this phone and sync after you sign in again.}}",
-  "@signOutPendingWarning": { "placeholders": { "count": { "type": "int" } } },
+  "@signOutPendingWarning": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "cancel": "Cancel",
   "syncQueueTitle": "Sync queue",
   "syncNow": "Sync now",
   "syncNeedsAttention": "Needs attention",
   "syncWaiting": "Waiting to sync",
   "syncNextTry": "Next try at {time}",
-  "@syncNextTry": { "placeholders": { "time": { "type": "String" } } },
+  "@syncNextTry": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "syncFiles": "Files to upload",
   "syncEmpty": "Nothing is waiting. All your changes are on the server.",
   "retry": "Retry",
@@ -92,11 +161,23 @@
   "offlineBanner": "Offline. Your changes are saved and will sync.",
   "updatedJustNow": "Updated just now",
   "updatedAgo": "{minutes, plural, =1{Updated 1 min ago} other{Updated {minutes} min ago}}",
-  "@updatedAgo": { "placeholders": { "minutes": { "type": "int" } } },
+  "@updatedAgo": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
   "errorTitle": "Something went wrong",
   "emptyTitle": "Nothing here yet",
   "homeWelcome": "Hello, {name}",
-  "@homeWelcome": { "placeholders": { "name": { "type": "String" } } },
+  "@homeWelcome": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "homeComingSoon": "The screens of this app arrive in the next release.",
   "updateRequiredTitle": "Update required",
   "updateRequiredBody": "This version is no longer supported. Install the latest version to continue.",
@@ -104,5 +185,252 @@
   "statusWatch": "Watch",
   "statusCritical": "Critical",
   "statusInfo": "Info",
-  "voiceInput": "Speak the value"
+  "voiceInput": "Speak the value",
+  "ok": "OK",
+  "close": "Close",
+  "next": "Next",
+  "back": "Back",
+  "skip": "Skip",
+  "send": "Send",
+  "saved": "Saved",
+  "todayAtSite": "Today at {site}",
+  "@todayAtSite": {
+    "placeholders": {
+      "site": {
+        "type": "String"
+      }
+    }
+  },
+  "countRegistered": "Registered",
+  "countGraded": "Graded",
+  "countStored": "In storage",
+  "countDispatched": "Dispatched",
+  "newFishBatch": "New fish batch",
+  "newProduceBatch": "New produce batch",
+  "receive": "Receive",
+  "loadTruck": "Load truck",
+  "batches": "Batches",
+  "printer": "Printer",
+  "resumeDraft": "Continue the batch you started",
+  "discardDraft": "Discard",
+  "stepForm": "Details",
+  "stepTag": "Tag",
+  "stepPhotos": "Photos",
+  "stepGrade": "Grade",
+  "stepStorage": "Storage",
+  "stepLabel": "Label",
+  "stepDone": "Done",
+  "stepOf": "Step {n} of {total}",
+  "@stepOf": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "product": "Product",
+  "catchTime": "Catch time",
+  "harvestTime": "Harvest time",
+  "weight": "Weight",
+  "vesselId": "Vessel ID",
+  "farmRef": "Farm ID",
+  "iceRatio": "Ice-to-fish ratio",
+  "coreTemp": "Core temperature",
+  "maturity": "Maturity index",
+  "brix": "Brix",
+  "fieldTemp": "Field temperature",
+  "fieldHumidity": "Field humidity",
+  "listening": "Listening… say the number",
+  "voiceNotHeard": "Didn't catch a number. Try again or type it.",
+  "mastersMissing": "Master lists are not downloaded yet. Connect once to download them.",
+  "tagChoose": "Tag the crate",
+  "tagNfc": "Tap NFC tag",
+  "tagQr": "Scan QR",
+  "tagWedge": "RFID reader",
+  "tagRead": "Tag {uid}",
+  "@tagRead": {
+    "placeholders": {
+      "uid": {
+        "type": "String"
+      }
+    }
+  },
+  "tagInvalid": "This is not a valid tag",
+  "tagWedgeTitle": "Scan with the RFID reader",
+  "tagWedgeHelp": "Pull the reader trigger, or type the tag number and press Enter.",
+  "nfcHold": "Hold the tag to the back of the phone",
+  "nfcUnavailable": "NFC is off or not available. Use QR or the RFID reader.",
+  "scanQr": "Scan QR",
+  "scanQrHelp": "Point the camera at the QR code",
+  "photoTop": "Top",
+  "photoSide": "Side",
+  "photoCloseup": "Close-up",
+  "photoHelpTop": "From above: the whole crate inside the frame",
+  "photoHelpSide": "From the side: show the depth of the crate",
+  "photoHelpCloseup": "Close-up: one fish or fruit fills the frame",
+  "retake": "Retake",
+  "photosNeeded": "Take all three photos",
+  "cameraUnavailable": "The camera is not available",
+  "gradeWaiting": "Grading…",
+  "gradeQueued": "Grading queued. The grade arrives when the phone is online.",
+  "gradeUnavailable": "Grading is not available right now. It is queued and runs later.",
+  "gradeResult": "Grade {grade}",
+  "@gradeResult": {
+    "placeholders": {
+      "grade": {
+        "type": "String"
+      }
+    }
+  },
+  "confidence": "Confidence {pct}%",
+  "@confidence": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "defects": "Defects",
+  "noDefects": "No defects found",
+  "dispute": "Dispute",
+  "disputeReason": "Why is the grade wrong?",
+  "disputeSent": "Dispute sent to the manager",
+  "pathBlastChiller": "Blast chiller",
+  "pathRipening": "Ripening chamber",
+  "pathColdRoom": "Cold room",
+  "sellFirst": "Sell first",
+  "recommendedUnit": "Recommended: {unit} ({free} kg free)",
+  "@recommendedUnit": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      },
+      "free": {
+        "type": "String"
+      }
+    }
+  },
+  "noUnit": "No suitable unit is free at this site",
+  "assign": "Assign",
+  "assigned": "Stored in {unit}",
+  "@assigned": {
+    "placeholders": {
+      "unit": {
+        "type": "String"
+      }
+    }
+  },
+  "storageOffline": "Shown from this phone's lists. Assign it when you are online.",
+  "print": "Print",
+  "shareImage": "Share image",
+  "labelOffline": "The label is ready once the batch has synced.",
+  "noPrinter": "No printer set up",
+  "printed": "Label sent to the printer",
+  "printFailed": "Printing failed. Share the label as an image instead.",
+  "doneTitle": "Batch registered",
+  "doneTime": "Done in {seconds} s",
+  "@doneTime": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "newBatch": "New batch",
+  "goHome": "Home",
+  "pendingSync": "Not synced yet",
+  "searchBatches": "Search code or tag",
+  "all": "All",
+  "stRegistered": "Registered",
+  "stGraded": "Graded",
+  "stStored": "Stored",
+  "stAllocated": "Allocated",
+  "stLoaded": "Loaded",
+  "stInTransit": "In transit",
+  "stDiverted": "Diverted",
+  "stDelivered": "Delivered",
+  "stPartial": "Partly delivered",
+  "stRejected": "Rejected",
+  "stSpoiled": "Spoiled",
+  "shelfLifeHours": "Shelf life {hours} h",
+  "@shelfLifeHours": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      }
+    }
+  },
+  "history": "History",
+  "chainVerified": "Record chain verified",
+  "chainBroken": "Record chain NOT verified",
+  "edit": "Edit",
+  "requestEdit": "Request edit",
+  "editMinutesLeft": "{minutes, plural, =1{1 min left to edit} other{{minutes} min left to edit}}",
+  "@editMinutesLeft": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "editClosed": "The 30-minute edit window has closed. Ask the manager.",
+  "reason": "Reason",
+  "requestSent": "Request sent to the manager",
+  "printLabel": "Print label",
+  "tags": "Tags",
+  "onlineOnly": "This needs an internet connection.",
+  "scanBatch": "Scan the batch",
+  "notFound": "No batch found for {value}",
+  "@notFound": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "condition": "Condition",
+  "condGood": "Good",
+  "condFair": "Fair",
+  "condPoor": "Poor",
+  "damagePhotos": "Damage photos",
+  "addPhoto": "Add photo",
+  "outcome": "Outcome",
+  "accept": "Accept",
+  "partial": "Partial",
+  "reject": "Reject",
+  "acceptedWeight": "Accepted weight",
+  "submit": "Submit",
+  "receiveSaved": "Receiving saved. It syncs when the phone is online.",
+  "noTrips": "No trips to load today",
+  "loadedCount": "{n} of {total} loaded",
+  "@loadedCount": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "wrongBatch": "Not for this trip: {code}",
+  "@wrongBatch": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "alreadyScanned": "Already scanned",
+  "confirmLoad": "Confirm loading",
+  "loadSaved": "Loading saved. It syncs when the phone is online.",
+  "scanNext": "Scan next crate",
+  "pairedPrinters": "Paired printers",
+  "noPairedPrinters": "No paired printer. Pair the printer in the phone’s Bluetooth settings first.",
+  "testPrint": "Test print",
+  "selectedPrinter": "Selected",
+  "bluetoothOff": "Bluetooth is off. Turn it on to print."
 }

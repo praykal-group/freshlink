@@ -80,21 +80,23 @@ class SyncEngine {
 
   bool get isRunning => _flight.isRunning;
 
-  /// One pass. Concurrent callers share the running pass.
-  Future<SyncReport> run() => _flight.run(_run);
+  /// One pass. Concurrent callers share the running pass. [force] ignores the retry backoff of
+  /// pending ops and files (connection regained, or the user tapped "Sync now"): the wait was only
+  /// there because the network was gone. Ops needing attention still wait for the user.
+  Future<SyncReport> run({bool force = false}) => _flight.run(() => _run(force));
 
   DateTime _retryAt(int attempts) => _now().toUtc().add(_backoff.delay(attempts, random: _random()));
 
-  Future<SyncReport> _run() async {
+  Future<SyncReport> _run(bool force) async {
     final report = SyncReport();
-    if (!await _uploadFiles(report)) return report;
-    await _pushOps(report);
+    if (!await _uploadFiles(report, force)) return report;
+    await _pushOps(report, force);
     return report;
   }
 
   /// Returns false when the network is gone (stop the pass).
-  Future<bool> _uploadFiles(SyncReport report) async {
-    final now = _now().toUtc();
+  Future<bool> _uploadFiles(SyncReport report, bool force) async {
+    final now = force ? DateTime.utc(9999) : _now().toUtc();
     final due = await (db.select(db.pendingFiles)
           ..where((f) => f.status.equals('pending') & (f.nextAttemptAt.isNull() | f.nextAttemptAt.isSmallerOrEqualValue(now)))
           ..orderBy([(f) => OrderingTerm(expression: f.createdAt)]))
@@ -123,8 +125,8 @@ class SyncEngine {
     return true;
   }
 
-  Future<void> _pushOps(SyncReport report) async {
-    final now = _now().toUtc();
+  Future<void> _pushOps(SyncReport report, bool force) async {
+    final now = force ? DateTime.utc(9999) : _now().toUtc();
     final ops = await (db.select(db.outboxOps)..orderBy([(o) => OrderingTerm(expression: o.capturedAt), (o) => OrderingTerm(expression: o.createdAt)])).get();
     final files = {for (final f in await db.select(db.pendingFiles).get()) f.id: f};
 

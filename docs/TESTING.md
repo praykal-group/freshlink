@@ -247,9 +247,46 @@ No ERROR lines in the API or worker logs during the run.
 - FCM push / Crashlytics on a device: no Firebase project configured.
 - Hindi and Marathi strings need a native-speaker review (D-124).
 
+### M11 — 2026-11-15
+`cd client && flutter analyze` → **no issues**. `flutter test` → **142 tests, all pass** (50 new). `cd server && npx jest` → **285 pass** (3 new, `src/modules/operator/operator.spec.ts`); `tsc --noEmit` clean.
+
+| File | M11 test item covered |
+|------|----------------------|
+| `test/operator/operator_units_test.dart` | NFC UID → hex; tag value normalisation (trace URL `/t/<code>` → code, server pattern); keyboard-wedge buffer (300 ms gap, Enter submits); **photo compression ≤ 1280 px long side and ≤ 500 KB** (quality steps, then shrink); spoken numbers (digits, Devanagari digits, decimal / minus words in EN/HI/MR, decimal comma; number words and other text → null); offline storage path = the server rule (fish → blast chiller, climacteric → ripening, grade C → cold room + sell first); label bytes (ESC/POS with code, product and the trace-URL QR) |
+| `test/operator/wizard_flow_test.dart` | Against a scripted backend (idempotent `/sync`, presign + S3 PUT): **online fish batch end to end** (details → NFC tag → 3 photos → grade A → storage BC-1 → label → done); **offline: register with the network off (storage path from cached masters, label "after sync", batch listed as not synced), then reconnect → the 5 ops applied once in capture order, outbox empty, the queued grade runs, a second pass sends nothing**; **grading 503 (no model) → "Grading queued"**, the batch is on the server and the grade stays in the local queue; **kill mid-wizard → resume from Home at the same step** |
+| `test/operator/operator_text_scale_test.dart` | **Every operator screen at text scale 2.0 on 360×640 dp in EN, HI and MR** (36 cases): home with a draft, fish + produce forms, wizard steps 2–7 resumed, receive scan, load truck with the wrong-batch warning, batch list — no overflow |
+| `test/core/sync_engine_test.dart` | + a forced pass ignores the retry backoff (D-134) |
+| `server/src/modules/operator/operator.spec.ts` | Summary counts by IST day at the operator's site; trips with allocated batches of the current route version + loaded ids; no site → 422 `NO_SITE` |
+
+**Builds (measured):**
+
+| Check | Result |
+|-------|--------|
+| `scripts/build_apk.sh <flavor> dev` | release, obfuscated, arm + arm64: **operator 53.8 MB, driver 53.8 MB, manager 53.3 MB** — all three built (debug-key signed, no upload keystore yet). Was 44 MB in M10: the bundled ML Kit barcode engine (`libbarhopper_v3.so`, 7.8 MB for arm + arm64) and CameraX are in every flavor (D-139). Before the ABI fix the APKs were 59.7 MB (x86_64 libraries) |
+| `scripts/verify_apk_isolation.sh` | **OK for all 3** (arm64-v8a and armeabi-v7a `libapp.so` each contain only their own module tag) |
+| Permissions (`aapt2 dump badging`) | After D-140: operator CAMERA, NFC, BLUETOOTH_CONNECT, BLUETOOTH_SCAN, BLUETOOTH + BLUETOOTH_ADMIN (≤ API 30), RECORD_AUDIO; driver ACCESS_FINE_LOCATION, FOREGROUND_SERVICE(_LOCATION), POST_NOTIFICATIONS, RECORD_AUDIO, CAMERA; manager POST_NOTIFICATIONS — as Section 11, plus INTERNET, REQUEST_INSTALL_PACKAGES, network state, wake lock, vibrate, FCM receive. No storage permission in any flavor |
+
+**Found and fixed during the milestone:**
+- The grade step read localisations from `initState` (assertion in the widget test) → started after the first frame.
+- Home showed a stale "resume" card after the wizard moved on → one shared draft provider, refreshed on every save.
+- The "storage assigned" snackbar covered the pinned Next button at text scale 2.0 → removed (the step itself shows the result).
+- **After a long offline period, queued ops waited up to 30 min after the network came back** (retry backoff) → reconnect / resume / "Sync now" force a pass (D-134). Found by the offline wizard test.
+- `permission_handler` 14.x and `flutter_local_notifications` 23 need Android SDK 37 → dropped / pinned (D-129).
+- **Plugins leaked permissions**: the first M11 build gave the driver and manager APKs camera, microphone and Bluetooth, and all three storage access → removed per flavor (D-140).
+- Plugin AARs shipped x86_64 libraries in arm-only release APKs (ML Kit 5.6 MB): Flutter's Gradle plugin sets arm + arm64 + x86_64, and a release-only `abiFilters` was unioned with it (measured: no change) → `abiFilters` from Flutter's `-Ptarget-platform` (D-140): 59.7 → 53.8 MB.
+- The first build hung for 12 min with no output: Gradle fetching the new plugins' Maven artifacts from the sandboxed shell stalled; outside the sandbox the same resolution took 5 min. Gradle's template heap (8 GB) on this 7.8 GB PC then made the machine swap and a test run wedge → `-Xmx3G`.
+
+**Deferred M11 checks (NOT RUN — no phone or emulator here, no Supabase login, no vision model):**
+- "A new fish batch is registered, tagged, graded, stored and labelled in < 60 s by an operator" — needs a person and a phone; the flow is covered end to end by `wizard_flow_test.dart` only.
+- Real NFC tag read (NTAG / ISO 15693), QR scan from the camera, UHF wedge reader, photo capture and the on-device compressed size, voice input in HI/MR, Bluetooth printing on a 58 mm printer, gloves / big-target use outdoors.
+- A real grade: no vision model is registered (D-57), so grading returns 503 and stays queued.
+- Operator endpoints against the live dev stack (needs a Supabase JWT).
+- Hindi and Marathi strings need a native-speaker review.
+
 ## Measured metrics
 - M8 pipeline (dev stack on one Windows PC, time scale 60): breach → shelf life 110–152 ms; 500 devices × 10 packets → 5,000 / 5,000 stored; warm publish → Kafka p95 222 ms. Sensor → Influx p95 **not verified** (see M8).
 - M9 incident engine (dev stack, time scale 60): diversion route proposed 217–509 ms after a buyer accepts; 26 / 26 live checks.
+- M11 release APK sizes (arm + arm64, obfuscated): operator 53.8 MB, driver 53.8 MB, manager 53.3 MB. The driver target (< 40 MB, M12) is further away: ML Kit barcode (7.8 MB) + CameraX are now in every flavor. Options for M12: per-ABI splits, or the unbundled (Play services) barcode model.
 - M10 release APK sizes (arm + arm64, obfuscated, M10 screens only): driver 44.2 MB, operator 44.2 MB, manager 43.7 MB. The M12 target (driver < 40 MB) is not met yet; per-ABI splits would roughly halve each file.
 
 ## Known issues

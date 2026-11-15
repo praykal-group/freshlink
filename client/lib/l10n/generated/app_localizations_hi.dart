@@ -342,4 +342,483 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get voiceInput => 'मान बोलें';
+
+  @override
+  String get ok => 'ठीक है';
+
+  @override
+  String get close => 'बंद करें';
+
+  @override
+  String get next => 'आगे';
+
+  @override
+  String get back => 'पीछे';
+
+  @override
+  String get skip => 'छोड़ें';
+
+  @override
+  String get send => 'भेजें';
+
+  @override
+  String get saved => 'सहेजा गया';
+
+  @override
+  String todayAtSite(String site) {
+    return 'आज $site पर';
+  }
+
+  @override
+  String get countRegistered => 'दर्ज';
+
+  @override
+  String get countGraded => 'ग्रेड हुए';
+
+  @override
+  String get countStored => 'भंडारण में';
+
+  @override
+  String get countDispatched => 'भेजे गए';
+
+  @override
+  String get newFishBatch => 'नया मछली बैच';
+
+  @override
+  String get newProduceBatch => 'नया फल-सब्ज़ी बैच';
+
+  @override
+  String get receive => 'प्राप्त करें';
+
+  @override
+  String get loadTruck => 'ट्रक लोड करें';
+
+  @override
+  String get batches => 'बैच';
+
+  @override
+  String get printer => 'प्रिंटर';
+
+  @override
+  String get resumeDraft => 'शुरू किया गया बैच पूरा करें';
+
+  @override
+  String get discardDraft => 'हटाएँ';
+
+  @override
+  String get stepForm => 'विवरण';
+
+  @override
+  String get stepTag => 'टैग';
+
+  @override
+  String get stepPhotos => 'फ़ोटो';
+
+  @override
+  String get stepGrade => 'ग्रेड';
+
+  @override
+  String get stepStorage => 'भंडारण';
+
+  @override
+  String get stepLabel => 'लेबल';
+
+  @override
+  String get stepDone => 'पूरा';
+
+  @override
+  String stepOf(int n, int total) {
+    return 'चरण $n / $total';
+  }
+
+  @override
+  String get product => 'उत्पाद';
+
+  @override
+  String get catchTime => 'पकड़ने का समय';
+
+  @override
+  String get harvestTime => 'कटाई का समय';
+
+  @override
+  String get weight => 'वज़न';
+
+  @override
+  String get vesselId => 'नाव संख्या';
+
+  @override
+  String get farmRef => 'खेत संख्या';
+
+  @override
+  String get iceRatio => 'बर्फ़-मछली अनुपात';
+
+  @override
+  String get coreTemp => 'अंदर का तापमान';
+
+  @override
+  String get maturity => 'पकने का स्तर';
+
+  @override
+  String get brix => 'ब्रिक्स';
+
+  @override
+  String get fieldTemp => 'खेत का तापमान';
+
+  @override
+  String get fieldHumidity => 'खेत की नमी';
+
+  @override
+  String get listening => 'सुन रहे हैं… संख्या बोलें';
+
+  @override
+  String get voiceNotHeard => 'संख्या सुनाई नहीं दी। फिर बोलें या लिखें।';
+
+  @override
+  String get mastersMissing =>
+      'मास्टर सूचियाँ अभी डाउनलोड नहीं हुईं। एक बार इंटरनेट से जुड़ें।';
+
+  @override
+  String get tagChoose => 'क्रेट पर टैग लगाएँ';
+
+  @override
+  String get tagNfc => 'NFC टैग छुआएँ';
+
+  @override
+  String get tagQr => 'QR स्कैन करें';
+
+  @override
+  String get tagWedge => 'RFID रीडर';
+
+  @override
+  String tagRead(String uid) {
+    return 'टैग $uid';
+  }
+
+  @override
+  String get tagInvalid => 'यह सही टैग नहीं है';
+
+  @override
+  String get tagWedgeTitle => 'RFID रीडर से स्कैन करें';
+
+  @override
+  String get tagWedgeHelp =>
+      'रीडर का बटन दबाएँ, या टैग नंबर लिखकर Enter दबाएँ।';
+
+  @override
+  String get nfcHold => 'टैग को फ़ोन के पीछे लगाएँ';
+
+  @override
+  String get nfcUnavailable =>
+      'NFC बंद है या उपलब्ध नहीं। QR या RFID रीडर इस्तेमाल करें।';
+
+  @override
+  String get scanQr => 'QR स्कैन करें';
+
+  @override
+  String get scanQrHelp => 'कैमरे को QR कोड की ओर करें';
+
+  @override
+  String get photoTop => 'ऊपर से';
+
+  @override
+  String get photoSide => 'बगल से';
+
+  @override
+  String get photoCloseup => 'पास से';
+
+  @override
+  String get photoHelpTop => 'ऊपर से: पूरा क्रेट फ़्रेम में';
+
+  @override
+  String get photoHelpSide => 'बगल से: क्रेट की गहराई दिखाएँ';
+
+  @override
+  String get photoHelpCloseup => 'पास से: एक मछली या फल पूरे फ़्रेम में';
+
+  @override
+  String get retake => 'फिर लें';
+
+  @override
+  String get photosNeeded => 'तीनों फ़ोटो लें';
+
+  @override
+  String get cameraUnavailable => 'कैमरा उपलब्ध नहीं है';
+
+  @override
+  String get gradeWaiting => 'ग्रेड हो रहा है…';
+
+  @override
+  String get gradeQueued =>
+      'ग्रेडिंग कतार में है। फ़ोन ऑनलाइन होने पर ग्रेड मिलेगा।';
+
+  @override
+  String get gradeUnavailable => 'अभी ग्रेडिंग उपलब्ध नहीं है। यह कतार में है।';
+
+  @override
+  String gradeResult(String grade) {
+    return 'ग्रेड $grade';
+  }
+
+  @override
+  String confidence(int pct) {
+    return 'भरोसा $pct%';
+  }
+
+  @override
+  String get defects => 'खराबियाँ';
+
+  @override
+  String get noDefects => 'कोई खराबी नहीं मिली';
+
+  @override
+  String get dispute => 'आपत्ति';
+
+  @override
+  String get disputeReason => 'ग्रेड गलत क्यों है?';
+
+  @override
+  String get disputeSent => 'आपत्ति मैनेजर को भेजी गई';
+
+  @override
+  String get pathBlastChiller => 'ब्लास्ट चिलर';
+
+  @override
+  String get pathRipening => 'पकाने का कक्ष';
+
+  @override
+  String get pathColdRoom => 'कोल्ड रूम';
+
+  @override
+  String get sellFirst => 'पहले बेचें';
+
+  @override
+  String recommendedUnit(String unit, String free) {
+    return 'सुझाव: $unit ($free किलो खाली)';
+  }
+
+  @override
+  String get noUnit => 'इस साइट पर कोई सही यूनिट खाली नहीं है';
+
+  @override
+  String get assign => 'सौंपें';
+
+  @override
+  String assigned(String unit) {
+    return '$unit में रखा गया';
+  }
+
+  @override
+  String get storageOffline =>
+      'यह फ़ोन की सूची से दिखाया गया है। ऑनलाइन होने पर सौंपें।';
+
+  @override
+  String get print => 'प्रिंट करें';
+
+  @override
+  String get shareImage => 'फ़ोटो भेजें';
+
+  @override
+  String get labelOffline => 'बैच सिंक होने के बाद लेबल तैयार होगा।';
+
+  @override
+  String get noPrinter => 'कोई प्रिंटर सेट नहीं है';
+
+  @override
+  String get printed => 'लेबल प्रिंटर को भेजा गया';
+
+  @override
+  String get printFailed => 'प्रिंट नहीं हुआ। लेबल को फ़ोटो की तरह भेजें।';
+
+  @override
+  String get doneTitle => 'बैच दर्ज हो गया';
+
+  @override
+  String doneTime(int seconds) {
+    return '$seconds सेकंड में पूरा';
+  }
+
+  @override
+  String get newBatch => 'नया बैच';
+
+  @override
+  String get goHome => 'होम';
+
+  @override
+  String get pendingSync => 'अभी सिंक नहीं हुआ';
+
+  @override
+  String get searchBatches => 'कोड या टैग खोजें';
+
+  @override
+  String get all => 'सभी';
+
+  @override
+  String get stRegistered => 'दर्ज';
+
+  @override
+  String get stGraded => 'ग्रेड हुआ';
+
+  @override
+  String get stStored => 'रखा गया';
+
+  @override
+  String get stAllocated => 'आवंटित';
+
+  @override
+  String get stLoaded => 'लोड हुआ';
+
+  @override
+  String get stInTransit => 'रास्ते में';
+
+  @override
+  String get stDiverted => 'मोड़ा गया';
+
+  @override
+  String get stDelivered => 'पहुँचाया';
+
+  @override
+  String get stPartial => 'आंशिक पहुँचा';
+
+  @override
+  String get stRejected => 'अस्वीकृत';
+
+  @override
+  String get stSpoiled => 'ख़राब';
+
+  @override
+  String shelfLifeHours(String hours) {
+    return 'शेल्फ़ लाइफ़ $hours घंटे';
+  }
+
+  @override
+  String get history => 'इतिहास';
+
+  @override
+  String get chainVerified => 'रिकॉर्ड शृंखला सत्यापित';
+
+  @override
+  String get chainBroken => 'रिकॉर्ड शृंखला सत्यापित नहीं';
+
+  @override
+  String get edit => 'बदलें';
+
+  @override
+  String get requestEdit => 'बदलाव का अनुरोध';
+
+  @override
+  String editMinutesLeft(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'बदलने के लिए $minutes मिनट बाकी',
+      one: 'बदलने के लिए 1 मिनट बाकी',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get editClosed => '30 मिनट का समय खत्म हो गया। मैनेजर से अनुरोध करें।';
+
+  @override
+  String get reason => 'कारण';
+
+  @override
+  String get requestSent => 'अनुरोध मैनेजर को भेजा गया';
+
+  @override
+  String get printLabel => 'लेबल प्रिंट करें';
+
+  @override
+  String get tags => 'टैग';
+
+  @override
+  String get onlineOnly => 'इसके लिए इंटरनेट ज़रूरी है।';
+
+  @override
+  String get scanBatch => 'बैच स्कैन करें';
+
+  @override
+  String notFound(String value) {
+    return '$value का कोई बैच नहीं मिला';
+  }
+
+  @override
+  String get condition => 'हालत';
+
+  @override
+  String get condGood => 'अच्छी';
+
+  @override
+  String get condFair => 'ठीक';
+
+  @override
+  String get condPoor => 'ख़राब';
+
+  @override
+  String get damagePhotos => 'नुकसान की फ़ोटो';
+
+  @override
+  String get addPhoto => 'फ़ोटो जोड़ें';
+
+  @override
+  String get outcome => 'नतीजा';
+
+  @override
+  String get accept => 'स्वीकार';
+
+  @override
+  String get partial => 'आंशिक';
+
+  @override
+  String get reject => 'अस्वीकार';
+
+  @override
+  String get acceptedWeight => 'स्वीकार वज़न';
+
+  @override
+  String get submit => 'जमा करें';
+
+  @override
+  String get receiveSaved => 'प्राप्ति सहेजी गई। ऑनलाइन होने पर सिंक होगी।';
+
+  @override
+  String get noTrips => 'आज लोड करने के लिए कोई ट्रिप नहीं';
+
+  @override
+  String loadedCount(int n, int total) {
+    return '$total में से $n लोड';
+  }
+
+  @override
+  String wrongBatch(String code) {
+    return 'यह इस ट्रिप का नहीं: $code';
+  }
+
+  @override
+  String get alreadyScanned => 'पहले ही स्कैन हुआ';
+
+  @override
+  String get confirmLoad => 'लोडिंग पक्की करें';
+
+  @override
+  String get loadSaved => 'लोडिंग सहेजी गई। ऑनलाइन होने पर सिंक होगी।';
+
+  @override
+  String get scanNext => 'अगला क्रेट स्कैन करें';
+
+  @override
+  String get pairedPrinters => 'जुड़े हुए प्रिंटर';
+
+  @override
+  String get noPairedPrinters =>
+      'कोई प्रिंटर नहीं जुड़ा। पहले फ़ोन की ब्लूटूथ सेटिंग में प्रिंटर जोड़ें।';
+
+  @override
+  String get testPrint => 'टेस्ट प्रिंट';
+
+  @override
+  String get selectedPrinter => 'चुना गया';
+
+  @override
+  String get bluetoothOff => 'ब्लूटूथ बंद है। प्रिंट के लिए चालू करें।';
 }

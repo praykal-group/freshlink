@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -11,6 +12,7 @@ import 'package:iccms/core/auth/auth_backend.dart';
 import 'package:iccms/core/auth/session.dart';
 import 'package:iccms/core/config/app_flavor.dart';
 import 'package:iccms/core/providers.dart';
+import 'package:iccms/core/storage/database.dart';
 import 'package:iccms/core/router/app_router.dart';
 import 'package:iccms/core/storage/secure_store.dart';
 
@@ -165,10 +167,19 @@ void main() {
           ..session = true
           ..id = const AuthIdentity(email: 'x@iccms.in', emailConfirmed: true, provider: 'google');
         final adapter = FakeAdapter((m, p, o) => p == '/me' ? (200, meJson(v.$2, name: 'Asha')) : (200, {}));
-        final c = ProviderContainer(overrides: [...overridesFor(flavor, backend: backend, adapter: adapter, router: v.$1)].cast());
+        // The operator app works on its local database (outbox, cached masters).
+        final db = flavor == AppFlavor.operator ? AppDatabase(NativeDatabase.memory()) : null;
+        if (db != null) addTearDown(db.close);
+        final c = ProviderContainer(overrides: [
+          ...overridesFor(flavor, backend: backend, adapter: adapter, router: v.$1),
+          if (db != null) databaseProvider.overrideWithValue(db),
+          if (db != null) syncSchedulerProvider.overrideWithValue(null),
+        ].cast());
         addTearDown(c.dispose);
         await tester.pumpWidget(UncontrolledProviderScope(container: c, child: const IccmsApp()));
         await tester.pumpAndSettle();
+        // The operator home lists its actions first; the module tag is at the end of the list.
+        await tester.scrollUntilVisible(find.text('iccms-module-${flavor.name}'), 300);
         expect(find.text('iccms-module-${flavor.name}'), findsOneWidget);
         expect(find.text('Hello, Asha'), findsOneWidget);
         expect(c.read(routerProvider).routerDelegate.currentConfiguration.uri.path, '/home');

@@ -2,6 +2,16 @@
 
 All notable changes, per milestone (Keep a Changelog style).
 
+## [m11] - 2026-11-15
+### Added
+- Operator app (Section 10.4): home with today's counts and draft resume; 7-step batch wizard for fish and produce (details with on-device ranges and voice number input, tag via NFC / QR / UHF wedge, guided 3-photo capture compressed to ≤ 500 KB, AI grade with dispute, storage path + unit, label with QR, done with elapsed time); batch list (search, status filter, infinite scroll) and detail (30-min edit, edit request, label reprint, timeline); receive at cold storage; load truck with wrong-batch warning; Bluetooth printer setup.
+- Offline: batch, tag, photo, update, receive and load ops queued in the outbox; grading queued and run after sync; wizard draft saved after every step.
+- Core: tag readers (NFC via nfc_manager, QR via mobile_scanner, keyboard-wedge UHF), photo compression, spoken-number parsing, ESC/POS 58 mm label printing, QR painter, label share as image.
+- Backend `GET /operator/summary`, `GET /operator/trips`.
+- 147 strings in EN / HI / MR; operator manifest permissions (camera, NFC, Bluetooth, microphone).
+### Changed
+- Sync passes started by reconnect, resume or "Sync now" ignore the retry backoff (D-134).
+
 ## [m10] - 2026-11-15
 ### Added
 - Flutter core: design tokens (colours light/dark, typography with bundled Poppins + Noto Sans/Devanagari, spacing, motion), app theme per flavor, contrast test.
